@@ -27,7 +27,7 @@ namespace RfpProxy
             _ommToRfpEncipher = new BlowFish(_ommToRfpDecipher);
         }
 
-        public ReadOnlyMemory<byte> RfpToOmmIv { get; private set; }
+        public ReadOnlyMemory<byte> RfpToOmmIv { get; set; }
 
         public ReadOnlyMemory<byte> OmmToRfpIv { get; private set; }
 
@@ -48,14 +48,14 @@ namespace RfpProxy
         public Memory<byte> CryptOmmToRfp(ReadOnlyMemory<byte> data)
         {
             var result = _ommToRfpEncipher.Encrypt_CBC(OmmToRfpIv.Span, data.Span);
-            OmmToRfpIv = data.Slice(data.Length - 8);
+            OmmToRfpIv = result.Slice(result.Length - 8);
             return result;
         }
 
         public ReadOnlyMemory<byte> CryptRfpToOmm(ReadOnlyMemory<byte> data)
         {
             var result = _rfpToOmmEncipher.Encrypt_CBC(RfpToOmmIv.Span, data.Span);
-            OmmToRfpIv = data.Slice(data.Length - 8);
+            RfpToOmmIv = result.Slice(result.Length - 8);
             return result;
         }
 

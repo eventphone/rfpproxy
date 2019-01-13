@@ -203,9 +203,7 @@ namespace RfpProxy
         /// <returns>(En/De)crypted data</returns>
         private byte[] Crypt_CBC(ReadOnlySpan<byte> iv, ReadOnlySpan<byte> data, bool decrypt)
         {
-            if (data.Length % 8 != 0)
-                throw new CryptographicException("invalid block size");
-            byte[] result = new byte[data.Length];
+            byte[] result = new byte[(data.Length + 7) & ~7];
             if (!decrypt)
             {
                 var localIv = iv.Slice(0, 8).ToArray();

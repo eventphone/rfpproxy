@@ -17,7 +17,11 @@ namespace RfpProxy
         protected override async Task ReadFromClientAsync(CryptedRfpConnection connection, PipeReader client, CancellationToken cancellationToken)
         {
             var sysInit = await ReadPacketAsync(0x0120, 0, client, cancellationToken).ConfigureAwait(false);
+
+            var iv = connection.RfpToOmmIv;
+            connection.RfpToOmmIv = ReadOnlyMemory<byte>.Empty;
             await OnClientMessageAsync(connection, sysInit, cancellationToken);
+            connection.RfpToOmmIv = iv;
             await ReadAsync(connection, client, OnClientMessageAsync, connection.RfpToOmmIv, connection.DecryptRfpToOmm, cancellationToken).ConfigureAwait(false);
         }
 
@@ -109,10 +113,10 @@ namespace RfpProxy
                         {
                             //length is correct
                             buffer = buffer.Slice(0, packetLength + 4);
-                            reader.AdvanceTo(buffer.Start, buffer.End);
+                            reader.AdvanceTo(buffer.End, buffer.End);
                             return buffer.ToMemory();
                         }
-                        return Array.Empty<byte>();
+                        throw new Exception("unexpected packet");
                     }
                 }
                 if (result.IsCompleted)
