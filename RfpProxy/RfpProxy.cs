@@ -24,7 +24,8 @@ namespace RfpProxy
 
         protected override Task OnServerMessageAsync(RfpConnection connection, ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
         {
-            Console.WriteLine($"OMM: {BlowFish.ByteToHex(data.Span)}");
+            var msgType = (MsgType)BinaryPrimitives.ReadUInt16BigEndian(data.Slice(2, 2).Span);
+            Console.WriteLine($"OMM: {msgType} {BlowFish.ByteToHex(data.Span)}");
             var send = connection.SendToClientAsync(data, cancellationToken);
             if (send.IsCompletedSuccessfully)
                 return Task.CompletedTask;
