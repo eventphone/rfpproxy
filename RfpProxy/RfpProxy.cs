@@ -13,6 +13,7 @@ namespace RfpProxy
 
         protected override Task OnClientMessageAsync(RfpConnection connection, ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
         {
+            Console.WriteLine($"RFP: {BlowFish.ByteToHex(data.Span)}");
             var send = connection.SendToServerAsync(data, cancellationToken);
             if (send.IsCompletedSuccessfully)
                 return Task.CompletedTask;
@@ -21,6 +22,7 @@ namespace RfpProxy
 
         protected override Task OnServerMessageAsync(RfpConnection connection, ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
         {
+            Console.WriteLine($"OMM: {BlowFish.ByteToHex(data.Span)}");
             var send = connection.SendToClientAsync(data, cancellationToken);
             if (send.IsCompletedSuccessfully)
                 return Task.CompletedTask;

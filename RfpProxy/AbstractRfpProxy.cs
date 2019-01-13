@@ -108,7 +108,9 @@ namespace RfpProxy
                         if (length == 0 || packetLength == length)
                         {
                             //length is correct
-                            return buffer.Slice(0, packetLength + 4).ToMemory();
+                            buffer = buffer.Slice(0, packetLength + 4);
+                            reader.AdvanceTo(buffer.Start, buffer.End);
+                            return buffer.ToMemory();
                         }
                         return Array.Empty<byte>();
                     }
