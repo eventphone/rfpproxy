@@ -17,7 +17,7 @@ namespace RfpProxy
             var msgType = (MsgType)BinaryPrimitives.ReadUInt16BigEndian(data.Slice(0, 2).Span);
             var msgLen = BinaryPrimitives.ReadUInt16BigEndian(data.Slice(2, 2).Span);
             var msgData = data.Slice(4).Span;
-            Console.WriteLine($"RFP: Len:{msgLen,4} Type:{msgType,22} Data: {BlowFish.ByteToHex(msgData)}");
+            Console.WriteLine($"RFP: Len:{msgLen,4} Type:{msgType,-22} Data: {BlowFish.ByteToHex(msgData)}");
             var send = connection.SendToServerAsync(data, cancellationToken);
             if (send.IsCompletedSuccessfully)
                 return Task.CompletedTask;
@@ -29,7 +29,7 @@ namespace RfpProxy
             var msgType = (MsgType)BinaryPrimitives.ReadUInt16BigEndian(data.Slice(0, 2).Span);
             var msgLen = BinaryPrimitives.ReadUInt16BigEndian(data.Slice(2, 2).Span);
             var msgData = data.Slice(4).Span;
-            Console.WriteLine($"OMM: Len:{msgLen,4} Type:{msgType,22} Data: {BlowFish.ByteToHex(msgData)}");
+            Console.WriteLine($"OMM: Len:{msgLen,4} Type:{msgType,-22} Data: {BlowFish.ByteToHex(msgData)}");
             var send = connection.SendToClientAsync(data, cancellationToken);
             if (send.IsCompletedSuccessfully)
                 return Task.CompletedTask;
