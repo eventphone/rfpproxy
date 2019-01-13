@@ -93,7 +93,7 @@ namespace RfpProxy
         private static async Task<ReadOnlyMemory<byte>> ReadPacketAsync(ushort type, ushort length, PipeReader reader, CancellationToken cancellationToken)
         {
             var typeArray = new byte[2];
-            BinaryPrimitives.WriteUInt16LittleEndian(typeArray, type);
+            BinaryPrimitives.WriteUInt16BigEndian(typeArray, type);
 
             while (!cancellationToken.IsCancellationRequested)
             {
