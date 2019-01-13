@@ -24,13 +24,13 @@ namespace RfpProxy
         protected override async Task ReadFromServerAsync(CryptedRfpConnection connection, PipeReader server, CancellationToken cancellationToken)
         {
             var sysAuthenticate = await ReadPacketAsync(0x012d, 0x20, server, cancellationToken).ConfigureAwait(false);
+            connection.InitRfpToOmmIv(sysAuthenticate.Slice(11, 8).Span);
 
             await OnServerMessageAsync(connection, sysAuthenticate, cancellationToken);
 
             var ack = await ReadPacketAsync(0x01, 0x08, server, cancellationToken).ConfigureAwait(false);
             await OnServerMessageAsync(connection, ack, cancellationToken).ConfigureAwait(false);
 
-            connection.InitRfpToOmmIv(sysAuthenticate.Slice(11, 8).Span);
             connection.InitOmmToRfpIv(sysAuthenticate.Slice(27, 8).Span);
 
             await ReadAsync(connection, server, OnServerMessageAsync, connection.OmmToRfpIv, connection.DecryptOmmToRfp, cancellationToken).ConfigureAwait(false);
