@@ -81,6 +81,15 @@ namespace RfpProxy
 
         #region "Constructors"
 
+        public BlowFish(BlowFish blowFish)
+        {
+            _roundKey = blowFish._roundKey;
+            _sbox0 = blowFish._sbox0;
+            _sbox1 = blowFish._sbox1;
+            _sbox2 = blowFish._sbox2;
+            _sbox3 = blowFish._sbox3;
+        }
+
         /// <summary>
         /// Constructor for hex key
         /// </summary>
@@ -163,7 +172,7 @@ namespace RfpProxy
         /// <param name="iv">IV or last cipher block</param>
         /// <param name="data">Ciphertext data to decrypt</param>
         /// <returns>Plaintext</returns>
-        public Span<byte> Decrypt_CBC(ReadOnlySpan<byte> iv, ReadOnlySpan<byte> data)
+        public Memory<byte> Decrypt_CBC(ReadOnlySpan<byte> iv, ReadOnlySpan<byte> data)
         {
             return Crypt_CBC(iv, data, true);
         }
@@ -175,7 +184,7 @@ namespace RfpProxy
         /// <param name="iv">IV or last cipher block</param>
         /// <param name="data">Plaintext data to encrypt</param>
         /// <returns>Ciphertext</returns>
-        public Span<byte> Encrypt_CBC(ReadOnlySpan<byte> iv, ReadOnlySpan<byte> data)
+        public Memory<byte> Encrypt_CBC(ReadOnlySpan<byte> iv, ReadOnlySpan<byte> data)
         {
             return Crypt_CBC(iv, data, false);
         }
@@ -228,12 +237,12 @@ namespace RfpProxy
         }
 
         /// <summary>
-        /// XoR encrypts two 8 bit blocks
+        /// XoR two 8 byte blocks
         /// </summary>
-        /// <param name="block">8 bit block 1</param>
-        /// <param name="iv">8 bit block 2</param>
+        /// <param name="block">8 byte block 1</param>
+        /// <param name="iv">8 byte block 2</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void XorBlock(Span<byte> block, ReadOnlySpan<byte> iv)
+        public static void XorBlock(Span<byte> block, ReadOnlySpan<byte> iv)
         {
             var left = BinaryPrimitives.ReadUInt64LittleEndian(block);
             var right = BinaryPrimitives.ReadUInt64LittleEndian(iv);

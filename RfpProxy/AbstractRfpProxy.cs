@@ -18,26 +18,25 @@ namespace RfpProxy
         {
             var sysInit = await ReadPacketAsync(0x0120, 0, client, cancellationToken).ConfigureAwait(false);
             await OnClientMessageAsync(connection, sysInit, cancellationToken);
-            await ReadAsync(connection, client, OnClientMessageAsync, connection.DecryptRfpToOmm, cancellationToken).ConfigureAwait(false);
+            await ReadAsync(connection, client, OnClientMessageAsync, connection.RfpToOmmIv, connection.DecryptRfpToOmm, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task ReadFromServerAsync(CryptedRfpConnection connection, PipeReader server, CancellationToken cancellationToken)
         {
             var sysAuthenticate = await ReadPacketAsync(0x012d, 0x20, server, cancellationToken).ConfigureAwait(false);
-            var txiv = sysAuthenticate.Slice(11, 8);
-            var rxiv = sysAuthenticate.Slice(27, 8);
-            connection.SetRfpToOmmIV(txiv.Span);
-            connection.SetOmmToRfpIV(rxiv.Span);
 
             await OnServerMessageAsync(connection, sysAuthenticate, cancellationToken);
 
             var ack = await ReadPacketAsync(0x01, 0x08, server, cancellationToken).ConfigureAwait(false);
             await OnServerMessageAsync(connection, ack, cancellationToken).ConfigureAwait(false);
 
-            await ReadAsync(connection, server, OnServerMessageAsync, connection.DecryptOmmToRfp, cancellationToken).ConfigureAwait(false);
+            connection.InitRfpToOmmIv(sysAuthenticate.Slice(11, 8).Span);
+            connection.InitOmmToRfpIv(sysAuthenticate.Slice(27, 8).Span);
+
+            await ReadAsync(connection, server, OnServerMessageAsync, connection.OmmToRfpIv, connection.DecryptOmmToRfp, cancellationToken).ConfigureAwait(false);
         }
 
-        private static async Task ReadAsync(CryptedRfpConnection connection, PipeReader reader, Func<RfpConnection, ReadOnlyMemory<byte>, CancellationToken, Task> messageCallback, Func<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>> decrypt, CancellationToken cancellationToken)
+        private static async Task ReadAsync(CryptedRfpConnection connection, PipeReader reader, Func<RfpConnection, ReadOnlyMemory<byte>, CancellationToken, Task> messageCallback, ReadOnlyMemory<byte> iv, Func<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>, Memory<byte>> decrypt,  CancellationToken cancellationToken)
         {
             try
             {
@@ -50,20 +49,35 @@ namespace RfpProxy
                     do
                     {
                         success = false;
-                        if (buffer.Length < 4)
+                        if (buffer.Length < 8)
                         {
                             break;
                         }
-                        var length = BinaryPrimitives.ReadUInt16BigEndian(decrypt(buffer.Slice(2, 2).ToMemory()).Span);
-                        if (buffer.Length >= length + 4)
+                        var block = buffer.Slice(0,8).ToMemory();
+                        var plain = decrypt(block, iv);
+                        var length = BinaryPrimitives.ReadUInt16BigEndian(plain.Slice(2, 2).Span);
+                        if (length <= 4)
                         {
-                            var data = buffer.Slice(0, length).ToMemory();
-                            buffer = buffer.Slice(4).Slice(length);
-                            
-                            await messageCallback(connection, data, cancellationToken).ConfigureAwait(false);
+                            iv = block;
+                            await messageCallback(connection, plain.Slice(0, length + 4), cancellationToken).ConfigureAwait(false);
+                            buffer = buffer.Slice(8);
                             success = true;
                         }
-                    } while (success && buffer.Length > 4);
+                        else if (buffer.Length >= length + 4)
+                        {
+                            var cryptedLength = (length + 4 + 7) & ~7;//next multiple of 8
+                            if (buffer.Length >= cryptedLength)
+                            {
+                                var data = buffer.Slice(0, cryptedLength).ToMemory();
+                                var plaintext = decrypt(data, iv);
+                                iv = data.Slice(data.Length - 8);
+                                plaintext = plaintext.Slice(0, length + 4);
+                                await messageCallback(connection, plaintext, cancellationToken).ConfigureAwait(false);
+                                buffer = buffer.Slice(cryptedLength);
+                                success = true;
+                            }
+                        }
+                    } while (success && buffer.Length >= 8);
                     if (result.IsCompleted)
                         break;
                     reader.AdvanceTo(buffer.Start, buffer.End);
