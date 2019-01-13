@@ -30,22 +30,20 @@ namespace RfpProxy.Test
             
             proxy.SendFromOmm("000100080120ffff01000000");
             ValidateTypeAndLength(proxy.LastOmmMessage);
-            
-            proxy.SendFromRfp("dd6d8018a5de60836d515a817fade8e8e8324e2fa96149dd938f209c9fe685655cf8960c" +
-                              "e91604f4c7569b85430ed9000bcb900bfa65bacf86cfc2bcf080a649ab404d28c14c89c0" +
-                              "44dc0b669817084e83349e02575f24213d8ecbb54c74dcdddf1594642bc7ec248ac7dfa0" +
-                              "c3ec3a4b783f09d3c68fc5818c99b086164fa231f2c77e9a08e8c58b90336a802fba08f2" +
-                              "e5bc07a0fee006e1535d82320ef78f0c48b7f02cddc173ea77d6c744226b42a570080208" +
-                              "eb6cb2041aa7251631a4fa7e68ce32168be6dbb380e06e11be95c4e5852205e056d7f700" +
-                              "9d30e415a9f12da68df6a4ea7c15308e53319466af552c95b8d3a24c2ad03936176daef0" +
-                              "51e1733d9420707ce57e7ebaf4f34017e464695b779cf32c61eef8dad30b2076090c1a58" +
-                              "068752705e0ce88648beaaaae2dcef95668c3b687116ed5b060eda7a2763e008585d9c6a" +
-                              "a9ba40b1d3819c4874174ba77e5a850c3f7d6e4f9d0f674e9ca8a1d9ae7d162785759f2e" +
-                              "136f29ff8b6285d5f2590ffb64ffad894caf331604f62d7aee3f697997f876be2a37bc6d" +
-                              "cf9aae30da8d0fc52fb176199fedc4fee321d5f2");
-            var msg = proxy.LastRfpMessage;
-            ValidateTypeAndLength(msg);
-            Assert.True(msg.Span.StartsWith(new byte[]{0x01,0x20,0x01,0x04}));
+
+            proxy.SendFromOmm("dd6d8018a5de6083");
+            ValidateTypeAndLength(proxy.LastOmmMessage);
+            proxy.SendFromOmm("6d515a817fade8e8e8324e2fa96149dd");
+            ValidateTypeAndLength(proxy.LastOmmMessage);
+            proxy.SendFromOmm("938f209c9fe68565");
+            ValidateTypeAndLength(proxy.LastOmmMessage);
+            proxy.SendFromOmm("5cf8960ce91604f4");
+            ValidateTypeAndLength(proxy.LastOmmMessage);
+            proxy.SendFromOmm("c7569b85430ed900");
+            ValidateTypeAndLength(proxy.LastOmmMessage);
+            proxy.SendFromOmm("0bcb900bfa65bacf");
+            ValidateTypeAndLength(proxy.LastOmmMessage);
+            Assert.Equal("0102000408003444", proxy.LastOmmMessageHex);
         }
 
         [Fact]
@@ -109,6 +107,11 @@ namespace RfpProxy.Test
             }
 
             public ReadOnlyMemory<byte> LastOmmMessage { get; private set; }
+
+            public string LastOmmMessageHex
+            {
+                get { return BlowFish.ByteToHex(LastOmmMessage.Span); }
+            }
 
             public ManualResetEventSlim RfpMessageEvent
             {
