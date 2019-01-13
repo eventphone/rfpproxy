@@ -6,6 +6,11 @@ namespace RfpProxy
     {
         public static uint RandR(uint seed)
         {
+            return RandR(ref seed);
+        }
+
+        public static uint RandR(ref uint seed)
+        {
             uint result;
             seed *= 1103515245;
             seed += 12345;

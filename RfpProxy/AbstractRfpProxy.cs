@@ -22,7 +22,7 @@ namespace RfpProxy
             connection.RfpToOmmIv = ReadOnlyMemory<byte>.Empty;
             await OnClientMessageAsync(connection, sysInit, cancellationToken);
             connection.RfpToOmmIv = iv;
-            await ReadAsync(connection, client, OnClientMessageAsync, connection.RfpToOmmIv, connection.DecryptRfpToOmm, cancellationToken).ConfigureAwait(false);
+            await ReadAsync(connection, client, OnClientMessageAsync, connection.RfpToOmmIv, connection.DecryptRfpToOmm, connection.RekeyRfpToOmmDecrypt, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task ReadFromServerAsync(CryptedRfpConnection connection, PipeReader server, CancellationToken cancellationToken)
@@ -37,10 +37,10 @@ namespace RfpProxy
 
             connection.InitOmmToRfpIv(sysAuthenticate.Slice(27, 8).Span);
 
-            await ReadAsync(connection, server, OnServerMessageAsync, connection.OmmToRfpIv, connection.DecryptOmmToRfp, cancellationToken).ConfigureAwait(false);
+            await ReadAsync(connection, server, OnServerMessageAsync, connection.OmmToRfpIv, connection.DecryptOmmToRfp, connection.RekeyOmmToRfpDecrypt, cancellationToken).ConfigureAwait(false);
         }
 
-        private static async Task ReadAsync(CryptedRfpConnection connection, PipeReader reader, Func<RfpConnection, ReadOnlyMemory<byte>, CancellationToken, Task> messageCallback, ReadOnlyMemory<byte> iv, Func<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>, Memory<byte>> decrypt,  CancellationToken cancellationToken)
+        private static async Task ReadAsync(CryptedRfpConnection connection, PipeReader reader, Func<RfpConnection, ReadOnlyMemory<byte>, CancellationToken, Task> messageCallback, ReadOnlyMemory<byte> iv, Func<ReadOnlyMemory<byte>, ReadOnlyMemory<byte>, Memory<byte>> decrypt, Action<ReadOnlyMemory<byte>> rekey,  CancellationToken cancellationToken)
         {
             try
             {
@@ -63,6 +63,7 @@ namespace RfpProxy
                         if (length <= 4)
                         {
                             iv = block;
+                            rekey(block);
                             await messageCallback(connection, plain.Slice(0, length + 4), cancellationToken).ConfigureAwait(false);
                             buffer = buffer.Slice(8);
                             success = true;
@@ -76,6 +77,7 @@ namespace RfpProxy
                                 var plaintext = decrypt(data, iv);
                                 iv = data.Slice(data.Length - 8);
                                 plaintext = plaintext.Slice(0, length + 4);
+                                rekey(data);
                                 await messageCallback(connection, plaintext, cancellationToken).ConfigureAwait(false);
                                 buffer = buffer.Slice(cryptedLength);
                                 success = true;
