@@ -43,5 +43,13 @@ namespace RfpProxy.Test
             var rehex = BlowFish.ByteToHex(recrypted.Span);
             Assert.Equal(hex, rehex);
         }
+
+        [Fact]
+        public void RandR()
+        {
+            Assert.Equal(1430195325u, StdLib.RandR(3));
+            Assert.Equal(681191333u, StdLib.RandR(42));
+            Assert.Equal(2063792036u, StdLib.RandR(99));
+        }
     }
 }

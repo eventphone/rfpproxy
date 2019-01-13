@@ -1,6 +1,6 @@
 namespace RfpProxy
 {
-    public enum MsgType
+    public enum MsgType:ushort
     {
         IPC_MSGT_ACK                    = 0x0001,
         IPC_MSGT_NACK                   = 0x0002,
