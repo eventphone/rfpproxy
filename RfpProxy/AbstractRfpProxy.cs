@@ -57,32 +57,25 @@ namespace RfpProxy
                         {
                             break;
                         }
-                        var block = buffer.Slice(0,8).ToMemory();
+                        var block = buffer.Slice(0, 8).ToMemory();
                         var plain = decrypt(block, iv);
                         var length = BinaryPrimitives.ReadUInt16BigEndian(plain.Slice(2, 2).Span);
-                        if (length <= 4)
+                        if (length > 4)
                         {
-                            iv = block;
-                            rekey(block);
-                            await messageCallback(connection, plain.Slice(0, length + 4), cancellationToken).ConfigureAwait(false);
-                            buffer = buffer.Slice(8);
-                            success = true;
+                            //decrypt remaining data
+                            if (buffer.Length < length + 4) continue;
+                            var cryptedLength = (length + 4 + 7) & ~7; //next multiple of 8
+                            if (buffer.Length < cryptedLength) continue;
+
+                            block = buffer.Slice(0, cryptedLength).ToMemory();
+                            plain = decrypt(block, iv);
                         }
-                        else if (buffer.Length >= length + 4)
-                        {
-                            var cryptedLength = (length + 4 + 7) & ~7;//next multiple of 8
-                            if (buffer.Length >= cryptedLength)
-                            {
-                                var data = buffer.Slice(0, cryptedLength).ToMemory();
-                                var plaintext = decrypt(data, iv);
-                                iv = data.Slice(data.Length - 8);
-                                plaintext = plaintext.Slice(0, length + 4);
-                                rekey(data);
-                                await messageCallback(connection, plaintext, cancellationToken).ConfigureAwait(false);
-                                buffer = buffer.Slice(cryptedLength);
-                                success = true;
-                            }
-                        }
+
+                        iv = block.Slice(block.Length - 8);
+                        rekey(block);
+                        await messageCallback(connection, plain.Slice(0, length + 4), cancellationToken).ConfigureAwait(false);
+                        buffer = buffer.Slice(block.Length);
+                        success = true;
                     } while (success && buffer.Length >= 8);
                     if (result.IsCompleted)
                         break;
