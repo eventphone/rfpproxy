@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +14,8 @@ namespace RfpProxy
 
         protected override Task OnClientMessageAsync(RfpConnection connection, ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
         {
-            Console.WriteLine($"RFP: {BlowFish.ByteToHex(data.Span)}");
+            var msgType = (MsgType)BinaryPrimitives.ReadUInt16BigEndian(data.Slice(2, 2).Span);
+            Console.WriteLine($"RFP: {msgType} {BlowFish.ByteToHex(data.Span)}");
             var send = connection.SendToServerAsync(data, cancellationToken);
             if (send.IsCompletedSuccessfully)
                 return Task.CompletedTask;

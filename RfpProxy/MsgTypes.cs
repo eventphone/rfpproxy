@@ -1,0 +1,80 @@
+namespace RfpProxy
+{
+    public enum MsgType
+    {
+        IPC_MSGT_ACK                    = 0x0001,
+        IPC_MSGT_NACK                   = 0x0002,
+        IPC_MSGT_HEARTBEAT              = 0x0003,
+
+        IPC_MSGT_SYS_IP_OPTIONS         = 0x0101,
+        IPC_MSGT_SYS_LED                = 0x0102,
+        IPC_MSGT_SYS_SYSLOG             = 0x0107,
+        IPC_MSGT_SYS_MAX_CHANNELS       = 0x0108,
+        IPC_MSGT_SYS_HTTP_SET           = 0x0109,
+        IPC_MSGT_SYS_PASSWD             = 0x010a,
+        IPC_MSGT_SYS_CRYPTED_PACKET     = 0x010b,
+        IPC_MSGT_SYS_OMM_CONTROL        = 0x010c,
+        IPC_MSGT_SYS_STATE_DUMP         = 0x010d,
+        IPC_MSGT_SYS_RPING              = 0x010e,
+        IPC_MSGT_SYS_STATE_DUMP_REQ     = 0x010f,
+        IPC_MSGT_SYS_STATE_DUMP_RES     = 0x0110,
+        IPC_MSGT_SYS_NEW_SW             = 0x0111,
+        IPC_MSGT_SYS_AUDIO_LOG          = 0x0112,
+
+        IPC_MSGT_SYS_ROUNDTRIP_DELAY    = 0x0117,
+        IPC_MSGT_SYS_USB_OVERLOAD       = 0x0113,
+        IPC_MSGT_SYS_INIT               = 0x0120,
+        IPC_MSGT_SYS_RESET              = 0x0121,
+        IPC_MSGT_SYS_AUTHENTICATE       = 0x012d,
+        IPC_MSGT_SYS_LICENSE_TIMER      = 0x0134,
+
+        IPC_MSGT_MEDIA_OPEN             = 0x0200,
+        IPC_MSGT_MEDIA_CLOSE            = 0x0202,
+        IPC_MSGT_MEDIA_START            = 0x0203,
+        IPC_MSGT_MEDIA_STOP             = 0x0204,
+        IPC_MSGT_MEDIA_STATISTICS       = 0x0205,
+        IPC_MSGT_MEDIA_REDIRECT_START   = 0x0206,
+        IPC_MSGT_MEDIA_REDIRECT_STOP    = 0x0207,
+        IPC_MSGT_MEDIA_RESTART          = 0x0208,
+        IPC_MSGT_MEDIA_DTMF             = 0x0209,
+        IPC_MSGT_MEDIA_DSP_CLOSE        = 0x020a,
+        IPC_MSGT_MEDIA_TONE2            = 0x020b,
+        IPC_MSGT_MEDIA_CHANNEL_MOD      = 0x020c,
+        IPC_MSGT_MEDIA_MUTE             = 0x020d,
+        IPC_MSGT_MEDIA_G729_USED        = 0x020e,
+        IPC_MSGT_MEDIA_TRACE_PPN        = 0x020f,
+        IPC_MSGT_MEDIA_EOS_DETECT       = 0x0210,
+        IPC_MSGT_MEDIA_AUDIO_STATISTICS = 0x0211,
+        IPC_MSGT_MEDIA_VIDEO_STATE      = 0x0212,
+
+        IPC_MSGT_DNM                    = 0x0301,
+        IPC_MSGT_SYNC                   = 0x0302,
+
+        IPC_MSGT_WLAN_RFP_CONFIG        = 0x0401,
+        IPC_MSGT_WLAN_RFP_UP            = 0x0402,
+        IPC_MSGT_WLAN_RFP_DOWN          = 0x0403,
+        IPC_MSGT_WLAN_RFP_CLIENT_REQ    = 0x0404,
+        IPC_MSGT_WLAN_RFP_CLIENT_REP    = 0x0405,
+        IPC_MSGT_WLAN_RFP_SET_ACL       = 0x0406,
+        IPC_MSGT_WLAN_RFP_CLIENT_INFO   = 0x0407,
+        IPC_MSGT_WLAN_RFP_ACK           = 0x0408,
+        IPC_MSGT_WLAN_RFP_LINK_NOK_NACK = 0x0409,
+        IPC_MSGT_WLAN_RFP_IFACE_REP     = 0x040e,
+
+        IPC_MSGT_SNMP_RFP_UPDATE        = 0x0501,
+
+        IPC_MSGT_CONF_OPEN              = 0x0600,
+        IPC_MSGT_CONF_ADD_SUBSCR        = 0x0601,
+        IPC_MSGT_CONF_CHG_SUBSCR        = 0x0602,
+        IPC_MSGT_CONF_DEL_SUBSCR        = 0x0603,
+        IPC_MSGT_CONF_CLOSE             = 0x0604,
+        IPC_MSGT_CONF_RTP               = 0x0605,
+
+        IPC_MSGT_BLUETOOTH_DEVICE       = 0x0700,
+        IPC_MSGT_BLUETOOTH_CONFIG       = 0x0701,
+        IPC_MSGT_BLUETOOTH_DATA         = 0x0702,
+
+        IPC_MSGT_VIDEO_DEVICE           = 0x0800,
+        IPC_MSGT_VIDEO_CONFIG           = 0x0801,
+    }
+}
