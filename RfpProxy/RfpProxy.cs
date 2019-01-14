@@ -19,7 +19,8 @@ namespace RfpProxy
 
         ReadOnlyMemory<byte> ParseLED(RfpConnection connection, ReadOnlyMemory<byte> data)
         {
-            var led_color = (LEDSignal)BinaryPrimitives.ReadUInt16BigEndian(data.Slice(6, 2).Span);
+            var color_byte = (data.Slice(5,1).Span)[0];
+            var led_color = (LEDSignal)color_byte;
             Console.WriteLine($"  set LED color {led_color}");
             return data;
         }
