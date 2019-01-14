@@ -80,7 +80,7 @@ namespace RfpProxy
 
     public enum LEDSignal
     {
-        NA0 = 0x00,
+        OFF = 0x00,
         GREEN = 0x01,
         GREEN_FLASH = 0x02,
         GREEN_ORANGE_FLASH = 0x03,

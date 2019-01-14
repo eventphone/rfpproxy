@@ -19,14 +19,14 @@ namespace RfpProxy
 
         ReadOnlyMemory<byte> ParseLED(RfpConnection connection, ReadOnlyMemory<byte> data)
         {
-            var led_color = (LEDSignal)BinaryPrimitives.ReadUInt16BigEndian(data.Slice(0, 2).Span);
+            var led_color = (LEDSignal)BinaryPrimitives.ReadUInt16BigEndian(data.Slice(6, 2).Span);
             Console.WriteLine($"  set LED color {led_color}");
             return data;
         }
         
         ReadOnlyMemory<byte> ParseLicenseTimer(RfpConnection connection, ReadOnlyMemory<byte> data)
         {
-            var grace_period = BinaryPrimitives.ReadUInt16BigEndian(data.Slice(2, 2).Span);
+            var grace_period = BinaryPrimitives.ReadUInt16BigEndian(data.Slice(6, 2).Span);
             Console.WriteLine($"  set grace time: {grace_period} minutes ");
             return data;
         }
