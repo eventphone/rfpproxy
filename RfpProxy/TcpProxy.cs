@@ -72,10 +72,14 @@ namespace RfpProxy
             }
         }
 
+        protected virtual TcpClient ConnectToServer(TcpClient client){
+            return new TcpClient(AddressFamily.InterNetworkV6){Client = {DualMode = true}};
+        }
+
         private async Task HandleClientAsync(TcpClient client, CancellationToken cancellationToken)
         {
             using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
-            using (var server = new TcpClient(AddressFamily.InterNetworkV6) {Client = {DualMode = true}})
+            using (var server = ConnectToServer(client))
             {
                 await server.ConnectAsync(_server, _port).ConfigureAwait(false);
                 var clientData = OnClientConnected(client, server);
