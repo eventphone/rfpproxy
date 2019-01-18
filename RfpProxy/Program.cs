@@ -53,7 +53,7 @@ namespace RfpProxy
                     e.Cancel = true;
                     cts.Cancel();
                 };
-                await proxy.RunAsync(cts.Token);
+                await proxy.RunAsync(cts.Token).ConfigureAwait(false);
             }
         }
     }

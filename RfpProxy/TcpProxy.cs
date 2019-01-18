@@ -32,43 +32,40 @@ namespace RfpProxy
             {
                 _listener.Start();
                 var accept = _listener.AcceptTcpClientAsync();
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken))
+                var tasks = new HashSet<Task>
                 {
-                    var tasks = new HashSet<Task>
+                    accept,
+                    Task.Delay(Timeout.Infinite, cancellationToken)
+                };
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    await Task.WhenAny(tasks).ConfigureAwait(false);
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+                    if (accept.IsCompleted)
                     {
-                        accept,
-                        Task.Delay(Timeout.Infinite, combined.Token)
-                    };
-                    while (!combined.IsCancellationRequested)
-                    {
-                        await Task.WhenAny(tasks).ConfigureAwait(false);
-                        if (cancellationToken.IsCancellationRequested)
-                            return;
-                        if (accept.IsCompleted)
-                        {
-                            var client = await accept.ConfigureAwait(false);
-                            tasks.Add(HandleClientAsync(client, combined.Token));
+                        var client = await accept.ConfigureAwait(false);
+                        tasks.Add(HandleClientAsync(client, cancellationToken));
 
-                            tasks.Remove(accept);
-                            accept = _listener.AcceptTcpClientAsync();
-                            tasks.Add(accept);
-                        }
-                        else
+                        tasks.Remove(accept);
+                        accept = _listener.AcceptTcpClientAsync();
+                        tasks.Add(accept);
+                    }
+                    else
+                    {
+                        //client finished
+                        foreach (var task in tasks.Where(x => x.IsCompleted).ToList())
                         {
-                            //client finished
-                            foreach (var task in tasks.Where(x => x.IsCompleted).ToList())
+                            try
                             {
-                                try
-                                {
-                                    await task.ConfigureAwait(false);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine("RFP Connection failed");
-                                    Console.WriteLine(ex);
-                                }
-                                tasks.Remove(task);
+                                await task.ConfigureAwait(false);
                             }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("RFP Connection failed");
+                                Console.WriteLine(ex);
+                            }
+                            tasks.Remove(task);
                         }
                     }
                 }
@@ -120,13 +117,13 @@ namespace RfpProxy
                 while (socket.Connected)
                 {
                     var memory = writer.GetMemory(512);
-                    int bytesRead = await socket.ReceiveAsync(memory, SocketFlags.None, cancellationToken);
+                    int bytesRead = await socket.ReceiveAsync(memory, SocketFlags.None, cancellationToken).ConfigureAwait(false);
                     if (bytesRead == 0)
                         break;
 
                     writer.Advance(bytesRead);
 
-                    var result = await writer.FlushAsync(cancellationToken);
+                    var result = await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
 
                     if (result.IsCompleted)
                         break;
