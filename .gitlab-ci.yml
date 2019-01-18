@@ -8,7 +8,7 @@ build:
  script:
   - 'dotnet add RfpProxy/RfpProxy.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
   - 'dotnet restore'
-  - 'dotnet publish -o publish -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy/RfpProxy.csproj'
+  - 'dotnet publish -o ../publish -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy/RfpProxy.csproj'
  only:
   - master
  artifacts:
