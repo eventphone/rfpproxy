@@ -18,7 +18,7 @@ deploy:
  stage: deploy
  when: manual
  tags: 
-  - guru
+  - omm
  dependencies:
   - build
  script:
