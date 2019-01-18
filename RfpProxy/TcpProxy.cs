@@ -58,7 +58,15 @@ namespace RfpProxy
                             //client finished
                             foreach (var task in tasks.Where(x => x.IsCompleted).ToList())
                             {
-                                await task.ConfigureAwait(false);
+                                try
+                                {
+                                    await task.ConfigureAwait(false);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine("RFP Connection failed");
+                                    Console.WriteLine(ex);
+                                }
                                 tasks.Remove(task);
                             }
                         }
