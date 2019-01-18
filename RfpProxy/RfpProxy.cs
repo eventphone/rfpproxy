@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace RfpProxy
 {
-    public class RfpProxy : AbstractRfpProxy
+    public class RfpProxy : TransparentRfpProxy
     {
         public RfpProxy(int listenPort, string ommHost, int ommPort) 
             : base(listenPort, ommHost, ommPort)

@@ -10,22 +10,24 @@ namespace RfpProxy
 {
     public abstract class TcpProxy<T>:IDisposable
     {
+        private readonly int _listenPort;
         private readonly string _server;
         private readonly int _port;
-        private readonly TcpListener _listener;
+        private TcpListener _listener;
         private readonly CancellationTokenSource _cts;
 
 
         protected TcpProxy(int listenPort, string server, int serverPort)
         {
+            _listenPort = listenPort;
             _server = server;
             _port = serverPort;
-            _listener = TcpListener.Create(listenPort);
             _cts = new CancellationTokenSource();
         }
 
         public async Task RunAsync(CancellationToken cancellationToken)
         {
+            _listener = CreateListener(_listenPort);
             try
             {
                 _listener.Start();
@@ -72,7 +74,13 @@ namespace RfpProxy
             }
         }
 
-        protected virtual TcpClient ConnectToServer(TcpClient client){
+        protected virtual TcpListener CreateListener(int port)
+        {
+            return TcpListener.Create(port);
+        }
+
+        protected virtual TcpClient ConnectToServer(TcpClient client)
+        {
             return new TcpClient(AddressFamily.InterNetworkV6){Client = {DualMode = true}};
         }
 
