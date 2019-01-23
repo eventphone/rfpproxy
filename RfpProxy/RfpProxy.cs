@@ -103,6 +103,7 @@ namespace RfpProxy
         private async Task HandleClientAsync(Socket client, CancellationToken cancellationToken)
         {
             Console.WriteLine("client connected");
+            client.SendTimeout = 1000;
             using (client)
             using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             {

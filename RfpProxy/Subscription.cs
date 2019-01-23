@@ -85,7 +85,7 @@ namespace RfpProxy
                 var reply = await Client.HandleAsync(message, cancellationToken).ConfigureAwait(false);
                 return reply.Message;
             }
-            await Client.SendAsync(message, cancellationToken).ConfigureAwait(false);
+            Client.Send(message, cancellationToken);
             return message.Message;
         }
 

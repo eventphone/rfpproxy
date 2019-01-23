@@ -80,7 +80,12 @@ namespace RfpProxy
             }
         }
 
-        public async Task SendAsync(OmmMessage message, CancellationToken cancellationToken)
+        public void Send(OmmMessage message, CancellationToken cancellationToken)
+        {
+            _ = SendInternalAsync(message, cancellationToken);
+        }
+
+        private async Task SendInternalAsync(OmmMessage message, CancellationToken cancellationToken)
         {
             await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
@@ -97,7 +102,7 @@ namespace RfpProxy
         {
             if (!_pending.TryAdd(message.MessageId, message))
                 throw new ArgumentException("message id must be unique", nameof(message));
-            await SendAsync(message, cancellationToken).ConfigureAwait(false);
+            await SendInternalAsync(message, cancellationToken).ConfigureAwait(false);
             var result = await message.WaitForReplyAsync(cancellationToken).ConfigureAwait(false);
             _pending.TryRemove(message.MessageId, out _);
             return result;
