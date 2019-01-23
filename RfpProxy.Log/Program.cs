@@ -108,6 +108,8 @@ namespace RfpProxy.Log
             Console.Write("> ");
             Console.WriteLine(msg);
             cancellationToken.ThrowIfCancellationRequested();
+            await writer.FlushAsync().ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
         }
 
         private static async Task LogAsync(Socket socket, CancellationToken cancellationToken)
@@ -115,25 +117,28 @@ namespace RfpProxy.Log
             var length = new byte[4];
             while (!cancellationToken.IsCancellationRequested)
             {
-                await FillBufferAsync(socket, length, cancellationToken).ConfigureAwait(false);
+                var success = await FillBufferAsync(socket, length, cancellationToken).ConfigureAwait(false);
+                if (!success) return;
 
                 var msgLength = BinaryPrimitives.ReadInt32BigEndian(length);
                 var msg = new byte[msgLength];
                 
-                await FillBufferAsync(socket, msg, cancellationToken).ConfigureAwait(false);
+                success = await FillBufferAsync(socket, msg, cancellationToken).ConfigureAwait(false);
+                if (!success) return;
 
                 OnMessage(msg);
             }
         }
 
-        private static async Task FillBufferAsync(Socket socket, Memory<byte> buffer, CancellationToken cancellationToken)
+        private static async Task<bool> FillBufferAsync(Socket socket, Memory<byte> buffer, CancellationToken cancellationToken)
         {
             while (buffer.Length > 0)
             {
                 var bytesRead = await socket.ReceiveAsync(buffer, SocketFlags.None, cancellationToken);
-                if (bytesRead == 0) break;
+                if (bytesRead == 0) return false;
                 buffer = buffer.Slice(bytesRead);
             }
+            return true;
         }
 
         private static void OnMessage(ReadOnlyMemory<byte> message)

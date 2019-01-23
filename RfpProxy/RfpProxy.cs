@@ -38,6 +38,7 @@ namespace RfpProxy
         {
             Console.WriteLine("new RFP connection");
             var connection = base.OnClientConnected(client, server);
+            connection.Identifier = new RfpIdentifier(new byte[RfpIdentifier.Length]);
             return connection;
         }
 
@@ -116,9 +117,9 @@ namespace RfpProxy
                         while (true)
                         {
                             var text = await reader.ReadLineAsync().ConfigureAwait(false);
+                            Console.WriteLine($"new subscription: {text}");
                             cancellationToken.ThrowIfCancellationRequested();
                             var msg = Deserialize(text);
-                            Console.WriteLine($"new subscription: {msg.Type} ({msg.Priority}) MAC:{msg.Rfp.Filter}/{msg.Rfp.Mask} Filter:{msg.Message.Filter}/{msg.Message.Mask}");
                             if (msg.Type == SubscriptionType.End)
                                 break;
                             var mac = DecodeHex(msg.Rfp.Filter);
@@ -135,6 +136,7 @@ namespace RfpProxy
                 catch (Exception ex) when (client.Connected)
                 {
                     await SendAsync(client, ex.Message, cancellationToken).ConfigureAwait(false);
+                    Console.WriteLine(ex);
                     return;
                 }
                 await clientConnection.RunAsync(cancellationToken).ConfigureAwait(false);
