@@ -87,7 +87,7 @@ namespace RfpProxy.Test
             private readonly ManualResetEventSlim _rfpMessage;
             private readonly ManualResetEventSlim _ommMessage;
 
-            public TestProxy() : base(51337, "localhost", 61337)
+            public TestProxy() : base(51337, "localhost", 61337, "asdf")
             {
                 _omm = TcpListener.Create(61337);
                 _omm.Start();

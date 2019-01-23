@@ -13,6 +13,7 @@ namespace RfpProxy
             string host = "localhost";
             int port = 16321;
             int listen = 16000;
+            string socket = "client.sock";
             bool showHelp = false;
             bool useTProxy = false;
             var options = new OptionSet
@@ -20,6 +21,7 @@ namespace RfpProxy
                 {"H|host=", "hostname of OMM", x => host = x},
                 {"p|port=", "port number of OMM", (ushort x) => port = x},
                 {"l|listen=", "TCP listen port of proxy", (ushort x) => listen = x},
+                {"s|socket", "socket path", (string x) => socket = x},
                 {"t|transparent", "use TPROXY", x => useTProxy = x != null},
                 {"h|help", "show help", x => showHelp = x != null},
             };
@@ -46,7 +48,7 @@ namespace RfpProxy
             }
 
             using (var cts = new CancellationTokenSource())
-            using (var proxy = new RfpProxy(listen, host, port) {UseTProxy = useTProxy})
+            using (var proxy = new RfpProxy(listen, host, port, socket) {UseTProxy = useTProxy})
             {
                 Console.CancelKeyPress += (s, e) =>
                 {

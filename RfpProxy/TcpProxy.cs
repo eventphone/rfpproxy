@@ -25,7 +25,7 @@ namespace RfpProxy
             _cts = new CancellationTokenSource();
         }
 
-        public async Task RunAsync(CancellationToken cancellationToken)
+        public virtual async Task RunAsync(CancellationToken cancellationToken)
         {
             _listener = CreateListener(_listenPort);
             try
@@ -98,47 +98,15 @@ namespace RfpProxy
                 var clientData = OnClientConnected(client, server);
 
                 var clientPipe = new Pipe();
-                var fillClientPipe = FillPipeAsync(client.Client, clientPipe.Writer, cts.Token);
+                var fillClientPipe = PipeHelper.FillPipeAsync(client.Client, clientPipe.Writer, cts.Token);
                 var readClientPipe = ReadFromClientAsync(clientData, clientPipe.Reader, cancellationToken);
 
                 var serverPipe = new Pipe();
-                var fillServerPipe = FillPipeAsync(server.Client, serverPipe.Writer, cts.Token);
+                var fillServerPipe = PipeHelper.FillPipeAsync(server.Client, serverPipe.Writer, cts.Token);
                 var readServerPipe = ReadFromServerAsync(clientData, serverPipe.Reader, cancellationToken);
 
                 await Task.WhenAny(fillClientPipe, readClientPipe, fillServerPipe, readServerPipe).ConfigureAwait(false);
                 cts.Cancel();
-            }
-        }
-
-        private async Task FillPipeAsync(Socket socket, PipeWriter writer, CancellationToken cancellationToken)
-        {
-            try
-            {
-                while (socket.Connected)
-                {
-                    var memory = writer.GetMemory(512);
-                    int bytesRead = await socket.ReceiveAsync(memory, SocketFlags.None, cancellationToken).ConfigureAwait(false);
-                    if (bytesRead == 0)
-                        break;
-
-                    writer.Advance(bytesRead);
-
-                    var result = await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
-
-                    if (result.IsCompleted)
-                        break;
-                }
-                writer.Complete();
-            }
-            catch (OperationCanceledException ex)
-            {
-                socket.Close();
-                writer.Complete(ex);
-            }
-            catch (SocketException ex)
-            {
-                socket.Close();
-                writer.Complete(ex);
             }
         }
 
