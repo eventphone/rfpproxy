@@ -25,50 +25,47 @@ namespace RfpProxy
             _cts = new CancellationTokenSource();
         }
 
-        public async Task RunAsync(CancellationToken cancellationToken)
+        public virtual async Task RunAsync(CancellationToken cancellationToken)
         {
             _listener = CreateListener(_listenPort);
             try
             {
                 _listener.Start();
                 var accept = _listener.AcceptTcpClientAsync();
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken))
+                var tasks = new HashSet<Task>
                 {
-                    var tasks = new HashSet<Task>
+                    accept,
+                    Task.Delay(Timeout.Infinite, cancellationToken)
+                };
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    await Task.WhenAny(tasks).ConfigureAwait(false);
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+                    if (accept.IsCompleted)
                     {
-                        accept,
-                        Task.Delay(Timeout.Infinite, combined.Token)
-                    };
-                    while (!combined.IsCancellationRequested)
-                    {
-                        await Task.WhenAny(tasks).ConfigureAwait(false);
-                        if (cancellationToken.IsCancellationRequested)
-                            return;
-                        if (accept.IsCompleted)
-                        {
-                            var client = await accept.ConfigureAwait(false);
-                            tasks.Add(HandleClientAsync(client, combined.Token));
+                        var client = await accept.ConfigureAwait(false);
+                        tasks.Add(HandleClientAsync(client, cancellationToken));
 
-                            tasks.Remove(accept);
-                            accept = _listener.AcceptTcpClientAsync();
-                            tasks.Add(accept);
-                        }
-                        else
+                        tasks.Remove(accept);
+                        accept = _listener.AcceptTcpClientAsync();
+                        tasks.Add(accept);
+                    }
+                    else
+                    {
+                        //client finished
+                        foreach (var task in tasks.Where(x => x.IsCompleted).ToList())
                         {
-                            //client finished
-                            foreach (var task in tasks.Where(x => x.IsCompleted).ToList())
+                            try
                             {
-                                try
-                                {
-                                    await task.ConfigureAwait(false);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine("RFP Connection failed");
-                                    Console.WriteLine(ex);
-                                }
-                                tasks.Remove(task);
+                                await task.ConfigureAwait(false);
                             }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("RFP Connection failed");
+                                Console.WriteLine(ex);
+                            }
+                            tasks.Remove(task);
                         }
                     }
                 }
@@ -101,47 +98,15 @@ namespace RfpProxy
                 var clientData = OnClientConnected(client, server);
 
                 var clientPipe = new Pipe();
-                var fillClientPipe = FillPipeAsync(client.Client, clientPipe.Writer, cts.Token);
+                var fillClientPipe = PipeHelper.FillPipeAsync(client.Client, clientPipe.Writer, cts.Token);
                 var readClientPipe = ReadFromClientAsync(clientData, clientPipe.Reader, cancellationToken);
 
                 var serverPipe = new Pipe();
-                var fillServerPipe = FillPipeAsync(server.Client, serverPipe.Writer, cts.Token);
+                var fillServerPipe = PipeHelper.FillPipeAsync(server.Client, serverPipe.Writer, cts.Token);
                 var readServerPipe = ReadFromServerAsync(clientData, serverPipe.Reader, cancellationToken);
 
                 await Task.WhenAny(fillClientPipe, readClientPipe, fillServerPipe, readServerPipe).ConfigureAwait(false);
                 cts.Cancel();
-            }
-        }
-
-        private async Task FillPipeAsync(Socket socket, PipeWriter writer, CancellationToken cancellationToken)
-        {
-            try
-            {
-                while (socket.Connected)
-                {
-                    var memory = writer.GetMemory(512);
-                    int bytesRead = await socket.ReceiveAsync(memory, SocketFlags.None, cancellationToken);
-                    if (bytesRead == 0)
-                        break;
-
-                    writer.Advance(bytesRead);
-
-                    var result = await writer.FlushAsync(cancellationToken);
-
-                    if (result.IsCompleted)
-                        break;
-                }
-                writer.Complete();
-            }
-            catch (OperationCanceledException ex)
-            {
-                socket.Close();
-                writer.Complete(ex);
-            }
-            catch (SocketException ex)
-            {
-                socket.Close();
-                writer.Complete(ex);
             }
         }
 

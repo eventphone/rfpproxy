@@ -1,4 +1,4 @@
-namespace RfpProxy
+namespace RfpProxy.Log
 {
     public enum MsgType : ushort
     {

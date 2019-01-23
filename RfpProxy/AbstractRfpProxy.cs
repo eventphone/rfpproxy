@@ -20,7 +20,7 @@ namespace RfpProxy
 
             var iv = connection.RfpToOmmIv;
             connection.RfpToOmmIv = ReadOnlyMemory<byte>.Empty;
-            await OnClientMessageAsync(connection, sysInit, cancellationToken);
+            await OnClientMessageAsync(connection, sysInit, cancellationToken).ConfigureAwait(false);
             connection.RfpToOmmIv = iv;
             await ReadAsync(connection, client, OnClientMessageAsync, connection.RfpToOmmIv, connection.DecryptRfpToOmm, connection.RekeyRfpToOmmDecrypt, cancellationToken).ConfigureAwait(false);
         }
@@ -30,7 +30,7 @@ namespace RfpProxy
             var sysAuthenticate = await ReadPacketAsync(0x012d, 0x20, server, cancellationToken).ConfigureAwait(false);
             connection.InitRfpToOmmIv(sysAuthenticate.Slice(11, 8).Span);
 
-            await OnServerMessageAsync(connection, sysAuthenticate, cancellationToken);
+            await OnServerMessageAsync(connection, sysAuthenticate, cancellationToken).ConfigureAwait(false);
 
             var ack = await ReadPacketAsync(0x01, 0x08, server, cancellationToken).ConfigureAwait(false);
             await OnServerMessageAsync(connection, ack, cancellationToken).ConfigureAwait(false);

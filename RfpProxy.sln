@@ -5,7 +5,11 @@ VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy", "RfpProxy\RfpProxy.csproj", "{F2CD5A70-C2A2-4267-8DB3-3DC614187745}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfpProxy.Test", "RfpProxy.Test\RfpProxy.Test.csproj", "{29872EB0-9784-4657-B937-E15C4FE457B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.Test", "RfpProxy.Test\RfpProxy.Test.csproj", "{29872EB0-9784-4657-B937-E15C4FE457B7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxyLib", "RfpProxyLib\RfpProxyLib.csproj", "{6BEC020A-C4CD-454D-8945-37E9711149EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfpProxy.Log", "RfpProxy.Log\RfpProxy.Log.csproj", "{18C9590F-F814-4681-8FE2-1E5EBE4D67B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{29872EB0-9784-4657-B937-E15C4FE457B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29872EB0-9784-4657-B937-E15C4FE457B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29872EB0-9784-4657-B937-E15C4FE457B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BEC020A-C4CD-454D-8945-37E9711149EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BEC020A-C4CD-454D-8945-37E9711149EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BEC020A-C4CD-454D-8945-37E9711149EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BEC020A-C4CD-454D-8945-37E9711149EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18C9590F-F814-4681-8FE2-1E5EBE4D67B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18C9590F-F814-4681-8FE2-1E5EBE4D67B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18C9590F-F814-4681-8FE2-1E5EBE4D67B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18C9590F-F814-4681-8FE2-1E5EBE4D67B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
