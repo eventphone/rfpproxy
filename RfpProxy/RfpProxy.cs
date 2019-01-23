@@ -112,6 +112,7 @@ namespace RfpProxy
                         while (true)
                         {
                             var text = await reader.ReadLineAsync().ConfigureAwait(false);
+                            cancellationToken.ThrowIfCancellationRequested();
                             var msg = Deserialize(text);
                             if (msg.Type == SubscriptionType.End)
                                 break;
