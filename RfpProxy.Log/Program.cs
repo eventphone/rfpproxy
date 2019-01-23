@@ -17,10 +17,14 @@ namespace RfpProxy.Log
         static async Task Main(string[] args)
         {
             string socketname = "client.sock";
+            string mac = "000000000000";
+            string mask = "000000000000";
             bool showHelp = false;
             var options = new OptionSet
             {
                 {"s|socket=", "socket path", x => socketname = x},
+                {"r|rfp=", "rfp MAC address", x => mac = x},
+                {"m|mask=", "rfp mask", x=>mask = x},
                 {"h|help", "show help", x => showHelp = x != null}
             };
             try
@@ -52,12 +56,12 @@ namespace RfpProxy.Log
                 };
                 await socket.ConnectAsync(new UnixDomainSocketEndPoint(socketname));
                 cts.Token.ThrowIfCancellationRequested();
-                await SubscribeAsync(socket, cts.Token).ConfigureAwait(false);
+                await SubscribeAsync(socket, mac, mask, cts.Token).ConfigureAwait(false);
                 await LogAsync(socket, cts.Token).ConfigureAwait(false);
             }
         }
 
-        private static async Task SubscribeAsync(Socket socket, CancellationToken cancellationToken)
+        private static async Task SubscribeAsync(Socket socket, string mac, string mask, CancellationToken cancellationToken)
         {
             using (var stream = new NetworkStream(socket, false))
             using (var reader = new StreamReader(stream))
@@ -71,8 +75,8 @@ namespace RfpProxy.Log
                     Type = SubscriptionType.Listen,
                     Rfp = new SubscriptionFilter
                     {
-                        Filter = "000000000000",
-                        Mask = "000000000000",
+                        Filter = mac,
+                        Mask = mask,
                     },
                     Message = new SubscriptionFilter
                     {
