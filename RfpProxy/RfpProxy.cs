@@ -36,6 +36,7 @@ namespace RfpProxy
 
         protected override CryptedRfpConnection OnClientConnected(TcpClient client, TcpClient server)
         {
+            Console.WriteLine("new RFP connection");
             var connection = base.OnClientConnected(client, server);
             return connection;
         }
@@ -98,6 +99,7 @@ namespace RfpProxy
 
         private async Task HandleClientAsync(Socket client, CancellationToken cancellationToken)
         {
+            Console.WriteLine("client connected");
             using (client)
             using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             {
@@ -114,6 +116,7 @@ namespace RfpProxy
                             var text = await reader.ReadLineAsync().ConfigureAwait(false);
                             cancellationToken.ThrowIfCancellationRequested();
                             var msg = Deserialize(text);
+                            Console.WriteLine($"new subscription: {msg.Type} ({msg.Priority}) MAC:{msg.Rfp.Filter}/{msg.Rfp.Mask} Filter:{msg.Message.Filter}/{msg.Message.Mask}");
                             if (msg.Type == SubscriptionType.End)
                                 break;
                             var mac = DecodeHex(msg.Rfp.Filter);

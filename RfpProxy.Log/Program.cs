@@ -63,9 +63,7 @@ namespace RfpProxy.Log
             using (var reader = new StreamReader(stream))
             using (var writer = new StreamWriter(stream))
             {
-                var syn = await reader.ReadLineAsync().ConfigureAwait(false);
-                Console.WriteLine(syn);
-                cancellationToken.ThrowIfCancellationRequested();
+                await ReadAsync(reader, cancellationToken).ConfigureAwait(false);
 
                 var subscribe = new Subscribe
                 {
@@ -82,18 +80,34 @@ namespace RfpProxy.Log
                         Mask = String.Empty,
                     },
                 };
-                await writer.WriteLineAsync(JsonConvert.SerializeObject(subscribe)).ConfigureAwait(false);
-                cancellationToken.ThrowIfCancellationRequested();
+                await WriteAsync(writer, subscribe, cancellationToken).ConfigureAwait(false);
+
                 var eos = new Subscribe
                 {
                     Type = SubscriptionType.End
                 };
-                await writer.WriteLineAsync(JsonConvert.SerializeObject(eos)).ConfigureAwait(false);
-                cancellationToken.ThrowIfCancellationRequested();
-                var ack = await reader.ReadLineAsync().ConfigureAwait(false);
-                Console.WriteLine(ack);
-                cancellationToken.ThrowIfCancellationRequested();
+                await WriteAsync(writer, eos, cancellationToken).ConfigureAwait(false);
+
+                await ReadAsync(reader, cancellationToken).ConfigureAwait(false);
             }
+        }
+
+        private static async Task<string> ReadAsync(StreamReader reader, CancellationToken cancellationToken)
+        {
+            var msg = await reader.ReadLineAsync().ConfigureAwait(false);
+            Console.Write("< ");
+            Console.WriteLine(msg);
+            cancellationToken.ThrowIfCancellationRequested();
+            return msg;
+        }
+
+        private static async Task WriteAsync<T>(StreamWriter writer, T data, CancellationToken cancellationToken)
+        {
+            var msg = JsonConvert.SerializeObject(data);
+            await writer.WriteLineAsync(msg).ConfigureAwait(false);
+            Console.Write("> ");
+            Console.WriteLine(msg);
+            cancellationToken.ThrowIfCancellationRequested();
         }
 
         private static async Task LogAsync(Socket socket, CancellationToken cancellationToken)
