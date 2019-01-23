@@ -21,7 +21,7 @@ namespace RfpProxy
                 {"H|host=", "hostname of OMM", x => host = x},
                 {"p|port=", "port number of OMM", (ushort x) => port = x},
                 {"l|listen=", "TCP listen port of proxy", (ushort x) => listen = x},
-                {"s|socket", "socket path", (string x) => socket = x},
+                {"s|socket=", "socket path", (string x) => socket = x},
                 {"t|transparent", "use TPROXY", x => useTProxy = x != null},
                 {"h|help", "show help", x => showHelp = x != null},
             };
