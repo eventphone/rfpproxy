@@ -9,15 +9,15 @@ namespace RfpProxy
 
         public RfpIdentifier(ReadOnlyMemory<byte> identifier)
         {
-            if (identifier.Length != 6)
-                throw new ArgumentOutOfRangeException(nameof(identifier), "identifier must be 6 bytes");
+            if (identifier.Length != Length)
+                throw new ArgumentOutOfRangeException(nameof(identifier), $"identifier must be {Length} bytes");
             _identifier = identifier;
         }
 
         public bool Matches(RfpIdentifier other, ReadOnlySpan<byte> mask)
         {
-            if (mask.Length != 6)
-                throw new ArgumentOutOfRangeException(nameof(mask), "mask must be 6 bytes");
+            if (mask.Length != Length)
+                throw new ArgumentOutOfRangeException(nameof(mask), $"mask must be {Length} bytes");
 
             for (int i = 0; i < _identifier.Length; i++)
             {

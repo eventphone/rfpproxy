@@ -10,9 +10,9 @@ namespace RfpProxy
 
         public Subscription(ClientConnection client, CancellationTokenSource cancellationTokenSource, byte priority, ReadOnlyMemory<byte> mac, ReadOnlyMemory<byte> macMask, ReadOnlyMemory<byte> filter, ReadOnlyMemory<byte> filterMask, bool handle)
         {
-            if (mac.Length != 6)
+            if (mac.Length != RfpIdentifier.Length)
                 throw new Exception("invalid mac length");
-            if (macMask.Length != 6)
+            if (macMask.Length != RfpIdentifier.Length)
                 throw new Exception("invalid mac mask length");
             if (filter.Length != filterMask.Length)
                 throw new Exception("filter and filter mask length must match");
