@@ -50,6 +50,10 @@ namespace RfpProxy
         private uint NextMessageId()
         {
             var next = Interlocked.Increment(ref _nextMessageId);
+            while (next == 0)
+            {
+                next = Interlocked.Increment(ref _nextMessageId);
+            }
             return (uint) next;
         }
 
