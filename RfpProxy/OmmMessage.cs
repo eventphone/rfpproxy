@@ -67,6 +67,7 @@ namespace RfpProxy
             BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(), 1 + 4 + RfpIdentifier.Length + Message.Length);
             header[4] = (byte) Direction;
             BinaryPrimitives.WriteUInt32BigEndian(header.AsSpan(5), MessageId);
+            Rfp.CopyTo(header.AsMemory().Slice(4 + 1 + 4));
             await socket.SendAsync(header, SocketFlags.None, cancellationToken).ConfigureAwait(false);
             await socket.SendAsync(Message, SocketFlags.None, cancellationToken).ConfigureAwait(false);
         }
