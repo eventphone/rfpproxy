@@ -42,18 +42,18 @@ namespace RfpProxy.Log
                 return;
             }
             using (var cts = new CancellationTokenSource())
+            using (var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP))
             {
                 Console.CancelKeyPress += (s, e) =>
                 {
-                    e.Cancel = true; 
+                    e.Cancel = true;
                     cts.Cancel();
+                    socket.Close();
                 };
-                using (var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP))
-                {
-                    socket.Bind(new UnixDomainSocketEndPoint(socketname));
-                    await SubscribeAsync(socket, cts.Token).ConfigureAwait(false);
-                    await LogAsync(socket, cts.Token).ConfigureAwait(false);
-                }
+                await socket.ConnectAsync(new UnixDomainSocketEndPoint(socketname));
+                cts.Token.ThrowIfCancellationRequested();
+                await SubscribeAsync(socket, cts.Token).ConfigureAwait(false);
+                await LogAsync(socket, cts.Token).ConfigureAwait(false);
             }
         }
 

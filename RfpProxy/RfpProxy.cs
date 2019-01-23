@@ -49,6 +49,7 @@ namespace RfpProxy
                 SendTimeout = 10,
             };
             socket.Bind(new UnixDomainSocketEndPoint(_socket));
+            socket.Listen(5);
             try
             {
                 var accept = socket.AcceptAsync();
@@ -58,6 +59,7 @@ namespace RfpProxy
                     Task.Delay(Timeout.Infinite, cancellationToken),
                     base.RunAsync(cancellationToken)
                 };
+                Console.WriteLine("interception socket up & running");
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     await Task.WhenAny(tasks).ConfigureAwait(false);
@@ -138,6 +140,7 @@ namespace RfpProxy
                 await clientConnection.RunAsync(cancellationToken).ConfigureAwait(false);
                 cts.Cancel();
             }
+            Console.WriteLine("client disconnected");
         }
 
         private Task OnSubscriptionMessageAsync(OmmMessage message, CancellationToken cancellationToken)
@@ -174,7 +177,7 @@ namespace RfpProxy
 
         private static Task SendAsync(Socket client, string message, CancellationToken cancellationToken)
         {
-            var data = Encoding.UTF8.GetBytes(message);
+            var data = Encoding.UTF8.GetBytes(message + "\n");
             return SendAsync(client, data, cancellationToken);
         }
 
