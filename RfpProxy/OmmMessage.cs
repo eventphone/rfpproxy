@@ -33,11 +33,8 @@ namespace RfpProxy
             Direction = (MessageDirection) span[0];
             MessageId = BinaryPrimitives.ReadUInt32BigEndian(span.Slice(1));
             data = data.Slice(5);
-            if (MessageId != 0)
-            {
-                Rfp = new RfpIdentifier(data.Slice(0, RfpIdentifier.Length));
-                data = data.Slice(RfpIdentifier.Length);
-            }
+            Rfp = new RfpIdentifier(data.Slice(0, RfpIdentifier.Length));
+            data = data.Slice(RfpIdentifier.Length);
             Message = data;
         }
 
