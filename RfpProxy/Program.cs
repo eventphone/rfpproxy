@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,6 +57,14 @@ namespace RfpProxy
                     cts.Cancel();
                 };
                 await proxy.RunAsync(cts.Token).ConfigureAwait(false);
+                try
+                {
+                    File.Delete(socket);
+                }
+                catch
+                {
+                    //ignore
+                }
             }
         }
     }

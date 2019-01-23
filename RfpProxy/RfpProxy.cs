@@ -49,6 +49,14 @@ namespace RfpProxy
                 ReceiveTimeout = 10,
                 SendTimeout = 10,
             };
+            try
+            {
+                File.Delete(_socket);
+            }
+            catch (FileNotFoundException)
+            {
+                //ignore, that's what we want
+            }
             socket.Bind(new UnixDomainSocketEndPoint(_socket));
             socket.Listen(5);
             try
