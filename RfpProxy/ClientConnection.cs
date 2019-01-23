@@ -12,7 +12,7 @@ namespace RfpProxy
     public class ClientConnection
     {
         private readonly Func<OmmMessage, CancellationToken, Task> _messageCallback;
-        private readonly SemaphoreSlim _writeLock = new SemaphoreSlim(0, 1);
+        private readonly SemaphoreSlim _writeLock = new SemaphoreSlim(1, 1);
         private readonly ConcurrentDictionary<uint, OmmMessage> _pending = new ConcurrentDictionary<uint, OmmMessage>();
 
         public ClientConnection(Socket socket, Func<OmmMessage, CancellationToken, Task> messageCallback)
