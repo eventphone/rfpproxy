@@ -43,6 +43,7 @@ namespace RfpProxy.Log
                 Console.Error.Write("rfpproxy.log: ");
                 Console.Error.WriteLine(ex.Message);
                 Console.Error.WriteLine("Try 'dotnet rfpproxy.log.dll --help' for more information");
+                return;
             }
             if (showHelp)
             {
