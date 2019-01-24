@@ -171,7 +171,7 @@ namespace RfpProxy
             }
         }
 
-        private static ReadOnlyMemory<byte> DecodeHex(string hex)
+        private static Memory<byte> DecodeHex(string hex)
         {
             return BlowFish.HexToByte(hex);
         }

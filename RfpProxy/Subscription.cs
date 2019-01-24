@@ -8,7 +8,7 @@ namespace RfpProxy
     {
         private readonly CancellationTokenSource _cts;
 
-        public Subscription(ClientConnection client, CancellationTokenSource cancellationTokenSource, byte priority, ReadOnlyMemory<byte> mac, ReadOnlyMemory<byte> macMask, ReadOnlyMemory<byte> filter, ReadOnlyMemory<byte> filterMask, bool handle)
+        public Subscription(ClientConnection client, CancellationTokenSource cancellationTokenSource, byte priority, Memory<byte> mac, ReadOnlyMemory<byte> macMask, Memory<byte> filter, ReadOnlyMemory<byte> filterMask, bool handle)
         {
             if (mac.Length != RfpIdentifier.Length)
                 throw new Exception("invalid mac length");
@@ -20,12 +20,17 @@ namespace RfpProxy
 
             Client = client;
             Priority = priority;
-            var masked = mac.ToArray();
+            var masked = mac.Span;
             for (int i = 0; i < masked.Length; i++)
             {
                 masked[i] &= macMask.Span[i];
             }
-            Mac = new RfpIdentifier(masked);
+            Mac = new RfpIdentifier(mac);
+            masked = filter.Span;
+            for (int i = 0; i < masked.Length; i++)
+            {
+                masked[i] &= filterMask.Span[i];
+            }
             MacMask = macMask;
             Filter = filter;
             FilterMask = filterMask;
