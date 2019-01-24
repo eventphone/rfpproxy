@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.Test", "RfpProxy.T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxyLib", "RfpProxyLib\RfpProxyLib.csproj", "{6BEC020A-C4CD-454D-8945-37E9711149EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfpProxy.Log", "RfpProxy.Log\RfpProxy.Log.csproj", "{18C9590F-F814-4681-8FE2-1E5EBE4D67B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.Log", "RfpProxy.Log\RfpProxy.Log.csproj", "{18C9590F-F814-4681-8FE2-1E5EBE4D67B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfpProxy.ChangeLed", "RfpProxy.ChangeLed\RfpProxy.ChangeLed.csproj", "{EC11CE7A-D4D2-4731-B290-C60F0A443E15}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{18C9590F-F814-4681-8FE2-1E5EBE4D67B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18C9590F-F814-4681-8FE2-1E5EBE4D67B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18C9590F-F814-4681-8FE2-1E5EBE4D67B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC11CE7A-D4D2-4731-B290-C60F0A443E15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC11CE7A-D4D2-4731-B290-C60F0A443E15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC11CE7A-D4D2-4731-B290-C60F0A443E15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC11CE7A-D4D2-4731-B290-C60F0A443E15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
