@@ -72,7 +72,7 @@ All messages (subscriptions, replies & unsolicited messages) are composed of a h
 * 4 bytes Length:
   * does not include the 4 bytes length itself
   * BigEndian
-  * signed (we will not send messages > 2GB)
+  * unsigned (max 0x7FFFFFC7)
 * 1 byte Direction:
   * 0: FromOmm / ToRfp
   * 1; FromRfp / ToOmm

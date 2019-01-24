@@ -61,7 +61,7 @@ namespace RfpProxy
         public async Task SendAsync(Socket socket, CancellationToken cancellationToken)
         {
             var header = new byte[4 + 1 + 4 + RfpIdentifier.Length];
-            BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(), 1 + 4 + RfpIdentifier.Length + Message.Length);
+            BinaryPrimitives.WriteUInt32BigEndian(header.AsSpan(), (uint) (1 + 4 + RfpIdentifier.Length + Message.Length));
             header[4] = (byte) Direction;
             BinaryPrimitives.WriteUInt32BigEndian(header.AsSpan(5), MessageId);
             Rfp.CopyTo(header.AsMemory().Slice(4 + 1 + 4));

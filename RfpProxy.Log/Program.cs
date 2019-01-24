@@ -124,7 +124,7 @@ namespace RfpProxy.Log
                 var success = await FillBufferAsync(socket, length, cancellationToken).ConfigureAwait(false);
                 if (!success) return;
 
-                var msgLength = BinaryPrimitives.ReadInt32BigEndian(length);
+                var msgLength = BinaryPrimitives.ReadUInt32BigEndian(length);
                 var msg = new byte[msgLength];
                 
                 success = await FillBufferAsync(socket, msg, cancellationToken).ConfigureAwait(false);
