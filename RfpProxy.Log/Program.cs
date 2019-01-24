@@ -18,13 +18,17 @@ namespace RfpProxy.Log
         {
             string socketname = "client.sock";
             string mac = "000000000000";
-            string mask = "000000000000";
+            string rfpMmask = "000000000000";
+            string filter = String.Empty;
+            string filterMask = String.Empty;
             bool showHelp = false;
             var options = new OptionSet
             {
                 {"s|socket=", "socket path", x => socketname = x},
                 {"r|rfp=", "rfp MAC address", x => mac = x},
-                {"m|mask=", "rfp mask", x=>mask = x},
+                {"rm|rfpmask=", "rfp mask", x=>rfpMmask = x},
+                {"f|filter=", "filter", x => filter = x},
+                {"fm|filtermask=", "filter mask", x=>filterMask = x},
                 {"h|help", "show help", x => showHelp = x != null}
             };
             try
@@ -58,7 +62,7 @@ namespace RfpProxy.Log
                     };
                     await socket.ConnectAsync(new UnixDomainSocketEndPoint(socketname));
                     cts.Token.ThrowIfCancellationRequested();
-                    await SubscribeAsync(socket, mac, mask, cts.Token).ConfigureAwait(false);
+                    await SubscribeAsync(socket, mac, rfpMmask, filter, filterMask, cts.Token).ConfigureAwait(false);
                     await LogAsync(socket, cts.Token).ConfigureAwait(false);
                 }
             }
@@ -70,7 +74,7 @@ namespace RfpProxy.Log
             }
         }
 
-        private static async Task SubscribeAsync(Socket socket, string mac, string mask, CancellationToken cancellationToken)
+        private static async Task SubscribeAsync(Socket socket, string mac, string mask, string filter, string filterMask, CancellationToken cancellationToken)
         {
             using (var stream = new NetworkStream(socket, false))
             using (var reader = new StreamReader(stream))
@@ -89,8 +93,8 @@ namespace RfpProxy.Log
                     },
                     Message = new SubscriptionFilter
                     {
-                        Filter = String.Empty,
-                        Mask = String.Empty,
+                        Filter = filter,
+                        Mask = filterMask,
                     },
                 };
                 await WriteAsync(writer, subscribe, cancellationToken).ConfigureAwait(false);
