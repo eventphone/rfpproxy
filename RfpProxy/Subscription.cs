@@ -20,18 +20,20 @@ namespace RfpProxy
 
             Client = client;
             Priority = priority;
+
             var masked = mac.Span;
             for (int i = 0; i < masked.Length; i++)
             {
                 masked[i] &= macMask.Span[i];
             }
             Mac = new RfpIdentifier(mac);
+            MacMask = macMask;
+
             masked = filter.Span;
             for (int i = 0; i < masked.Length; i++)
             {
                 masked[i] &= filterMask.Span[i];
             }
-            MacMask = macMask;
             Filter = filter;
             FilterMask = filterMask;
             HandleMessage = handle;
