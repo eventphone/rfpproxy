@@ -84,8 +84,8 @@ namespace RfpProxy.ChangeLed
                     },
                     Message = new SubscriptionFilter
                     {
-                        Filter = "01020403",
-                        Mask = "ffffffff",
+                        Filter = "010200000403",
+                        Mask = "ffff0000ffff",
                     },
                 };
                 await WriteAsync(writer, subscribe, cancellationToken).ConfigureAwait(false);
