@@ -45,19 +45,28 @@ namespace RfpProxy.Log
                 options.WriteOptionDescriptions(Console.Error);
                 return;
             }
-            using (var cts = new CancellationTokenSource())
-            using (var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP))
+            try
             {
-                Console.CancelKeyPress += (s, e) =>
+                using (var cts = new CancellationTokenSource())
+                using (var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP))
                 {
-                    e.Cancel = true;
-                    cts.Cancel();
-                    socket.Close();
-                };
-                await socket.ConnectAsync(new UnixDomainSocketEndPoint(socketname));
-                cts.Token.ThrowIfCancellationRequested();
-                await SubscribeAsync(socket, mac, mask, cts.Token).ConfigureAwait(false);
-                await LogAsync(socket, cts.Token).ConfigureAwait(false);
+                    Console.CancelKeyPress += (s, e) =>
+                    {
+                        e.Cancel = true;
+                        cts.Cancel();
+                        socket.Close();
+                    };
+                    await socket.ConnectAsync(new UnixDomainSocketEndPoint(socketname));
+                    cts.Token.ThrowIfCancellationRequested();
+                    await SubscribeAsync(socket, mac, mask, cts.Token).ConfigureAwait(false);
+                    await LogAsync(socket, cts.Token).ConfigureAwait(false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (SocketException ex) when (ex.SocketErrorCode == SocketError.OperationAborted)
+            {
             }
         }
 

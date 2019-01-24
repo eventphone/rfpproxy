@@ -18,6 +18,12 @@ There are two JSON formatted message types: `text` & `subscription`. Every messa
 > Ack (text)
 <> binary
 ```
+Example:
+
+    > {"msg":"stay connected"}
+    < {"type":"Listen","prio":255,"rfp":{"filter":"000000000007","mask":"00000000000f"},"filter":{"filter":"","mask":""}}
+    < {"type":"End","prio":0,"rfp":null,"filter":null}
+    > {"msg":"switching protocols"}
 
 #### Text
 `{"msg":"<content>"}`
