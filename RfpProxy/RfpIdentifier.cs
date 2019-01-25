@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 
 namespace RfpProxy
 {
@@ -49,7 +50,9 @@ namespace RfpProxy
 
         public override int GetHashCode()
         {
-            return _identifier.GetHashCode();
+            var first = BinaryPrimitives.ReadInt32BigEndian(_identifier.Span);
+            var second = BinaryPrimitives.ReadInt32BigEndian(_identifier.Span.Slice(2));
+            return first ^ second;
         }
 
         public static bool operator ==(RfpIdentifier left, RfpIdentifier right)

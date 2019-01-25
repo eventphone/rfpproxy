@@ -11,7 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxyLib", "RfpProxyLib\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.Log", "RfpProxy.Log\RfpProxy.Log.csproj", "{18C9590F-F814-4681-8FE2-1E5EBE4D67B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfpProxy.ChangeLed", "RfpProxy.ChangeLed\RfpProxy.ChangeLed.csproj", "{EC11CE7A-D4D2-4731-B290-C60F0A443E15}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.ChangeLed", "RfpProxy.ChangeLed\RfpProxy.ChangeLed.csproj", "{EC11CE7A-D4D2-4731-B290-C60F0A443E15}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A648EB0B-1DA2-4834-88E3-61CAA95982BF}"
+	ProjectSection(SolutionItems) = preProject
+		rfpled.py = rfpled.py
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
