@@ -30,6 +30,27 @@ namespace RfpProxy.Log.Messages
                     return new SysLedMessage(data);
                 case MsgType.SYS_LICENSE_TIMER:
                     return new SysLicenseTimerMessage(data);
+                case MsgType.MEDIA_AUDIO_STATISTICS:
+                case MsgType.MEDIA_CHANNEL_MOD:
+                case MsgType.MEDIA_CLOSE:
+                case MsgType.MEDIA_DSP_CLOSE:
+                case MsgType.MEDIA_EOS_DETECT:
+                case MsgType.MEDIA_G729_USED:
+                case MsgType.MEDIA_MUTE:
+                case MsgType.MEDIA_REDIRECT_START:
+                case MsgType.MEDIA_REDIRECT_STOP:
+                case MsgType.MEDIA_RESTART:
+                case MsgType.MEDIA_START:
+                case MsgType.MEDIA_STATISTICS:
+                case MsgType.MEDIA_STOP:
+                case MsgType.MEDIA_TONE2:
+                case MsgType.MEDIA_TRACE_PPN:
+                case MsgType.MEDIA_VIDEO_STATE:
+                    return new UnknownMediaMessage(type, data);
+                case MsgType.MEDIA_OPEN:
+                    return new OpenMediaMessage(data);
+                case MsgType.MEDIA_DTMF:
+                    return new DtmfMediaMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }
@@ -46,6 +67,23 @@ namespace RfpProxy.Log.Messages
             foreach (byte b in bytes)
                 s.Append(b.ToString("x2"));
             return s.ToString();
+        }
+
+        public static void PrintIfNotZero(TextWriter writer, string prefix, ReadOnlySpan<byte> data)
+        {
+            bool hasData = false;
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (data[i] != 0)
+                {
+                    hasData = true;
+                    break;
+                }
+            }
+            if (hasData)
+            {
+                writer.Write(prefix + ByteToHex(data));
+            }
         }
     }
 }
