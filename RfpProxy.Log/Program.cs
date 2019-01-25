@@ -198,7 +198,7 @@ namespace RfpProxy.Log
             if (_logRaw)
             {
                 Console.WriteLine(AaMiDeMessage.ByteToHex(data.Span));
-                Console.Write($"RFP:{AaMiDeMessage.ByteToHex(identifier)} ");
+                Console.Write($"OMM:{AaMiDeMessage.ByteToHex(identifier)} ");
             }
             message.Log(Console.Out);
             Console.WriteLine();
