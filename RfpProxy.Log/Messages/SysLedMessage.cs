@@ -11,7 +11,10 @@ namespace RfpProxy.Log.Messages
             Green = 0x01,
             GreenFlash = 0x02,
             GreenOrangeFlash = 0x03,
+            GreenRedFlash = 0x04,
+            Red = 0x05,
             Orange = 0x06,
+            GreenRed = 0x07
         }
 
         public bool Led1 { get; }
