@@ -15,6 +15,7 @@ namespace RfpProxy.Log
 {
     class Program
     {
+        private static bool _logRaw = false;
         static async Task Main(string[] args)
         {
             string socketname = "client.sock";
@@ -30,7 +31,8 @@ namespace RfpProxy.Log
                 {"rm|rfpmask=", "rfp mask", x=>rfpMmask = x},
                 {"f|filter=", "filter", x => filter = x},
                 {"fm|filtermask=", "filter mask", x=>filterMask = x},
-                {"h|help", "show help", x => showHelp = x != null}
+                {"raw", "log raw packets", x=>_logRaw = x != null},
+                {"h|help", "show help", x => showHelp = x != null},
             };
             try
             {
@@ -180,6 +182,11 @@ namespace RfpProxy.Log
         {
             var message = AaMiDeMessage.Create(data);
             Console.Write($"RFP:{AaMiDeMessage.ByteToHex(identifier)} ");
+            if (_logRaw)
+            {
+                Console.WriteLine(AaMiDeMessage.ByteToHex(data.Span));
+                Console.Write($"RFP:{AaMiDeMessage.ByteToHex(identifier)} ");
+            }
             message.Log(Console.Out);
             Console.WriteLine();
         }
@@ -188,6 +195,11 @@ namespace RfpProxy.Log
         {
             var message = AaMiDeMessage.Create(data);
             Console.Write($"OMM:{AaMiDeMessage.ByteToHex(identifier)} ");
+            if (_logRaw)
+            {
+                Console.WriteLine(AaMiDeMessage.ByteToHex(data.Span));
+                Console.Write($"RFP:{AaMiDeMessage.ByteToHex(identifier)} ");
+            }
             message.Log(Console.Out);
             Console.WriteLine();
         }
