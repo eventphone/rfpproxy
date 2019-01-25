@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Buffers.Binary;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -40,6 +39,11 @@ namespace RfpProxy
             var connection = base.OnClientConnected(client, server);
             connection.Identifier = new RfpIdentifier(new byte[RfpIdentifier.Length]);
             return connection;
+        }
+
+        protected override void OnClientDisconnected(CryptedRfpConnection client)
+        {
+            _connections.TryRemove(client.Identifier, out _);
         }
 
         private async Task RunInternalAsync(CancellationToken cancellationToken)
@@ -116,6 +120,7 @@ namespace RfpProxy
             using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             {
                 var clientConnection = new ClientConnection(client, OnSubscriptionMessageAsync);
+                var subscriptions = new List<Subscription>();
                 try
                 {
                     using (var stream = new NetworkStream(client, FileAccess.ReadWrite, false))
@@ -136,6 +141,7 @@ namespace RfpProxy
                             var filter = DecodeHex(msg.Message.Filter);
                             var filterMask = DecodeHex(msg.Message.Mask);
                             var subscription = new Subscription(clientConnection, cts, msg.Priority, mac, macMask, filter, filterMask, msg.Type == SubscriptionType.Handle);
+                            subscriptions.Add(subscription);
                             _subscriptions.TryAdd(subscription, subscription);
                         }
                         await SendAsync(client, Serialize(new Hello("switching protocols")), cancellationToken)
@@ -150,6 +156,10 @@ namespace RfpProxy
                 }
                 await clientConnection.RunAsync(cancellationToken).ConfigureAwait(false);
                 cts.Cancel();
+                foreach (var subscription in subscriptions)
+                {
+                    _subscriptions.TryRemove(subscription, out _);
+                }
             }
             Console.WriteLine("client disconnected");
         }

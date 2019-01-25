@@ -107,6 +107,7 @@ namespace RfpProxy
 
                 await Task.WhenAny(fillClientPipe, readClientPipe, fillServerPipe, readServerPipe).ConfigureAwait(false);
                 cts.Cancel();
+                OnClientDisconnected(clientData);
             }
         }
 
@@ -114,6 +115,8 @@ namespace RfpProxy
         protected abstract Task ReadFromServerAsync(T clientData, PipeReader server, CancellationToken cancellationToken);
 
         protected abstract T OnClientConnected(TcpClient client, TcpClient server);
+
+        protected abstract void OnClientDisconnected(T client);
 
         public void Stop()
         {
