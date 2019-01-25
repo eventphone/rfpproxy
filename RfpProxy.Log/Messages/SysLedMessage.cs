@@ -24,7 +24,7 @@ namespace RfpProxy.Log.Messages
 
         public ColorScheme Color { get; }
         
-        public SysLedMessage(ushort type, ReadOnlyMemory<byte> data) : base(type, data)
+        public SysLedMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LED, data)
         {
             var led = Raw.Span[0];
             var color = Raw.Span[1];

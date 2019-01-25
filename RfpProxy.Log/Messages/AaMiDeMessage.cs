@@ -7,7 +7,7 @@ namespace RfpProxy.Log.Messages
 {
     public abstract class AaMiDeMessage
     {
-        public ushort Type { get; }
+        public MsgType Type { get; }
 
         public ushort Length => BinaryPrimitives.ReadUInt16BigEndian(_data.Slice(2).Span);
 
@@ -15,7 +15,7 @@ namespace RfpProxy.Log.Messages
 
         protected virtual ReadOnlyMemory<byte> Raw => _data.Slice(4);
 
-        protected AaMiDeMessage(ushort type, ReadOnlyMemory<byte> data)
+        protected AaMiDeMessage(MsgType type, ReadOnlyMemory<byte> data)
         {
             Type = type;
             _data = data;
@@ -23,13 +23,13 @@ namespace RfpProxy.Log.Messages
 
         public static AaMiDeMessage Create(ReadOnlyMemory<byte> data)
         {
-            var type = BinaryPrimitives.ReadUInt16BigEndian(data.Slice(0, 2).Span);
-            switch ((MsgType)type)
+            var type = (MsgType)BinaryPrimitives.ReadUInt16BigEndian(data.Slice(0, 2).Span);
+            switch (type)
             {
                 case MsgType.SYS_LED:
-                    return new SysLedMessage(type, data);
+                    return new SysLedMessage(data);
                 case MsgType.SYS_LICENSE_TIMER:
-                    return new SysLicenseTimerMessage(type, data);
+                    return new SysLicenseTimerMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }

@@ -8,7 +8,7 @@ namespace RfpProxy.Log.Messages
     {
         public TimeSpan GracePeriod { get; }
 
-        public SysLicenseTimerMessage(ushort type, ReadOnlyMemory<byte> data) : base(type, data)
+        public SysLicenseTimerMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LICENSE_TIMER, data)
         {
             var grace = BinaryPrimitives.ReadUInt16BigEndian(Raw.Slice(6).Span);
             GracePeriod = TimeSpan.FromMinutes(grace);

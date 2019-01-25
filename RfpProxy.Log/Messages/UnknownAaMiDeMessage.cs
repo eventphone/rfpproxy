@@ -5,7 +5,7 @@ namespace RfpProxy.Log.Messages
 {
     public sealed class UnknownAaMiDeMessage:AaMiDeMessage
     {
-        public UnknownAaMiDeMessage(ushort type, ReadOnlyMemory<byte> data) : base(type, data)
+        public UnknownAaMiDeMessage(MsgType type, ReadOnlyMemory<byte> data) : base(type, data)
         {
         }
 
