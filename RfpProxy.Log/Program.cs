@@ -179,7 +179,7 @@ namespace RfpProxy.Log
         private static void OnClientMessage(ReadOnlySpan<byte> identifier, ReadOnlyMemory<byte> data)
         {
             var message = AaMiDeMessage.Create(data);
-            Console.Write($"RFP:{AaMiDeMessage.ByteToHex(identifier)}");
+            Console.Write($"RFP:{AaMiDeMessage.ByteToHex(identifier)} ");
             message.Log(Console.Out);
             Console.WriteLine();
         }
@@ -187,7 +187,7 @@ namespace RfpProxy.Log
         private static void OnServerMessage(ReadOnlySpan<byte> identifier, ReadOnlyMemory<byte> data)
         {
             var message = AaMiDeMessage.Create(data);
-            Console.Write($"OMM:{AaMiDeMessage.ByteToHex(identifier)}");
+            Console.Write($"OMM:{AaMiDeMessage.ByteToHex(identifier)} ");
             message.Log(Console.Out);
             Console.WriteLine();
         }

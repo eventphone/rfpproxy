@@ -10,7 +10,7 @@ namespace RfpProxy.Log.Messages
 
         public SysLicenseTimerMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LICENSE_TIMER, data)
         {
-            var grace = BinaryPrimitives.ReadUInt16BigEndian(Raw.Slice(6).Span);
+            var grace = BinaryPrimitives.ReadUInt16BigEndian(Raw.Slice(2).Span);
             GracePeriod = TimeSpan.FromMinutes(grace);
         }
 
