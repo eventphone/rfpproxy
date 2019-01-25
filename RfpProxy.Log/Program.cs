@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Mono.Options;
 using Newtonsoft.Json;
 using RfpProxyLib.Messages;
+using RfpProxy.Log.Messages;
 
 namespace RfpProxy.Log
 {
@@ -177,56 +178,18 @@ namespace RfpProxy.Log
 
         private static void OnClientMessage(ReadOnlySpan<byte> identifier, ReadOnlyMemory<byte> data)
         {
-            var msgType = (MsgType)BinaryPrimitives.ReadUInt16BigEndian(data.Slice(0, 2).Span);
-            var msgLen = BinaryPrimitives.ReadUInt16BigEndian(data.Slice(2, 2).Span);
-            var msgData = data.Slice(4).Span;
-            Console.WriteLine($"RFP:{ByteToHex(identifier)} Len:{msgLen,4} Type:{msgType,-22} Data: {ByteToHex(msgData)}");
+            var message = AaMiDeMessage.Create(data);
+            Console.Write($"RFP:{AaMiDeMessage.ByteToHex(identifier)}");
+            message.Log(Console.Out);
+            Console.WriteLine();
         }
 
         private static void OnServerMessage(ReadOnlySpan<byte> identifier, ReadOnlyMemory<byte> data)
         {
-            var msgType = (MsgType)BinaryPrimitives.ReadUInt16BigEndian(data.Slice(0, 2).Span);
-            var msgLen = BinaryPrimitives.ReadUInt16BigEndian(data.Slice(2, 2).Span);
-            var msgData = data.Slice(4).Span;
-            Console.WriteLine($"OMM:{ByteToHex(identifier)} Len:{msgLen,4} Type:{msgType,-22} Data: {ByteToHex(msgData)}");
-            switch (msgType)
-            {
-                case MsgType.DNM:
-                    ParseDNM(identifier, data);
-                    break;
-                case MsgType.SYS_LED:
-                    ParseLED(identifier, data);
-                    break;
-                case MsgType.SYS_LICENSE_TIMER:
-                    ParseLicenseTimer(identifier, data);
-                    break;
-            }
-        }
-
-        private static void ParseDNM(ReadOnlySpan<byte> identifier, ReadOnlyMemory<byte> data)
-        {
-            return;
-        }
-
-        private static void ParseLED(ReadOnlySpan<byte> identifier, ReadOnlyMemory<byte> data)
-        {
-            var color_byte = (data.Slice(5,1).Span)[0];
-            var led_color = (LEDSignal)color_byte;
-            Console.WriteLine($"  set LED color {led_color}");
-        }
-
-        private static void ParseLicenseTimer(ReadOnlySpan<byte> identifier, ReadOnlyMemory<byte> data)
-        {
-            var grace_period = BinaryPrimitives.ReadUInt16BigEndian(data.Slice(6, 2).Span);
-            Console.WriteLine($"  set grace time: {grace_period} minutes ");
-        }
-
-        private static string ByteToHex(ReadOnlySpan<byte> bytes)
-        {
-            StringBuilder s = new StringBuilder(bytes.Length*2);
-            foreach (byte b in bytes)
-                s.Append(b.ToString("x2"));
-            return s.ToString();
+            var message = AaMiDeMessage.Create(data);
+            Console.Write($"OMM:{AaMiDeMessage.ByteToHex(identifier)}");
+            message.Log(Console.Out);
+            Console.WriteLine();
         }
     }
 }

@@ -1,4 +1,4 @@
-namespace RfpProxy.Log
+namespace RfpProxy.Log.Messages
 {
     public enum MsgType : ushort
     {
@@ -78,16 +78,5 @@ namespace RfpProxy.Log
         VIDEO_CONFIG = 0x0801,
     }
 
-    public enum LEDSignal
-    {
-        OFF = 0x00,
-        GREEN = 0x01,
-        GREEN_FLASH = 0x02,
-        GREEN_ORANGE_FLASH = 0x03,
-        NA4 = 0x04,
-        NA5 = 0x05,
-        ORANGE = 0x06,
-        NA7 = 0x07
-    }
 
 }
