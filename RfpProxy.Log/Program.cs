@@ -182,13 +182,13 @@ namespace RfpProxy.Log
         {
             var message = AaMiDeMessage.Create(data);
             Console.Write($"RFP:{AaMiDeMessage.ByteToHex(identifier)} ");
+            message.Log(Console.Out);
+            Console.WriteLine();
             if (_logRaw)
             {
                 Console.WriteLine(AaMiDeMessage.ByteToHex(data.Span));
                 Console.Write($"RFP:{AaMiDeMessage.ByteToHex(identifier)} ");
             }
-            message.Log(Console.Out);
-            Console.WriteLine();
         }
 
         private static void OnServerMessage(ReadOnlySpan<byte> identifier, ReadOnlyMemory<byte> data)
