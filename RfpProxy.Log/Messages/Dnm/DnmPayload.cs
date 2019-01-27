@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace RfpProxy.Log.Messages
+namespace RfpProxy.Log.Messages.Dnm
 {
     public abstract class DnmPayload
     {
@@ -38,6 +38,8 @@ namespace RfpProxy.Log.Messages
         {
             switch (type)
             {
+                case DnmType.MacConInd:
+                    return new MacConIndPayload(data);
                 case DnmType.MacDisReq:
                     return new EmptyDnmPayload(data);
                 default:

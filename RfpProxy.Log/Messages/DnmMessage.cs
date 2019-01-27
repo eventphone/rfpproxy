@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using RfpProxyLib;
+using RfpProxy.Log.Messages.Dnm;
 
 namespace RfpProxy.Log.Messages
 {
