@@ -35,24 +35,30 @@ namespace RfpProxy.Log.Messages
         MacGetCurrCkeyIdCnf = 0x21,
     }
 
+    public enum DnmLayer : byte
+    {
+        Lc = 0x79,
+        Mac = 0x7a
+    }
+
     public sealed class DnmMessage : AaMiDeMessage
     {
 
-        public byte Reserved0 { get; }
+        public DnmLayer Layer { get; }
+
+        public DnmType DnmType { get; }
 
         /// <summary>
         /// MAC Connection Endpoint Identification 
         /// </summary>
         public byte MCEI { get; }
 
-        public DnmType DnmType { get; }
-
         public byte Reserved1 { get; }
 
         public DnmMessage(ReadOnlyMemory<byte> data) : base(MsgType.DNM, data)
         {
             var span = base.Raw.Span;
-            Reserved0 = span[0];
+            Layer = (DnmLayer) span[0];
             DnmType = (DnmType) span[1];
             MCEI = span[2];
             Reserved1 = data.Span[3];
@@ -72,7 +78,7 @@ namespace RfpProxy.Log.Messages
         {
             base.Log(writer);
             writer.WriteLine();
-            writer.WriteLine($"\tDNM: Length({Raw.Length}) Type({DnmType,20:G}) MCEI({MCEI:X}) Reserved0({Reserved0:X}) Reserved1({Reserved1:x})");
+            writer.WriteLine($"\tDNM: Length({Raw.Length,3}) Layer({Layer,3:G}) Type({DnmType,20:G}) MCEI({MCEI:X}) Reserved1(0x{Reserved1:x})");
             writer.Write($"\t{HexEncoding.ByteToHex(Raw.Span)}");
         }
     }
