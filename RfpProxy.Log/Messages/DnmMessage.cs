@@ -77,8 +77,7 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.WriteLine();
-            writer.WriteLine($"\tDNM: Length({DnmLength,3}) Layer({Layer,-3:G}) Type({DnmType,-20:G}) MCEI(0x{MCEI:x2})");
+            writer.WriteLine($"Length({DnmLength,3}) Layer({Layer,-3:G}) Type({DnmType,-20:G}) MCEI(0x{MCEI:x2})");
             writer.Write($"\t{HexEncoding.ByteToHex(Raw.Span)}");
         }
     }
