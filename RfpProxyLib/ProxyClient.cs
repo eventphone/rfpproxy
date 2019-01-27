@@ -99,6 +99,11 @@ namespace RfpProxyLib
             await _socket.SendAsync(data, SocketFlags.None, cancellationToken).ConfigureAwait(false);
         }
 
+        public void Stop()
+        {
+            _socket.Close();
+        }
+
         private Task OnMessageAsync(byte[] message, CancellationToken cancellationToken)
         {
             var direction = (MessageDirection) message[0];

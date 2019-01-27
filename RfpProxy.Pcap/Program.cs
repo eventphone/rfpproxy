@@ -59,6 +59,7 @@ namespace RfpProxy.Pcap
                     {
                         e.Cancel = true;
                         cts.Cancel();
+                        client.Stop();
                     };
                     await client.AddListenAsync(mac, rfpMmask, filter, filterMask, cts.Token).ConfigureAwait(false);
                     await client.RunAsync(cts.Token).ConfigureAwait(false);
@@ -107,6 +108,7 @@ namespace RfpProxy.Pcap
 
         protected override async Task OnMessageAsync(MessageDirection direction, uint messageId, RfpIdentifier rfp, Memory<byte> data, CancellationToken cancellationToken)
         {
+            data = data.Slice(4);
             var packetheaderlength = 6 + 6 + 2 + 4;
             var timestamp = DateTimeOffset.UtcNow;
             var header = new byte[16];
@@ -129,10 +131,9 @@ namespace RfpProxy.Pcap
             }
             header[12] = 0xa0;
 
-            header[14] = 0xde;
-            header[15] = 0xad;
-            header[16] = 0xbe;
-            header[17] = 0xef;
+            BinaryPrimitives.WriteUInt16BigEndian(header.AsSpan(14), (ushort) data.Length);
+            header[16] = 0xba;
+            header[17] = 0xbe;
             await _file.WriteAsync(header, cancellationToken).ConfigureAwait(false);
 
             await _file.WriteAsync(data, cancellationToken).ConfigureAwait(false);

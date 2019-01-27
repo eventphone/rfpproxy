@@ -58,6 +58,7 @@ namespace RfpProxy.Log
                     {
                         e.Cancel = true;
                         cts.Cancel();
+                        client.Stop();
                     };
                     client.Log += (s, e) =>
                     {
