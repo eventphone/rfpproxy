@@ -1,6 +1,7 @@
 using System;
 using System.Buffers.Binary;
 using System.IO;
+using RfpProxyLib;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -24,8 +25,8 @@ namespace RfpProxy.Test
             var baseiv_tx_hex = sysinit.Substring(11*2, 8*2);
             var baseiv_rx_hex = sysinit.Substring(27*2, 8*2);
 
-            var baseiv_rx = BlowFish.HexToByte(baseiv_rx_hex);
-            var baseiv_tx = BlowFish.HexToByte(baseiv_tx_hex);
+            var baseiv_rx = HexEncoding.HexToByte(baseiv_rx_hex);
+            var baseiv_tx = HexEncoding.HexToByte(baseiv_tx_hex);
             
             _connection.InitOmmToRfpIv(baseiv_rx);
             _connection.InitRfpToOmmIv(baseiv_tx);
@@ -35,14 +36,14 @@ namespace RfpProxy.Test
         public void CanDecrypt()
         {
             var hex = "d427a873ed113a2a57eb9dbfe6e0eb7d";
-            var crypted = BlowFish.HexToByte(hex);
+            var crypted = HexEncoding.HexToByte(hex);
             var plain = _connection.DecryptOmmToRfp(crypted, _connection.OmmToRfpIv);
-            var plainhex = BlowFish.ByteToHex(plain.Span);
+            var plainhex = HexEncoding.ByteToHex(plain.Span);
             _output.WriteLine(plainhex);
             Assert.Equal("010c00000101000801010008b8b82006", plainhex);
 
             var recrypted = _connection.CryptOmmToRfp(plain);
-            var rehex = BlowFish.ByteToHex(recrypted.Span);
+            var rehex = HexEncoding.ByteToHex(recrypted.Span);
             Assert.Equal(hex, rehex);
         }
 
@@ -52,18 +53,18 @@ namespace RfpProxy.Test
             _connection = new CryptedRfpConnection(null, null);
             var sysinit = "012d00209bc21bab186210cd8d619849d192e75f28e79d0744696a53ba172a916a48d877";
             var baseiv_tx_hex = sysinit.Substring(11*2, 8*2);
-            var baseiv_tx = BlowFish.HexToByte(baseiv_tx_hex);
+            var baseiv_tx = HexEncoding.HexToByte(baseiv_tx_hex);
             _connection.InitRfpToOmmIv(baseiv_tx);
 
             var blowfish = new BlowFish("87E0F9B38927F7231541FA19C2E2DE7629EB96C85E7C794D2EA55DE608E4AE07CFF431A267B8790A36C6E41C21F8350C77871E168798731F");
-            var plain = blowfish.Decrypt_CBC(_connection.RfpToOmmIv.Span, BlowFish.HexToByte("f2133e35cb05e2ab"));
-            Assert.Equal("0117001000000000", BlowFish.ByteToHex(plain.Span));
+            var plain = blowfish.Decrypt_CBC(_connection.RfpToOmmIv.Span, HexEncoding.HexToByte("f2133e35cb05e2ab"));
+            Assert.Equal("0117001000000000", HexEncoding.ByteToHex(plain.Span));
 
             Decrypt(blowfish, "19bd7633111aee81", "c2ecf097d56210a8c9688232a2c11c33", "030100087906070003236101eeeeeeee");
             Decrypt(blowfish, "c9688232a2c11c33", "d6f0cf994acd7ccc", "0301000479070710");
             Decrypt(blowfish, "d6f0cf994acd7ccc", "a428979598d57473", "0301000479070700");
             
-            var rekeyed = _connection.Rekey(BlowFish.HexToByte("a4289795"));
+            var rekeyed = _connection.Rekey(HexEncoding.HexToByte("a4289795"));
             Decrypt(rekeyed, "a428979598d57473", "04aa5061fabfc098", "0301000879060700");
         }
 
@@ -73,7 +74,7 @@ namespace RfpProxy.Test
             var blowfish = new BlowFish("87E0F9B38927F7231541FA19C2E2DE7629EB96C85E7C794D2EA55DE608E4AE07CFF431A267B8790A36C6E41C21F8350C77871E168798731F");
             var sysinit = "012d00209bc21bab186210cd8d619849d192e75f28e79d0744696a53ba172a916a48d877";
             var baseiv_tx_hex = sysinit.Substring(11*2, 8*2);
-            var baseiv_tx = BlowFish.HexToByte(baseiv_tx_hex);
+            var baseiv_tx = HexEncoding.HexToByte(baseiv_tx_hex);
             _connection = new CryptedRfpConnection(null, null);
             _connection.InitRfpToOmmIv(baseiv_tx);
             var iv = _connection.RfpToOmmIv.Span;
@@ -111,9 +112,9 @@ namespace RfpProxy.Test
 
         private void Decrypt(BlowFish blowfish, string iv, string data, string plain)
         {
-            var ivb = BlowFish.HexToByte(iv);
-            var plainb = blowfish.Decrypt_CBC(ivb, BlowFish.HexToByte(data));
-            Assert.Equal(plain, BlowFish.ByteToHex(plainb.Span));
+            var ivb = HexEncoding.HexToByte(iv);
+            var plainb = blowfish.Decrypt_CBC(ivb, HexEncoding.HexToByte(data));
+            Assert.Equal(plain, HexEncoding.ByteToHex(plainb.Span));
         }
 
         [Fact]

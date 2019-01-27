@@ -2,6 +2,7 @@
 using System.Buffers.Binary;
 using System.IO;
 using System.Text;
+using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages
 {
@@ -61,14 +62,6 @@ namespace RfpProxy.Log.Messages
             writer.Write($"{Type,-22}({Length,4}) ");
         }
 
-        public static string ByteToHex(ReadOnlySpan<byte> bytes)
-        {
-            StringBuilder s = new StringBuilder(bytes.Length*2);
-            foreach (byte b in bytes)
-                s.Append(b.ToString("x2"));
-            return s.ToString();
-        }
-
         public static void PrintIfNotZero(TextWriter writer, string prefix, ReadOnlySpan<byte> data)
         {
             bool hasData = false;
@@ -82,7 +75,7 @@ namespace RfpProxy.Log.Messages
             }
             if (hasData)
             {
-                writer.Write(prefix + ByteToHex(data));
+                writer.Write(prefix + HexEncoding.ByteToHex(data));
             }
         }
     }

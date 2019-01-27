@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages
 {
@@ -12,7 +13,7 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write(ByteToHex(Raw.Span));
+            writer.Write(HexEncoding.ByteToHex(Raw.Span));
         }
     }
 }

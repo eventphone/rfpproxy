@@ -81,7 +81,7 @@ All messages (subscriptions, replies & unsolicited messages) are composed of a h
   * unsigned (max 0x7FFFFFC7)
 * 1 byte Direction:
   * 0: FromOmm / ToRfp
-  * 1; FromRfp / ToOmm
+  * 1: FromRfp / ToOmm
 * 4 byte message id:
   * when received from proxy and subscribed with handle the response has to contain this message id - even if the message should be discarded
   * when sending unsolicited messages this has to be 0

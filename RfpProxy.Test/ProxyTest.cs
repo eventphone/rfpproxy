@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using RfpProxyLib;
 using Xunit;
 
 namespace RfpProxy.Test
@@ -103,14 +104,14 @@ namespace RfpProxy.Test
 
             public string LastRfpMessageHex
             {
-                get { return BlowFish.ByteToHex(LastRfpMessage.Span); }
+                get { return HexEncoding.ByteToHex(LastRfpMessage.Span); }
             }
 
             public ReadOnlyMemory<byte> LastOmmMessage { get; private set; }
 
             public string LastOmmMessageHex
             {
-                get { return BlowFish.ByteToHex(LastOmmMessage.Span); }
+                get { return HexEncoding.ByteToHex(LastOmmMessage.Span); }
             }
 
             public ManualResetEventSlim RfpMessageEvent
@@ -120,7 +121,7 @@ namespace RfpProxy.Test
 
             public void SendFromOmm(string hex)
             {
-                SendFromOmm(BlowFish.HexToByte(hex));
+                SendFromOmm(HexEncoding.HexToByte(hex));
             }
 
             public void SendFromOmm(ReadOnlySpan<byte> data)
@@ -132,7 +133,7 @@ namespace RfpProxy.Test
 
             public void SendFromRfp(string hex)
             {
-                SendFromRfp(BlowFish.HexToByte(hex));
+                SendFromRfp(HexEncoding.HexToByte(hex));
             }
 
             public void SendFromRfp(ReadOnlySpan<byte> data)

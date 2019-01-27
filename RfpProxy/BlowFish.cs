@@ -58,6 +58,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
+using RfpProxyLib;
 
 namespace RfpProxy
 {
@@ -95,7 +96,7 @@ namespace RfpProxy
         /// </summary>
         /// <param name="hexKey">Cipher key as a hex string</param>
         public BlowFish(string hexKey)
-            :this(HexToByte(hexKey))
+            :this(HexEncoding.HexToByte(hexKey))
         {
         }
 
@@ -549,51 +550,6 @@ namespace RfpProxy
                 0x01c36ae4, 0xd6ebe1f9, 0x90d4f869, 0xa65cdea0, 0x3f09252d, 0xc208e69f,
                 0xb74e6132, 0xce77e25b, 0x578fdfe3, 0x3ac372e6
             };
-        }
-
-        #endregion
-
-        #region Conversions
-
-        //converts a byte array to a hex string
-        public static string ByteToHex(ReadOnlySpan<byte> bytes)
-        {
-            StringBuilder s = new StringBuilder(bytes.Length*2);
-            foreach (byte b in bytes)
-                s.Append(b.ToString("x2"));
-            return s.ToString();
-        }
-
-        //converts a hex string to a byte array
-        public static byte[] HexToByte(string hex)
-        {
-            var r = new byte[hex.Length / 2];
-            for (var i = 0; i < hex.Length - 1; i += 2)
-            {
-                var a = GetHex(hex[i]);
-                var b = GetHex(hex[i + 1]);
-                r[i / 2] = (byte)(a * 16 + b);
-            }
-            return r;
-        }
-
-        //converts a single hex character to it's decimal value
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static byte GetHex(char x)
-        {
-            if (x <= '9' && x >= '0')
-            {
-                return (byte)(x - '0');
-            }
-            else if (x <= 'z' && x >= 'a')
-            {
-                return (byte)(x - 'a' + 10);
-            }
-            else if (x <= 'Z' && x >= 'A')
-            {
-                return (byte)(x - 'A' + 10);
-            }
-            return 0;
         }
 
         #endregion

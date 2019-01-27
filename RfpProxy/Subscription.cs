@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using RfpProxyLib;
+using RfpProxyLib.Messages;
 
 namespace RfpProxy
 {

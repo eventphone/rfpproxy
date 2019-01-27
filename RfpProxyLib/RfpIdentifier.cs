@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 
-namespace RfpProxy
+namespace RfpProxyLib
 {
     public readonly struct RfpIdentifier:IEquatable<RfpIdentifier>
     {
@@ -31,9 +31,9 @@ namespace RfpProxy
             return true;
         }
 
-        public void CopyTo(Memory<byte> target)
+        public void CopyTo(Span<byte> target)
         {
-            _identifier.CopyTo(target);
+            _identifier.Span.CopyTo(target);
         }
 
         public bool Equals(RfpIdentifier other)
@@ -63,6 +63,11 @@ namespace RfpProxy
         public static bool operator !=(RfpIdentifier left, RfpIdentifier right)
         {
             return !left.Equals(right);
+        }
+
+        public override string ToString()
+        {
+            return HexEncoding.ByteToHex(_identifier.Span);
         }
     }
 }

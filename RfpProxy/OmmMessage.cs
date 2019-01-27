@@ -3,17 +3,11 @@ using System.Buffers.Binary;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using RfpProxyLib;
+using RfpProxyLib.Messages;
 
 namespace RfpProxy
 {
-    public enum MessageDirection:byte
-    {
-        FromOmm = 0,
-        ToRfp = FromOmm,
-        FromRfp = 1,
-        ToOmm = FromRfp
-    }
-
     public class OmmMessage
     {
         private readonly SemaphoreSlim _receivedReply = new SemaphoreSlim(0,1);
@@ -64,7 +58,7 @@ namespace RfpProxy
             BinaryPrimitives.WriteUInt32BigEndian(header.AsSpan(), (uint) (1 + 4 + RfpIdentifier.Length + Message.Length));
             header[4] = (byte) Direction;
             BinaryPrimitives.WriteUInt32BigEndian(header.AsSpan(5), MessageId);
-            Rfp.CopyTo(header.AsMemory().Slice(4 + 1 + 4));
+            Rfp.CopyTo(header.AsSpan(4 + 1 + 4));
             await socket.SendAsync(header, SocketFlags.None, cancellationToken).ConfigureAwait(false);
             await socket.SendAsync(Message, SocketFlags.None, cancellationToken).ConfigureAwait(false);
         }
