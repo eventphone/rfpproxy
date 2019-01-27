@@ -58,13 +58,13 @@ namespace RfpProxy.Log.Messages
             Reserved1 = data.Span[3];
         }
 
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(4);
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(3);
 
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
             writer.WriteLine();
-            writer.WriteLine($"\tDNM: Length({Raw.Length}) Type({DnmType:20:G}) MCEI({MCEI:X}) Reserved0({Reserved0:X}) Reserved1({Reserved1:x})");
+            writer.WriteLine($"\tDNM: Length({Raw.Length}) Type({DnmType,20:G}) MCEI({MCEI:X}) Reserved0({Reserved0:X}) Reserved1({Reserved1:x})");
             writer.Write($"\t{HexEncoding.ByteToHex(Raw.Span)}");
         }
     }
