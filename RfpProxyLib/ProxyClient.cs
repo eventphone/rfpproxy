@@ -103,7 +103,7 @@ namespace RfpProxyLib
         {
             var direction = (MessageDirection) message[0];
             var messageId = BinaryPrimitives.ReadUInt32BigEndian(message.AsSpan(1));
-            var rfp = new RfpIdentifier(message.AsMemory(5));
+            var rfp = new RfpIdentifier(message.AsMemory(5, 6));
             return OnMessageAsync(direction, messageId, rfp, message.AsMemory(5).Slice(RfpIdentifier.Length), cancellationToken);
         }
 
