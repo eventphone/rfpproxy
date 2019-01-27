@@ -96,10 +96,10 @@ namespace RfpProxy.Pcap
             header[6] = 0x00; // minor version
             header[7] = 0x04;
             
-            header[17] = 0xff; // snaplen
+            header[16] = 0xff; // snaplen
+            header[17] = 0xff;
             header[18] = 0xff;
             header[19] = 0xff;
-            header[20] = 0xff;
 
             header[23] = 0x01; // ethernet
             _file.Write(header);
