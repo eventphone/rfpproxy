@@ -53,7 +53,7 @@ namespace RfpProxy.Log.Messages
         /// </summary>
         public byte MCEI { get; }
 
-        public byte Reserved1 { get; }
+        public byte DnmLength { get; }
 
         public DnmMessage(ReadOnlyMemory<byte> data) : base(MsgType.DNM, data)
         {
@@ -61,7 +61,7 @@ namespace RfpProxy.Log.Messages
             Layer = (DnmLayer) span[0];
             DnmType = (DnmType) span[1];
             MCEI = span[2];
-            Reserved1 = data.Span[3];
+            DnmLength = data.Span[3];
         }
 
         protected override ReadOnlyMemory<byte> Raw
@@ -78,7 +78,7 @@ namespace RfpProxy.Log.Messages
         {
             base.Log(writer);
             writer.WriteLine();
-            writer.WriteLine($"\tDNM: Length({Raw.Length,3}) Layer({Layer,3:G}) Type({DnmType,20:G}) MCEI({MCEI:X}) Reserved1(0x{Reserved1:x})");
+            writer.WriteLine($"\tDNM: Length({DnmLength,3}) Layer({Layer,-3:G}) Type({DnmType,-20:G}) MCEI(0x{MCEI:x2})");
             writer.Write($"\t{HexEncoding.ByteToHex(Raw.Span)}");
         }
     }
