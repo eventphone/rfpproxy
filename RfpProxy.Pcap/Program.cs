@@ -81,6 +81,7 @@ namespace RfpProxy.Pcap
         public PcapClient(string socket, string filename) : base(socket)
         {
             _file = File.OpenWrite(filename);
+            _file.SetLength(0);
             WritePcapHeader();
         }
 
