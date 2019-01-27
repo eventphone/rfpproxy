@@ -5,7 +5,7 @@ namespace RfpProxy.Log.Messages.Dnm
 {
     public abstract class DnmPayload
     {
-        public ReadOnlyMemory<byte> Raw { get; }
+        public virtual ReadOnlyMemory<byte> Raw { get; }
 
         protected DnmPayload(ReadOnlyMemory<byte> data)
         {
@@ -30,7 +30,7 @@ namespace RfpProxy.Log.Messages.Dnm
             switch (type)
             {
                 default:
-                    return new UnknownDnmPayload(data);
+                    return new UnknowLcPayload(data);
             }
         }
 
