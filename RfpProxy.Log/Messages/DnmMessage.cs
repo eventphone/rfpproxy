@@ -35,7 +35,7 @@ namespace RfpProxy.Log.Messages
         MacGetCurrCkeyIdCnf = 0x21,
     }
 
-    public class DnmMessage : AaMiDeMessage
+    public sealed class DnmMessage : AaMiDeMessage
     {
 
         public byte Reserved0 { get; }
@@ -51,14 +51,22 @@ namespace RfpProxy.Log.Messages
 
         public DnmMessage(ReadOnlyMemory<byte> data) : base(MsgType.DNM, data)
         {
-            var span = data.Span;
+            var span = base.Raw.Span;
             Reserved0 = span[0];
             DnmType = (DnmType) span[1];
             MCEI = span[2];
             Reserved1 = data.Span[3];
         }
 
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(3);
+        protected override ReadOnlyMemory<byte> Raw
+        {
+            get
+            {
+                if (base.Raw.Length >= 4)
+                    return base.Raw.Slice(4);
+                return Array.Empty<byte>();
+            }
+        }
 
         public override void Log(TextWriter writer)
         {
