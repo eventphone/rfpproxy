@@ -18,7 +18,7 @@ namespace RfpProxy.Log.Messages.Dnm
             var span = data.Span;
             FMID = span[0];
             PMID = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(1));
-            Reserved = data.Slice(2);
+            Reserved = data.Slice(3);
         }
         
         public override void Log(TextWriter writer)
