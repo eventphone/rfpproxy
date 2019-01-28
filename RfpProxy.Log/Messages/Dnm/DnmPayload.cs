@@ -46,6 +46,8 @@ namespace RfpProxy.Log.Messages.Dnm
                     return new EmptyDnmPayload(data);
                 case DnmType.MacEncKeyReq:
                     return new MacEncKeyReqPayload(data);
+                case DnmType.MacEncEksInd:
+                    return new MacEncEksIndPayload(data);
                 default:
                     return new UnknownDnmPayload(data);
             }
