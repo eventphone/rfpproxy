@@ -19,7 +19,7 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public override void Log(TextWriter writer)
         {
-            writer.Write($"\tMAC: Flag({Flag:G})");
+            writer.Write($"\tFlag({Flag:G})");
         }
     }
 }

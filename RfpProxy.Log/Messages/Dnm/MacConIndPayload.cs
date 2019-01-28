@@ -23,7 +23,7 @@ namespace RfpProxy.Log.Messages.Dnm
         
         public override void Log(TextWriter writer)
         {
-            writer.Write($"\tMAC: PMID({PMID:x5}) Reserved({HexEncoding.ByteToHex(Reserved.Span)})");
+            writer.Write($"\tPMID({PMID:x5}) Reserved({HexEncoding.ByteToHex(Reserved.Span)})");
         }
     }
 }
