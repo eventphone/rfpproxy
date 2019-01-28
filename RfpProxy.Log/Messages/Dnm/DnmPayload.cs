@@ -40,6 +40,8 @@ namespace RfpProxy.Log.Messages.Dnm
             {
                 case DnmType.MacConInd:
                     return new MacConIndPayload(data);
+                case DnmType.MacDisInd:
+                    return new MacDisIndPayload(data);
                 case DnmType.MacDisReq:
                     return new EmptyDnmPayload(data);
                 case DnmType.MacEncKeyReq:

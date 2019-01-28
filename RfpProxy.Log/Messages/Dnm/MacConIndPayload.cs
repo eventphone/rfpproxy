@@ -7,8 +7,14 @@ namespace RfpProxy.Log.Messages.Dnm
 {
     public sealed class MacConIndPayload : DnmPayload
     {
+        /// <summary>
+        /// Fixed part MAC Identity
+        /// </summary>
         public byte FMID { get; }
 
+        /// <summary>
+        /// Portable part MAC Identity
+        /// </summary>
         public ushort PMID { get; }
 
         public ReadOnlyMemory<byte> Reserved { get; }
