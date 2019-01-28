@@ -8,29 +8,23 @@ namespace RfpProxy.Log.Messages.Dnm
     public sealed class MacConIndPayload : DnmPayload
     {
         /// <summary>
-        /// Fixed part MAC Identity
-        /// </summary>
-        public byte FMID { get; }
-
-        /// <summary>
         /// Portable part MAC Identity
         /// </summary>
-        public ushort PMID { get; }
+        public uint PMID { get; }
 
         public ReadOnlyMemory<byte> Reserved { get; }
 
         public MacConIndPayload(ReadOnlyMemory<byte> data) : base(data)
         {
             var span = data.Span;
-            FMID = span[0];
-            PMID = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(1));
+            PMID = (uint)(span[0] << 16) | BinaryPrimitives.ReadUInt16BigEndian(span.Slice(1));
             Reserved = data.Slice(3);
         }
         
         public override void Log(TextWriter writer)
         {
             writer.WriteLine();
-            writer.Write($"\tMAC: FMID({FMID:x2}) PMID({PMID:x4}) Reserved({HexEncoding.ByteToHex(Reserved.Span)})");
+            writer.Write($"\tMAC: PMID({PMID:x6}) Reserved({HexEncoding.ByteToHex(Reserved.Span)})");
         }
     }
 }
