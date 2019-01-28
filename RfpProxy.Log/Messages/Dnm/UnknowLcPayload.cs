@@ -12,8 +12,6 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public override void Log(TextWriter writer)
         {
-            
-            writer.WriteLine();
             writer.Write($"\tReserved0(0x{Reserved0:x2})");
             if (Length > 0)
             {

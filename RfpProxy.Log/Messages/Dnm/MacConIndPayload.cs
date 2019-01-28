@@ -8,7 +8,7 @@ namespace RfpProxy.Log.Messages.Dnm
     public sealed class MacConIndPayload : DnmPayload
     {
         /// <summary>
-        /// Portable part MAC Identity
+        /// Portable part MAC Identity / OMM PPn
         /// </summary>
         public uint PMID { get; }
 
@@ -23,8 +23,7 @@ namespace RfpProxy.Log.Messages.Dnm
         
         public override void Log(TextWriter writer)
         {
-            writer.WriteLine();
-            writer.Write($"\tMAC: PMID({PMID:x6}) Reserved({HexEncoding.ByteToHex(Reserved.Span)})");
+            writer.Write($"\tMAC: PMID({PMID:x5}) Reserved({HexEncoding.ByteToHex(Reserved.Span)})");
         }
     }
 }

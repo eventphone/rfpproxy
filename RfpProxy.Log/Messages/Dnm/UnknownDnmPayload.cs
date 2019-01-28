@@ -14,8 +14,7 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public override void Log(TextWriter writer)
         {
-            writer.WriteLine();
-            writer.Write($" UNK\t{HexEncoding.ByteToHex(Raw.Span)}");
+            writer.Write($"\tUNK: {HexEncoding.ByteToHex(Raw.Span)}");
         }
     }
 }

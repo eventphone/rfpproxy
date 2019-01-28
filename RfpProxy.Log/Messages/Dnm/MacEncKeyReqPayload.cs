@@ -20,7 +20,6 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public override void Log(TextWriter writer)
         {
-            writer.WriteLine();
             writer.Write($"\tKey({HexEncoding.ByteToHex(Key.Span)}) Id({Id,3})");
         }
     }

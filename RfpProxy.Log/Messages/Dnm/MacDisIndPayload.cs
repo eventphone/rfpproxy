@@ -24,7 +24,6 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public override void Log(TextWriter writer)
         {
-            writer.WriteLine();
             writer.Write($"\tMAC: Reason({Reason,-11:G})");
         }
     }
