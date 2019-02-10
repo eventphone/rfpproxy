@@ -4,6 +4,7 @@ stages:
 build:
  stage: build
  tags: 
+  - build
   - dotnet
  script:
   - 'dotnet add RfpProxy/RfpProxy.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
@@ -22,12 +23,17 @@ deploy:
  stage: deploy
  when: manual
  tags: 
+  - deploy
   - omm
  dependencies:
   - build
  script:
   - 'rsync -av --delete publish/ /opt/rfpproxy/'
-  - '/bin/chmod +x /opt/rfpproxy/RfpProxy'
-  - 'sudo /bin/systemctl restart rfpproxy'
+  - 'chmod +x /opt/rfpproxy/rfpproxy/rfpproxy'
+  - 'chmod +x /opt/rfpproxy/rfpproxy.log/rfpproxylog'
+  - 'chmod +x /opt/rfpproxy/rfpproxy.pcap/rfpproxydump'
+  - 'ln -s /opt/rfpproxy/rfpproxy.log/rfpproxylog /usr/local/bin/rfpproxylog'
+  - 'ln -s /opt/rfpproxy/rfpproxy.pcap/rfpproxydump /usr/local/bin/rfpproxydump'
+  - 'sudo /usr/bin/systemctl restart rfpproxy'
  only:
   - master

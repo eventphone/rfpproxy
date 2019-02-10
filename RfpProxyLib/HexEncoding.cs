@@ -18,6 +18,8 @@ namespace RfpProxyLib
         //converts a hex string to a byte array
         public static byte[] HexToByte(string hex)
         {
+            if ((hex.Length & 1) != 0)
+                throw new ArgumentException("uneven hex length");
             var r = new byte[hex.Length / 2];
             for (var i = 0; i < hex.Length - 1; i += 2)
             {
