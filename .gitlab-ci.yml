@@ -32,8 +32,6 @@ deploy:
   - 'chmod +x /opt/rfpproxy/rfpproxy/rfpproxy'
   - 'chmod +x /opt/rfpproxy/rfpproxy.log/rfpproxylog'
   - 'chmod +x /opt/rfpproxy/rfpproxy.pcap/rfpproxydump'
-  - 'ln -s /opt/rfpproxy/rfpproxy.log/rfpproxylog /usr/local/bin/rfpproxylog'
-  - 'ln -s /opt/rfpproxy/rfpproxy.pcap/rfpproxydump /usr/local/bin/rfpproxydump'
   - 'sudo /usr/bin/systemctl restart rfpproxy'
  only:
   - master
