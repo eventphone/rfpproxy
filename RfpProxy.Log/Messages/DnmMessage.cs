@@ -39,7 +39,9 @@ namespace RfpProxy.Log.Messages
     {
         Rfpc = 0x78,
         Lc = 0x79,
-        Mac = 0x7a
+        Mac = 0x7a,
+        Unknown1 = 0x7B,
+        Unknown2 = 0x7C, //HO???
     }
 
     public sealed class DnmMessage : AaMiDeMessage

@@ -11,9 +11,28 @@ namespace RfpProxy.Log.Messages
         InitReq = 0x02,
         InitCfm = 0x03,
         SariListReq = 0x05,
+        ChangeHigherLayerCapabilitiesReq = 0x06,
+        ChangeHigherLayerCapabilitiesCfm = 0x07,
+        ChangeStatusInfoReq = 0x08,
+        ChangeStatusInfoCfm = 0x09,
         ActivateReq = 0x0f,
         ActivateCfm = 0x10,
+        DeactivateReq = 0x11,
+        DeactivateCfm = 0x12,
+        ResetReq = 0x13,
         StatisticsDataReq = 0x16,
+        StatisticsDataCfm = 0x17,
+        ErrorInd = 0x18,
+        ToRfpInd = 0x20,
+        ToRfpReq = 0x21,
+        TopoDataReq = 0x22,
+        TopoDataInd = 0x23,
+        BmcRestartReq = 0x24,
+        ChangeMasterReq = 0x25,
+        InfoInd = 0x26,
+        ActiveInd = 0x30,
+        ActiveRes = 0x31,
+        PagingQueueOverflowInd = 0x32
     }
 
     public enum RfpcKey : byte
