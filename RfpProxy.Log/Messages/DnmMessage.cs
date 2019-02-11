@@ -60,8 +60,10 @@ namespace RfpProxy.Log.Messages
             var span = base.Raw.Span;
             Layer = (DnmLayer) span[0];
             DnmType = (DnmType) span[1];
-            MCEI = span[2];
-            Payload = DnmPayload.Create(Layer, DnmType, Raw);
+            if (span.Length > 2)
+                MCEI = span[2];
+            if (span.Length > 3)
+                Payload = DnmPayload.Create(Layer, DnmType, Raw);
         }
 
         protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(3);
@@ -70,7 +72,7 @@ namespace RfpProxy.Log.Messages
         {
             base.Log(writer);
             writer.Write($"Layer({Layer,-3:G}) Type({DnmType,-20:G}) MCEI(0x{MCEI:x2})");
-            Payload.Log(writer);
+            Payload?.Log(writer);
         }
     }
 }

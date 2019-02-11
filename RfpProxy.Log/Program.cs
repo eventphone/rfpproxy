@@ -98,13 +98,20 @@ namespace RfpProxy.Log
                 {
                     prefix = "RFP:";
                 }
-                Console.Write($"{prefix}{rfp} ");
+                Console.Write($"{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff} {prefix}{rfp} ");
                 message.Log(Console.Out);
                 Console.WriteLine();
                 if (_logRaw)
                 {
-                    Console.WriteLine(HexEncoding.ByteToHex(data.Span));
-                    Console.Write($"RFP:{rfp} ");
+                    Console.Write("\t");
+                    int i = 0;
+                    var span = data.Span;
+                    for (i = 0; i < span.Length-8; i += 8)
+                    {
+                        Console.Write(HexEncoding.ByteToHex(span.Slice(i, 8)));
+                        Console.Write(' ');
+                    }
+                    Console.WriteLine(HexEncoding.ByteToHex(span.Slice(i)));
                 }
                 return Task.CompletedTask;
             }
