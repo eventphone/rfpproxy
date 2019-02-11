@@ -106,9 +106,9 @@ namespace RfpProxy.Log
                     Console.Write("\t");
                     int i = 0;
                     var span = data.Span;
-                    for (i = 0; i < span.Length-8; i += 8)
+                    for (i = 0; i < span.Length-4; i += 4)
                     {
-                        Console.Write(HexEncoding.ByteToHex(span.Slice(i, 8)));
+                        Console.Write(HexEncoding.ByteToHex(span.Slice(i, 4)));
                         Console.Write(' ');
                     }
                     Console.WriteLine(HexEncoding.ByteToHex(span.Slice(i)));
