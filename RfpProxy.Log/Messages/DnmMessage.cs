@@ -37,13 +37,13 @@ namespace RfpProxy.Log.Messages
 
     public enum DnmLayer : byte
     {
+        Rfpc = 0x78,
         Lc = 0x79,
         Mac = 0x7a
     }
 
     public sealed class DnmMessage : AaMiDeMessage
     {
-
         public DnmLayer Layer { get; }
 
         public DnmType DnmType { get; }
@@ -60,10 +60,23 @@ namespace RfpProxy.Log.Messages
             var span = base.Raw.Span;
             Layer = (DnmLayer) span[0];
             DnmType = (DnmType) span[1];
-            if (span.Length > 2)
-                MCEI = span[2];
-            if (span.Length > 3)
-                Payload = DnmPayload.Create(Layer, DnmType, Raw);
+            MCEI = span[2];
+            Payload = DnmPayload.Create(Layer, DnmType, Raw);
+        }
+
+        public static AaMiDeMessage Create(ReadOnlyMemory<byte> data)
+        {
+            var layer = (DnmLayer) data.Span[4];
+            switch (layer)
+            {
+                case DnmLayer.Rfpc:
+                    return new DnmRfpcMessage(data);
+                case DnmLayer.Lc:
+                case DnmLayer.Mac:
+                    return new DnmMessage(data);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(3);
@@ -72,7 +85,7 @@ namespace RfpProxy.Log.Messages
         {
             base.Log(writer);
             writer.Write($"Layer({Layer,-3:G}) Type({DnmType,-20:G}) MCEI(0x{MCEI:x2})");
-            Payload?.Log(writer);
+            Payload.Log(writer);
         }
     }
 }

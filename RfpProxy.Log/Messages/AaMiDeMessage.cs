@@ -53,7 +53,7 @@ namespace RfpProxy.Log.Messages
                 case MsgType.MEDIA_DTMF:
                     return new DtmfMediaMessage(data);
                 case MsgType.DNM:
-                    return new DnmMessage(data);
+                    return DnmMessage.Create(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }
