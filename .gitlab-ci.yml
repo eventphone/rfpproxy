@@ -1,6 +1,7 @@
 stages:
   - build
   - deploy
+  - deploy-proxy
 build:
  stage: build
  tags: 
@@ -21,6 +22,19 @@ build:
   - publish
 deploy:
  stage: deploy
+ tags: 
+  - deploy
+  - omm
+ dependencies:
+  - build
+ script:
+  - 'rsync -av --delete --exclude rfpproxy publish/ /opt/rfpproxy/'
+  - 'chmod +x /opt/rfpproxy/rfpproxy.log/rfpproxylog'
+  - 'chmod +x /opt/rfpproxy/rfpproxy.pcap/rfpproxydump'
+ only:
+  - master
+deploy-proxy:
+ stage: deploy-proxy
  when: manual
  tags: 
   - deploy
@@ -28,10 +42,9 @@ deploy:
  dependencies:
   - build
  script:
-  - 'rsync -av --delete publish/ /opt/rfpproxy/'
+  - 'rsync -av --delete publish/rfpproxy/ /opt/rfpproxy/rfpproxy/'
   - 'chmod +x /opt/rfpproxy/rfpproxy/rfpproxy'
-  - 'chmod +x /opt/rfpproxy/rfpproxy.log/rfpproxylog'
-  - 'chmod +x /opt/rfpproxy/rfpproxy.pcap/rfpproxydump'
+  - 'sudo /sbin/setcap CAP_NET_ADMIN=+eip /opt/rfpproxy/rfpproxy/rfpproxy'
   - 'sudo /usr/bin/systemctl restart rfpproxy'
  only:
   - master
