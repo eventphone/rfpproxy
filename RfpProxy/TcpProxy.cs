@@ -91,24 +91,34 @@ namespace RfpProxy
 
         private async Task HandleClientAsync(TcpClient client, CancellationToken cancellationToken)
         {
-            using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
-            using (var server = ConnectToServer(client))
-            {
-                await server.ConnectAsync(_server, _port).ConfigureAwait(false);
-                var clientData = OnClientConnected(client, server);
+                using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+                using (var server = ConnectToServer(client))
+                {
+                    await server.ConnectAsync(_server, _port).ConfigureAwait(false);
+                    var clientData = OnClientConnected(client, server);
+                    try
+                    {
+                        var clientPipe = new Pipe();
+                        var fillClientPipe = PipeHelper.FillPipeAsync(client.Client, clientPipe.Writer, cts.Token);
+                        var readClientPipe = ReadFromClientAsync(clientData, clientPipe.Reader, cancellationToken);
 
-                var clientPipe = new Pipe();
-                var fillClientPipe = PipeHelper.FillPipeAsync(client.Client, clientPipe.Writer, cts.Token);
-                var readClientPipe = ReadFromClientAsync(clientData, clientPipe.Reader, cancellationToken);
+                        var serverPipe = new Pipe();
+                        var fillServerPipe = PipeHelper.FillPipeAsync(server.Client, serverPipe.Writer, cts.Token);
+                        var readServerPipe = ReadFromServerAsync(clientData, serverPipe.Reader, cancellationToken);
 
-                var serverPipe = new Pipe();
-                var fillServerPipe = PipeHelper.FillPipeAsync(server.Client, serverPipe.Writer, cts.Token);
-                var readServerPipe = ReadFromServerAsync(clientData, serverPipe.Reader, cancellationToken);
-
-                await Task.WhenAny(fillClientPipe, readClientPipe, fillServerPipe, readServerPipe).ConfigureAwait(false);
-                cts.Cancel();
-                OnClientDisconnected(clientData);
-            }
+                        await Task.WhenAny(fillClientPipe, readClientPipe, fillServerPipe, readServerPipe).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("HandleClient failed");
+                        Console.WriteLine(ex);
+                    }
+                    finally
+                    {
+                        cts.Cancel();
+                        OnClientDisconnected(clientData);
+                    }
+                }
         }
 
         protected abstract Task ReadFromClientAsync(T clientData, PipeReader client, CancellationToken cancellationToken);
