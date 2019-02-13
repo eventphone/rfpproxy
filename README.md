@@ -103,4 +103,13 @@ The RFP Identifier is set when the `SYS_INIT` message is received. It is therefo
 
 ## TPROXY
 command to redirect without TPROXY:
-iptables -t nat -I PREROUTING 1 -d 172.20.23.1 -p tcp --dport 16321 -j DNAT --to 172.20.23.1:16000
+
+`iptables -t nat -I PREROUTING 1 -d 172.20.23.1 -p tcp --dport 16321 -j DNAT --to 172.20.23.1:16000`
+
+for TPROXY (real IPs in OMM / MGR) add the following commands in addition to the `-t` switch:
+
+```
+ip -4 rule add from 127.0.0.1/8 iif lo table 100
+ip route add local 0.0.0.0/0 dev lo table 100
+```
+detailed explanation can be found at the [mmproxy github repo](https://github.com/cloudflare/mmproxy)
