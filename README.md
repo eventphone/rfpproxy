@@ -106,7 +106,7 @@ command to redirect without TPROXY:
 
 `iptables -t nat -I PREROUTING 1 -d 172.20.23.1 -p tcp --dport 16321 -j DNAT --to 172.20.23.1:16000`
 
-for TPROXY (real IPs in OMM / MGR) add the following commands in addition to the `-t` switch:
+for TPROXY (real IPs in OMM / MGR) add the following commands in addition to the `-t -H 127.0.0.1` command line arguments:
 
 ```
 ip -4 rule add from 127.0.0.1/8 iif lo table 100
