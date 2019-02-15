@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using RfpProxy.Log.Messages;
 using RfpProxyLib;
 using Xunit;
@@ -56,6 +55,22 @@ namespace RfpProxy.Test
             Assert.Equal("172.20.23.1", snmp.Server.ToString());
             Assert.True(snmp.TrapEnabled);
             
+            Log(message);
+        }
+
+        [Fact]
+        public void CanDecodeSysAuthenticateMessage()
+        {
+            var data = HexEncoding.HexToByte("012d0020" +
+                                             "57b858bb227549d7" +
+                                             "2215096317457eee" +
+                                             "f01aa118ab156ad5" +
+                                             "e8b35e55ab2b30a0");
+            var message = AaMiDeMessage.Create(data);
+            var auth = Assert.IsType<SysAuthenticateMessage>(message);
+            Assert.Equal("2215096317457eee", HexEncoding.ByteToHex(auth.RfpIv.Span));
+            Assert.Equal("e8b35e55ab2b30a0", HexEncoding.ByteToHex(auth.OmmIv.Span));
+
             Log(message);
         }
 

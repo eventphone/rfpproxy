@@ -56,6 +56,8 @@ namespace RfpProxy.Log.Messages
                     return DnmMessage.Create(data);
                 case MsgType.SNMP_RFP_UPDATE:
                     return new SnmpRfpUpdateMessage(data);
+                case MsgType.SYS_AUTHENTICATE:
+                    return new SysAuthenticateMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }
