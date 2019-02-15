@@ -54,6 +54,8 @@ namespace RfpProxy.Log.Messages
                     return new DtmfMediaMessage(data);
                 case MsgType.DNM:
                     return DnmMessage.Create(data);
+                case MsgType.SNMP_RFP_UPDATE:
+                    return new SnmpRfpUpdateMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }

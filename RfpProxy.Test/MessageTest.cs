@@ -33,6 +33,34 @@ namespace RfpProxy.Test
             var rfpc = Assert.IsType<DnmRfpcMessage>(message);
             Assert.Equal(DnmRfpcType.InitReq, rfpc.DnmType);
 
+            Log(message);
+        }
+
+        [Fact]
+        public void CanDecodeSysSnmpMessage()
+        {
+            var data = HexEncoding.HexToByte("0501014c" +
+                                             "ac141701" +
+                                             "62626262626262626262626262626262626262626262626262626262626262626262626262626262009f92b0f09f92b0f09f92b0f09f92b0f09f92b0f09f92b0f09f92b0f09f92b0f09f92b0f09f92b000" +
+                                             "646562756744454354313233009f92b0f09f92b0f09f92b0f09f92b0f09f92b0f09f92b0f09f92b00000000000000000000000000000000000000000000000000000000000000000000000000000000000" +
+                                             "524650203432202830303a33303a34323a30463a38323a323729000000000000000000000000000000000000000000000000890000001839361690be751600000000000000000000000000000000000000" +
+                                             "6161616161616161616161616161616161616161009f92b0f09f92b0f09f92b0f09f92b0f09f92b000" +
+                                             "6363636363636363636363636363636363636363000000000000000000000000000000000000000000010000");
+            var message = AaMiDeMessage.Create(data);
+            var snmp = Assert.IsType<SnmpRfpUpdateMessage>(message);
+            Assert.Equal("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", snmp.Contact);
+            Assert.Equal("debugDECT123", snmp.Location);
+            Assert.Equal("RFP 42 (00:30:42:0F:82:27)", snmp.Name);
+            Assert.Equal("aaaaaaaaaaaaaaaaaaaa", snmp.RoCommunity);
+            Assert.Equal("cccccccccccccccccccc", snmp.TrapCommunity);
+            Assert.Equal("172.20.23.1", snmp.Server.ToString());
+            Assert.True(snmp.TrapEnabled);
+            
+            Log(message);
+        }
+
+        private void Log(AaMiDeMessage message)
+        {
             using (var writer = new StringWriter())
             {
                 message.Log(writer);
