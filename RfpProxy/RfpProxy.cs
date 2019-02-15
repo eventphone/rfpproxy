@@ -35,7 +35,7 @@ namespace RfpProxy
 
         protected override CryptedRfpConnection OnClientConnected(TcpClient client, TcpClient server)
         {
-            Console.WriteLine("new RFP connection");
+            Console.WriteLine($"new RFP connection from {client.Client.RemoteEndPoint}");
             var connection = base.OnClientConnected(client, server);
             connection.Identifier = new RfpIdentifier(new byte[RfpIdentifier.Length]);
             return connection;
