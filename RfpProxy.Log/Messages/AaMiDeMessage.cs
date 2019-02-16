@@ -58,6 +58,8 @@ namespace RfpProxy.Log.Messages
                     return new SnmpRfpUpdateMessage(data);
                 case MsgType.SYS_AUTHENTICATE:
                     return new SysAuthenticateMessage(data);
+                case MsgType.SYS_INIT:
+                    return new SysInitMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }

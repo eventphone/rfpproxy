@@ -74,6 +74,24 @@ namespace RfpProxy.Test
             Log(message);
         }
 
+        [Fact]
+        public void CanDecodeSysInitMessage()
+        {
+            var data = HexEncoding.HexToByte("01200104" +
+                                             "0000000800070100" +
+                                             "0030420f8227" +
+                                             "0000000000000000" +
+                                             "03fca9b9df00301bd287ea0373c9f7869951d6fa651ccbdf21e665488dd8d84e52e805da3272c066522501360cffe09efbad5393d713ad9a19874c2496ae5c629b69000701000000000000000000" +
+                                             "5349502d4445435420372e312d434b313400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" +
+                                             "3720690a8f6d49be" +
+                                             "756b4815d44020ee");
+            var message = AaMiDeMessage.Create(data);
+            var init = Assert.IsType<SysInitMessage>(message);
+            Assert.Equal("0030420F8227", init.Mac.ToString());
+            Assert.Equal("SIP-DECT 7.1-CK14", init.SwVersion);
+            Log(message);
+        }
+
         private void Log(AaMiDeMessage message)
         {
             using (var writer = new StringWriter())
