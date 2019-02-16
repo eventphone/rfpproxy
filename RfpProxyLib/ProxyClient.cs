@@ -41,9 +41,8 @@ namespace RfpProxyLib
             return AddSubscriptionAsync(subscription, mac, macMask, filter, filterMask, cancellationToken);
         }
 
-        public async Task RunAsync(CancellationToken cancellationToken)
+        public async Task FinishHandshakeAsync(CancellationToken cancellationToken)
         {
-            await InitAsync(cancellationToken).ConfigureAwait(false);
             var eos = new Subscribe
             {
                 Type = SubscriptionType.End
@@ -51,7 +50,6 @@ namespace RfpProxyLib
             await _readLock.WaitAsync(cancellationToken);
             try
             {
-
                 using (var stream = new NetworkStream(_socket, false))
                 using (var writer = new StreamWriter(stream))
                 using (var reader = new StreamReader(stream))
@@ -66,7 +64,20 @@ namespace RfpProxyLib
                     LogRead(msg);
                     cancellationToken.ThrowIfCancellationRequested();
                 }
+            }
+            finally
+            {
+                _readLock.Release();
+            }
+        }
 
+        public async Task RunAsync(CancellationToken cancellationToken)
+        {
+            await InitAsync(cancellationToken).ConfigureAwait(false);
+            await FinishHandshakeAsync(cancellationToken).ConfigureAwait(false);
+            await _readLock.WaitAsync(cancellationToken);
+            try
+            {
                 var length = new byte[4];
                 while (!cancellationToken.IsCancellationRequested)
                 {
