@@ -62,6 +62,8 @@ namespace RfpProxy.Log.Messages
                     return new SysInitMessage(data);
                 case MsgType.ACK:
                     return new AckMessage(data);
+                case MsgType.SYS_HEARTBEAT_INTERVAL:
+                    return new SysHeartbeatIntervalMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }
