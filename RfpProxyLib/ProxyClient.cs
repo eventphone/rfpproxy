@@ -43,6 +43,7 @@ namespace RfpProxyLib
 
         public async Task FinishHandshakeAsync(CancellationToken cancellationToken)
         {
+            await InitAsync(cancellationToken).ConfigureAwait(false);
             var eos = new Subscribe
             {
                 Type = SubscriptionType.End
@@ -73,7 +74,6 @@ namespace RfpProxyLib
 
         public async Task RunAsync(CancellationToken cancellationToken)
         {
-            await InitAsync(cancellationToken).ConfigureAwait(false);
             await FinishHandshakeAsync(cancellationToken).ConfigureAwait(false);
             await _readLock.WaitAsync(cancellationToken);
             try
