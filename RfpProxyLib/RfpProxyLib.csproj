@@ -6,6 +6,8 @@
     <OutputType>Library</OutputType>
     <StartupObject />
     <LangVersion>7.2</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
   </PropertyGroup>
 
   <ItemGroup>

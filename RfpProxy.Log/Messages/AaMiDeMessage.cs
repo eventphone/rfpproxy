@@ -53,7 +53,7 @@ namespace RfpProxy.Log.Messages
                 case MsgType.MEDIA_DTMF:
                     return new DtmfMediaMessage(data);
                 case MsgType.DNM:
-                    return DnmMessage.Create(data);
+                    return DnmMessage.CreateDnm(data);
                 case MsgType.SNMP_RFP_UPDATE:
                     return new SnmpRfpUpdateMessage(data);
                 case MsgType.SYS_AUTHENTICATE:

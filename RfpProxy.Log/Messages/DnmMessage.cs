@@ -66,7 +66,7 @@ namespace RfpProxy.Log.Messages
             Payload = DnmPayload.Create(Layer, DnmType, Raw);
         }
 
-        public static AaMiDeMessage Create(ReadOnlyMemory<byte> data)
+        public static AaMiDeMessage CreateDnm(ReadOnlyMemory<byte> data)
         {
             var layer = (DnmLayer) data.Span[4];
             switch (layer)
