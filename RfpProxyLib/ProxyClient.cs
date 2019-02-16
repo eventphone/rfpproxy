@@ -103,7 +103,7 @@ namespace RfpProxyLib
         {
             var header = new byte[4 + 1 + 4 + RfpIdentifier.Length];
             BinaryPrimitives.WriteUInt32BigEndian(header, (uint) (1+4+RfpIdentifier.Length + data.Length));
-            header[5] = (byte) direction;
+            header[4] = (byte) direction;
             BinaryPrimitives.WriteUInt32BigEndian(header.AsSpan(5), messageId);
             rfp.CopyTo(header.AsSpan(4 + 1 + 4));
             await _socket.SendAsync(header, SocketFlags.None, cancellationToken).ConfigureAwait(false);
