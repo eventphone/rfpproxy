@@ -60,6 +60,8 @@ namespace RfpProxy.Log.Messages
                     return new SysAuthenticateMessage(data);
                 case MsgType.SYS_INIT:
                     return new SysInitMessage(data);
+                case MsgType.ACK:
+                    return new AckMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }

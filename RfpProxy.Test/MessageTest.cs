@@ -89,6 +89,19 @@ namespace RfpProxy.Test
             var init = Assert.IsType<SysInitMessage>(message);
             Assert.Equal("0030420F8227", init.Mac.ToString());
             Assert.Equal("SIP-DECT 7.1-CK14", init.SwVersion);
+
+            Log(message);
+        }
+
+        [Fact]
+        public void CanDecodeAckMessage()
+        {
+            var data = HexEncoding.HexToByte("00010008" +
+                                             "0120ffff01000000");
+            var message = AaMiDeMessage.Create(data);
+            var ack = Assert.IsType<AckMessage>(message);
+            Assert.Equal(MsgType.SYS_INIT, ack.Message);
+
             Log(message);
         }
 
