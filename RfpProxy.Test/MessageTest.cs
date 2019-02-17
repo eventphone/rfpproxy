@@ -178,6 +178,27 @@ namespace RfpProxy.Test
             Log(message);
         }
 
+        [Fact]
+        public void CanDecodeSysPasswdMessage()
+        {
+            var data = HexEncoding.HexToByte("010a0108" +
+                                             "014e" +
+                                             "726f6f74006a2f50747353547a4d78387247517264597273316846326a4752664771464a61486b543943793861764952426b497249416a4c742e5063477448596a" +
+                                             "6a755071316f6c65694767375748645a3569746c432f00574f786f48464e3071474d6977426c6e2e79466a5541676e50544f72304d41596d374e334f6d36453255" +
+                                             "6f6d6d006f686933524346372f67635058656f6a4461746367484f6f59534957542f4748692e4d39436449454a786674625463713456536d7073614e4c75767176" +
+                                             "6a755071316f6c65694767375748645a3569746c432f00764a6b474467363874466e356d6358776d445173616f615270394f4d43376a3753555168415972337166" +
+                                             "0000");
+            var message = AaMiDeMessage.Create(data);
+            var passwd = Assert.IsType<SysPasswdMessage>(message);
+            Assert.Equal("root", passwd.RootUser);
+            Assert.Equal("juPq1oleiGg7WHdZ5itlC/", passwd.RootPassword);
+            Assert.Equal("omm", passwd.AdminUser);
+            Assert.Equal("juPq1oleiGg7WHdZ5itlC/", passwd.AdminPassword);
+            Assert.True(passwd.IsRemoteAccessEnabled);
+
+            Log(message);
+        }
+
         private void Log(AaMiDeMessage message)
         {
             using (var writer = new StringWriter())
