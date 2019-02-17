@@ -199,6 +199,21 @@ namespace RfpProxy.Test
             Log(message);
         }
 
+        [Fact]
+        public void CanDecodeSysRPingMessage()
+        {
+            var data = HexEncoding.HexToByte("010e000c" +
+                                             "ac141701" +
+                                             "00000023" +
+                                             "00000000");
+            var message = AaMiDeMessage.Create(data);
+            var rping = Assert.IsType<SysRPingMessage>(message);
+            Assert.Equal("172.20.23.1", rping.Ip.ToString());
+            Assert.Equal(TimeSpan.FromMilliseconds(0x23), rping.Rtt);
+
+            Log(message);
+        }
+
         private void Log(AaMiDeMessage message)
         {
             using (var writer = new StringWriter())

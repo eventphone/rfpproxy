@@ -74,6 +74,8 @@ namespace RfpProxy.Log.Messages
                     return new SysCorefileUrlMessage(data);
                 case MsgType.SYS_PASSWD:
                     return new SysPasswdMessage(data);
+                case MsgType.SYS_RPING:
+                    return new SysRPingMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }
