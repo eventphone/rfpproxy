@@ -18,11 +18,11 @@ namespace RfpProxy.Log.Messages
             
             var seconds = BinaryPrimitives.ReadUInt32BigEndian(span);
             var nseconds = BinaryPrimitives.ReadUInt32BigEndian(span.Slice(4));
-            Time1 = Epoch.AddSeconds(seconds).AddMilliseconds(nseconds / 1000000d);
+            Time1 = Epoch.AddSeconds(seconds).AddTicks(nseconds /(1000000 / TimeSpan.TicksPerMillisecond));
 
             seconds = BinaryPrimitives.ReadUInt32BigEndian(span.Slice(8));
             nseconds = BinaryPrimitives.ReadUInt32BigEndian(span.Slice(12));
-            Time2 = Epoch.AddSeconds(seconds).AddMilliseconds(nseconds / 1000000d);
+            Time2 = Epoch.AddSeconds(seconds).AddTicks(nseconds /(1000000 / TimeSpan.TicksPerMillisecond));
         }
 
         public override void Log(TextWriter writer)

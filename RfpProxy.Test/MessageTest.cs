@@ -243,6 +243,25 @@ namespace RfpProxy.Test
             Log(message);
         }
 
+        [Fact]
+        public void CanDecodeHeartbeatMessage()
+        {
+            var heartbeat = Decode<HeartbeatMessage>("00030008" + 
+                                                     "0c6b560004a60000");
+            Assert.Equal(0, heartbeat.Uptime.Days);
+            Assert.Equal(1, heartbeat.Uptime.Hours);
+            Assert.Equal(34, heartbeat.Uptime.Minutes);
+
+            Log(heartbeat);
+        }
+
+        private T Decode<T>(string hex)
+        {
+            var data = HexEncoding.HexToByte(hex);
+            var message = AaMiDeMessage.Create(data);
+            return Assert.IsType<T>(message);
+        }
+
         private void Log(AaMiDeMessage message)
         {
             using (var writer = new StringWriter())
