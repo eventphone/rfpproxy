@@ -21,9 +21,10 @@ namespace RfpProxy.Log.Messages
         SYS_STATE_DUMP_RES = 0x0110,
         SYS_NEW_SW = 0x0111,
         SYS_AUDIO_LOG = 0x0112,
-
-        SYS_ROUNDTRIP_DELAY = 0x0117,
         SYS_USB_OVERLOAD = 0x0113,
+
+        SYS_COREFILE_URL = 0x0116,
+        SYS_ROUNDTRIP_DELAY = 0x0117,
         SYS_INIT = 0x0120,
         SYS_RESET = 0x0121,
         SYS_AUTHENTICATE = 0x012d,

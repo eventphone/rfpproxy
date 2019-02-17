@@ -166,6 +166,18 @@ namespace RfpProxy.Test
             Log(message);
         }
 
+        [Fact]
+        public void CanDecodeSysCorefileUrlMessage()
+        {
+            var data = HexEncoding.HexToByte("01160020" +
+                                             "746674703a2f2f3137322e32302e352e362f616263646566676800332e310030");
+            var message = AaMiDeMessage.Create(data);
+            var corefile = Assert.IsType<SysCorefileUrlMessage>(message);
+            Assert.Equal("tftp://172.20.5.6/abcdefgh", corefile.Url);
+
+            Log(message);
+        }
+
         private void Log(AaMiDeMessage message)
         {
             using (var writer = new StringWriter())
