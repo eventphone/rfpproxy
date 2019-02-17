@@ -66,6 +66,8 @@ namespace RfpProxy.Log.Messages
                     return new SysHeartbeatIntervalMessage(data);
                 case MsgType.SYS_IP_OPTIONS:
                     return new SysIpOptionsMessage(data);
+                case MsgType.SYS_HTTP_SET:
+                    return new SysHttpSetMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }
@@ -89,7 +91,7 @@ namespace RfpProxy.Log.Messages
             }
             if (hasData)
             {
-                writer.Write(prefix + HexEncoding.ByteToHex(data));
+                writer.Write(prefix + data.ToHex());
             }
         }
     }

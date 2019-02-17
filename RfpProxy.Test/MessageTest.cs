@@ -68,8 +68,8 @@ namespace RfpProxy.Test
                                              "e8b35e55ab2b30a0");
             var message = AaMiDeMessage.Create(data);
             var auth = Assert.IsType<SysAuthenticateMessage>(message);
-            Assert.Equal("2215096317457eee", HexEncoding.ByteToHex(auth.RfpIv.Span));
-            Assert.Equal("e8b35e55ab2b30a0", HexEncoding.ByteToHex(auth.OmmIv.Span));
+            Assert.Equal("2215096317457eee", auth.RfpIv.ToHex());
+            Assert.Equal("e8b35e55ab2b30a0", auth.OmmIv.ToHex());
 
             Log(message);
         }
@@ -132,6 +132,21 @@ namespace RfpProxy.Test
             Assert.Equal(32, options.Ttl);
             Assert.Equal(7, options.SignalVlanPriority);
             Assert.Equal(6, options.VoiceVlanPriority);
+
+            Log(message);
+        }
+
+        [Fact]
+        public void CanDecodeSysHttpSetMessage()
+        {
+            var data = HexEncoding.HexToByte("01090008" +
+                                             "ac140103" +
+                                             "01bb" +
+                                             "022f");
+            var message = AaMiDeMessage.Create(data);
+            var http = Assert.IsType<SysHttpSetMessage>(message);
+            Assert.Equal("172.20.1.3", http.Ip.ToString());
+            Assert.Equal(443, http.Port);
 
             Log(message);
         }

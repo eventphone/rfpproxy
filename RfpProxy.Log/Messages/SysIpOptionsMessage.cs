@@ -34,7 +34,7 @@ namespace RfpProxy.Log.Messages
             base.Log(writer);
             writer.Write($"VoiceTOS(0x{VoiceTos:x2}) SignalTOS(0x{SignalTos:x2}) TTL({Ttl}) ");
             writer.Write($"SignalVlanPrio({SignalVlanPriority}) VoiceVlanPrio({VoiceVlanPriority}) ");
-            writer.Write($"Reserved({HexEncoding.ByteToHex(Reserved.Span)})");
+            writer.Write($"Reserved({Reserved.ToHex()})");
         }
     }
 }
