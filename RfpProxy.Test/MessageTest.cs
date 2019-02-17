@@ -214,6 +214,25 @@ namespace RfpProxy.Test
             Log(message);
         }
 
+        [Fact]
+        public void CanDecodeSysRoundtripDelayMessage()
+        {
+            var data = HexEncoding.HexToByte("01170010" +
+                                             "e0142a0c216bb98c" +
+                                             "e0142a0c2ef544bb");
+            var message = AaMiDeMessage.Create(data);
+            var rtdelay = Assert.IsType<SysRoundtripDelayMessage>(message);
+            Assert.Equal(2019, rtdelay.Time2.Year);
+            Assert.Equal(2, rtdelay.Time2.Month);
+            Assert.Equal(17, rtdelay.Time2.Day);
+            Assert.Equal(18, rtdelay.Time2.Hour);
+            Assert.Equal(44, rtdelay.Time2.Minute);
+            Assert.Equal(28, rtdelay.Time2.Second);
+            Assert.NotEqual(rtdelay.Time1, rtdelay.Time2);
+
+            Log(message);
+        }
+
         private void Log(AaMiDeMessage message)
         {
             using (var writer = new StringWriter())

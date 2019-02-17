@@ -76,6 +76,8 @@ namespace RfpProxy.Log.Messages
                     return new SysPasswdMessage(data);
                 case MsgType.SYS_RPING:
                     return new SysRPingMessage(data);
+                case MsgType.SYS_ROUNDTRIP_DELAY:
+                    return new SysRoundtripDelayMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }
