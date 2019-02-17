@@ -81,7 +81,8 @@ namespace RfpProxy.Test
                                              "0000000800070100" +
                                              "0030420f8227" +
                                              "0000000000000000" +
-                                             "03fca9b9df00301bd287ea0373c9f7869951d6fa651ccbdf21e665488dd8d84e52e805da3272c066522501360cffe09efbad5393d713ad9a19874c2496ae5c629b69000701000000000000000000" +
+                                             "03fc" +
+                                             "a9b9df00301bd287ea0373c9f7869951d6fa651ccbdf21e665488dd8d84e52e805da3272c066522501360cffe09efbad5393d713ad9a19874c2496ae5c629b69000701000000000000000000" +
                                              "5349502d4445435420372e312d434b313400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" +
                                              "3720690a8f6d49be" +
                                              "756b4815d44020ee");
@@ -102,6 +103,35 @@ namespace RfpProxy.Test
             var message = AaMiDeMessage.Create(data);
             var ack = Assert.IsType<AckMessage>(message);
             Assert.Equal(MsgType.SYS_INIT, ack.Message);
+
+            Log(message);
+        }
+
+        [Fact]
+        public void CanDecodeHeartBeatIntervalMessage()
+        {
+            var data = HexEncoding.HexToByte("01050004" +
+                                             "0f000000");
+            var message = AaMiDeMessage.Create(data);
+            var interval = Assert.IsType<SysHeartbeatIntervalMessage>(message);
+            Assert.Equal(TimeSpan.FromSeconds(15), interval.Interval);
+
+            Log(message);
+        }
+
+        [Fact]
+        public void CanDecodeSysIpOptionsMessage()
+        {
+            var data = HexEncoding.HexToByte("01010008" +
+                                             "b9b8200706" +
+                                             "000000");
+            var message = AaMiDeMessage.Create(data);
+            var options = Assert.IsType<SysIpOptionsMessage>(message);
+            Assert.Equal(0xb9, options.VoiceTos);
+            Assert.Equal(0xb8, options.SignalTos);
+            Assert.Equal(32, options.Ttl);
+            Assert.Equal(7, options.SignalVlanPriority);
+            Assert.Equal(6, options.VoiceVlanPriority);
 
             Log(message);
         }
