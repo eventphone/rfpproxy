@@ -6,6 +6,26 @@ namespace RfpProxyLib
 {
     public static class HexEncoding
     {
+        public static string ToHex(this ReadOnlyMemory<byte> bytes)
+        {
+            return ByteToHex(bytes.Span);
+        }
+
+        public static string ToHex(this Memory<byte> bytes)
+        {
+            return ByteToHex(bytes.Span);
+        }
+
+        public static string ToHex(this ReadOnlySpan<byte> bytes)
+        {
+            return ByteToHex(bytes);
+        }
+
+        public static string ToHex(this Span<byte> bytes)
+        {
+            return ByteToHex(bytes);
+        }
+
         //converts a byte array to a hex string
         public static string ByteToHex(ReadOnlySpan<byte> bytes)
         {

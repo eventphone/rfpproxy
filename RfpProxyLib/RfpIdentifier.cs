@@ -67,7 +67,7 @@ namespace RfpProxyLib
 
         public override string ToString()
         {
-            return HexEncoding.ByteToHex(_identifier.Span);
+            return _identifier.ToHex();
         }
     }
 }

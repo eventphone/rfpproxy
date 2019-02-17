@@ -37,10 +37,10 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Reserved1({HexEncoding.ByteToHex(Reserved1.Span)}) MAC({Mac}) ");
-            writer.Write($"Reserved2({HexEncoding.ByteToHex(Reserved2.Span)}) Capabilities({Capabilities:x2}) ");
-            writer.Write($"Reserved3({HexEncoding.ByteToHex(Reserved3.Span)}) SW Version({SwVersion}) ");
-            writer.Write($"Reserved4({HexEncoding.ByteToHex(Reserved4.Span)})");
+            writer.Write($"Reserved1({Reserved1.ToHex()}) MAC({Mac}) ");
+            writer.Write($"Reserved2({Reserved2.ToHex()}) Capabilities({Capabilities:x2}) ");
+            writer.Write($"Reserved3({Reserved3.ToHex()}) SW Version({SwVersion}) ");
+            writer.Write($"Reserved4({Reserved4.ToHex()})");
         }
     }
 }

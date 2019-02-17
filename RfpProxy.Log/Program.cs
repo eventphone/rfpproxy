@@ -108,10 +108,10 @@ namespace RfpProxy.Log
                     var span = data.Span;
                     for (i = 0; i < span.Length-4; i += 4)
                     {
-                        Console.Write(HexEncoding.ByteToHex(span.Slice(i, 4)));
+                        Console.Write(span.Slice(i, 4).ToHex());
                         Console.Write(' ');
                     }
-                    Console.WriteLine(HexEncoding.ByteToHex(span.Slice(i)));
+                    Console.WriteLine(span.Slice(i).ToHex());
                 }
                 return Task.CompletedTask;
             }

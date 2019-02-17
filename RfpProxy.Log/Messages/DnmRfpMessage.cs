@@ -86,7 +86,7 @@ namespace RfpProxy.Log.Messages
             writer.Write($"Layer({Layer,-3:G}) Type({DnmType,-20:G})");
             foreach (var kvp in Values)
             {
-                writer.Write($" {kvp.Key}={HexEncoding.ByteToHex(kvp.Value.Span)}");
+                writer.Write($" {kvp.Key}={kvp.Value.ToHex()}");
             }
         }
     }

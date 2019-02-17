@@ -19,7 +19,7 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Interval({Interval}) Reserved({HexEncoding.ByteToHex(Reserved.Span)})");
+            writer.Write($"Interval({Interval}) Reserved({Reserved.ToHex()})");
         }
     }
 }

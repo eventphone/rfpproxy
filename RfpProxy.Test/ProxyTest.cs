@@ -104,14 +104,14 @@ namespace RfpProxy.Test
 
             public string LastRfpMessageHex
             {
-                get { return HexEncoding.ByteToHex(LastRfpMessage.Span); }
+                get { return LastRfpMessage.ToHex(); }
             }
 
             public ReadOnlyMemory<byte> LastOmmMessage { get; private set; }
 
             public string LastOmmMessageHex
             {
-                get { return HexEncoding.ByteToHex(LastOmmMessage.Span); }
+                get { return LastOmmMessage.ToHex(); }
             }
 
             public ManualResetEventSlim RfpMessageEvent

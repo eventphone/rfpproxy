@@ -13,7 +13,7 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write(HexEncoding.ByteToHex(Raw.Span));
+            writer.Write(Raw.ToHex());
         }
     }
 }

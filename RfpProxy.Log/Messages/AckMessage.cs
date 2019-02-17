@@ -20,7 +20,7 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Message({Message}) Reserved({HexEncoding.ByteToHex(Reserved.Span)})");
+            writer.Write($"Message({Message}) Reserved({Reserved.ToHex()})");
         }
     }
 }

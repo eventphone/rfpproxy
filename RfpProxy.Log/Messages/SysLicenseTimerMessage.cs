@@ -27,7 +27,7 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Grace Period({GracePeriod}) Reserved1({HexEncoding.ByteToHex(Reserved1.Span)}) Md5({HexEncoding.ByteToHex(Md5.Span)})");
+            writer.Write($"Grace Period({GracePeriod}) Reserved1({Reserved1.ToHex()}) Md5({Md5.ToHex()})");
         }
     }
 }

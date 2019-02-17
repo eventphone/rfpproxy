@@ -39,10 +39,12 @@ namespace RfpProxy.Log.Messages
             Color = (ColorScheme) color;
         }
 
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(2);
+
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"LEDs: {(Led1?'1':'0')}{(Led2?'1':'0')}{(Led3?'1':'0')}{(Led4?'1':'0')} Color: {Color} Reserved: {HexEncoding.ByteToHex(Raw.Slice(2).Span)}");
+            writer.Write($"LEDs({(Led1?'1':'0')}{(Led2?'1':'0')}{(Led3?'1':'0')}{(Led4?'1':'0')}) Color({Color}) Reserved({Raw.ToHex()})");
         }
     }
 }

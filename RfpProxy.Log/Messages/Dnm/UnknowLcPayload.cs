@@ -15,7 +15,7 @@ namespace RfpProxy.Log.Messages.Dnm
             writer.Write($"\tReserved0(0x{Reserved0:x2})");
             if (Length > 0)
             {
-                writer.Write($" Length({Length,3}) Reserved2({HexEncoding.ByteToHex(Raw.Span)})");
+                writer.Write($" Length({Length,3}) Reserved2({Raw.ToHex()})");
             }
         }
     }

@@ -25,10 +25,10 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Reserved1({HexEncoding.ByteToHex(Reserved1.Span)}) ");
-            writer.Write($"RfpIv({HexEncoding.ByteToHex(RfpIv.Span)}) ");
-            writer.Write($"Reserved2({HexEncoding.ByteToHex(Reserved2.Span)}) ");
-            writer.Write($"OmmIv({HexEncoding.ByteToHex(OmmIv.Span)})");
+            writer.Write($"Reserved1({Reserved1.ToHex()}) ");
+            writer.Write($"RfpIv({RfpIv.ToHex()}) ");
+            writer.Write($"Reserved2({Reserved2.ToHex()}) ");
+            writer.Write($"OmmIv({OmmIv.ToHex()})");
         }
     }
 }
