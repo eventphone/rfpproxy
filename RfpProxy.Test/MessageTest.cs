@@ -233,6 +233,16 @@ namespace RfpProxy.Test
             Log(message);
         }
 
+        [Fact]
+        public void CanDecodeSysResetMessage()
+        {
+            var data = HexEncoding.HexToByte("0121000402000000");
+            var message = AaMiDeMessage.Create(data);
+            var reset = Assert.IsType<SysResetMessage>(message);
+            
+            Log(message);
+        }
+
         private void Log(AaMiDeMessage message)
         {
             using (var writer = new StringWriter())

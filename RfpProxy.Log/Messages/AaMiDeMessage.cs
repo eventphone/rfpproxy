@@ -78,6 +78,8 @@ namespace RfpProxy.Log.Messages
                     return new SysRPingMessage(data);
                 case MsgType.SYS_ROUNDTRIP_DELAY:
                     return new SysRoundtripDelayMessage(data);
+                case MsgType.SYS_RESET:
+                    return new SysResetMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }
