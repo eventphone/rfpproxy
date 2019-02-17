@@ -151,6 +151,21 @@ namespace RfpProxy.Test
             Log(message);
         }
 
+        [Fact]
+        public void CanDecodeSysSyslogMessage()
+        {
+            var data = HexEncoding.HexToByte("01070008" +
+                                             "ac141701" +
+                                             "0202" +
+                                             "676a");
+            var message = AaMiDeMessage.Create(data);
+            var syslog = Assert.IsType<SysSyslogMessage>(message);
+            Assert.Equal("172.20.23.1", syslog.Ip.ToString());
+            Assert.Equal(514, syslog.Port);
+
+            Log(message);
+        }
+
         private void Log(AaMiDeMessage message)
         {
             using (var writer = new StringWriter())

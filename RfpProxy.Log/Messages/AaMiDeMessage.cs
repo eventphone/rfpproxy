@@ -68,6 +68,8 @@ namespace RfpProxy.Log.Messages
                     return new SysIpOptionsMessage(data);
                 case MsgType.SYS_HTTP_SET:
                     return new SysHttpSetMessage(data);
+                case MsgType.SYS_SYSLOG:
+                    return new SysSyslogMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }
