@@ -22,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.Pcap", "RfpProxy.P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.Inject", "RfpProxy.Inject\RfpProxy.Inject.csproj", "{97C6D03B-5B18-4518-B596-5E8746E5AF78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfpProxy.ToggleLed", "RfpProxy.ToggleLed\RfpProxy.ToggleLed.csproj", "{D4FFAF39-3DF1-42CC-8592-8E1712479E53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfpProxy.Traffic", "RfpProxy.Traffic\RfpProxy.Traffic.csproj", "{D4FFAF39-3DF1-42CC-8592-8E1712479E53}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -6,7 +6,7 @@ using Mono.Options;
 using RfpProxyLib;
 using RfpProxyLib.Messages;
 
-namespace RfpProxy.ToggleLed
+namespace RfpProxy.Traffic
 {
     class Program
     {
@@ -30,9 +30,9 @@ namespace RfpProxy.ToggleLed
             }
             catch (OptionException ex)
             {
-                Console.Error.Write("rfpproxytoggleled: ");
+                Console.Error.Write("rfpproxytraffic: ");
                 Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine("Try 'dotnet rfpproxytoggleled.dll --help' for more information");
+                Console.Error.WriteLine("Try 'dotnet rfpproxytraffic.dll --help' for more information");
                 return;
             }
             if (String.IsNullOrEmpty(mac))
@@ -47,7 +47,7 @@ namespace RfpProxy.ToggleLed
             try
             {
                 using (var cts = new CancellationTokenSource())
-                using (var client = new ToggleClient(socketname))
+                using (var client = new TrafficClient(socketname))
                 {
                     Console.CancelKeyPress += (s, e) =>
                     {
@@ -61,16 +61,10 @@ namespace RfpProxy.ToggleLed
                         Console.WriteLine(e.Message);
                     };
                     var rfp = new RfpIdentifier(HexEncoding.HexToByte(mac));
-                    var on = HexEncoding.HexToByte("0102000408010000");
-                    var off = HexEncoding.HexToByte("0102000408000000");
+                    await client.AddHandlerAsync(0, mac, "ffffffffffff", "010e000cac141701ffffffff", "ffffffffffffffffffffffff", cts.Token);
                     await client.FinishHandshakeAsync(cts.Token);
-                    while (!cts.IsCancellationRequested)
-                    {
-                        await client.WriteAsync(MessageDirection.ToRfp, 0, rfp, on, cts.Token);
-                        await Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
-                        await client.WriteAsync(MessageDirection.ToRfp, 0, rfp, off, cts.Token);
-                        await Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
-                    }
+                    await client.WriteAsync(MessageDirection.ToRfp, 0, rfp, HexEncoding.HexToByte("010e000cac141701ffffffff00000000"), cts.Token);
+                    await client.RunAsync(cts.Token);
                 }
             }
             catch (OperationCanceledException)
@@ -81,15 +75,21 @@ namespace RfpProxy.ToggleLed
             }
         }
 
-        class ToggleClient : ProxyClient
+        class TrafficClient : ProxyClient
         {
-            public ToggleClient(string socket) : base(socket)
-            {
-            }
+            private byte[] _ping;
 
-            protected override Task OnMessageAsync(MessageDirection direction, uint messageId, RfpIdentifier rfp, Memory<byte> data, CancellationToken cancellationToken)
+            public TrafficClient(string socket) : base(socket)
             {
-                return Task.CompletedTask;
+                _ping = HexEncoding.HexToByte("010e000c" +
+                                              "ac141701" +
+                                              "ffffffff00000000");
+            }
+            
+            protected override async Task OnMessageAsync(MessageDirection direction, uint messageId, RfpIdentifier rfp, Memory<byte> data, CancellationToken cancellationToken)
+            {
+                await WriteAsync(direction, messageId, rfp, ReadOnlyMemory<byte>.Empty, cancellationToken);
+                await WriteAsync(MessageDirection.ToRfp, 0, rfp, _ping, cancellationToken);
             }
         }
     }
