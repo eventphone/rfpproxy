@@ -30,8 +30,8 @@ namespace RfpProxy.Log.Messages
         
         public SysLedMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LED, data)
         {
-            var led = Raw.Span[0];
-            var color = Raw.Span[1];
+            var led = base.Raw.Span[0];
+            var color = base.Raw.Span[1];
             Led1 = (led & 0x1) != 0;
             Led2 = (led & 0x2) != 0;
             Led3 = (led & 0x4) != 0;
