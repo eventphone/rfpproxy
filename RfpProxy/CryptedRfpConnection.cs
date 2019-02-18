@@ -117,6 +117,7 @@ namespace RfpProxy
             _ommToRfpDecryptCount++;
             if (_ommToRfpDecryptCount == 2500)
             {
+                Console.WriteLine("Rekey OMM to RFP decrypt");
                 _ommToRfpDecipher = Rekey(packet.Span.Slice(0, 4));
                 _ommToRfpDecryptCount = 0;
             }
@@ -127,6 +128,7 @@ namespace RfpProxy
             _rfpToOmmDecryptCount++;
             if (_rfpToOmmDecryptCount == 2500)
             {
+                Console.WriteLine("Rekey RFP to OMM decrypt");
                 _rfpToOmmDecipher = Rekey(packet.Span.Slice(0, 4));
                 _rfpToOmmDecryptCount = 0;
             }
@@ -139,6 +141,7 @@ namespace RfpProxy
                 data = CryptRfpToOmm(data);
             if (_rfpToOmmEncryptCount == 2500)
             {
+                Console.WriteLine("Rekey RFP to OMM encrypt");
                 _rfpToOmmEncipher = Rekey(data.Span.Slice(0, 4));
                 _rfpToOmmEncryptCount = 0;
             }
@@ -152,6 +155,7 @@ namespace RfpProxy
                 data = CryptOmmToRfp(data);
             if (_ommToRfpEncryptCount == 2500)
             {
+                Console.WriteLine("Rekey OMM to RFP encrypt");
                 _ommToRfpEncipher = Rekey(data.Span.Slice(0, 4));
                 _ommToRfpEncryptCount = 0;
             }
