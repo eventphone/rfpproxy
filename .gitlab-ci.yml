@@ -36,7 +36,7 @@ deploy:
   - 'chmod +x /opt/rfpproxy/rfpproxy.log/rfpproxylog'
 #  - 'chmod +x /opt/rfpproxy/rfpproxy.pcap/rfpproxydump'
   - 'chmod +x /opt/rfpproxy/rfpproxy.inject/rfpproxyinject'
-  - 'chmod +x /opt/rfpproxy/rfpproxy.toggle/rfpproxytoggle'
+  - 'chmod +x /opt/rfpproxy/rfpproxy.toggle/rfpproxytoggleled'
  only:
   - master
 deploy-proxy:
