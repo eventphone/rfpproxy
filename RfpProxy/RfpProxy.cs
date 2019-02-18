@@ -217,8 +217,9 @@ namespace RfpProxy
                 {
                     data = await subscription.OnRfpMessageAsync(connection.Identifier, data, cancellationToken).ConfigureAwait(false);
                 }
-                catch
+                catch(Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     _subscriptions.TryRemove(subscription, out _);
                     subscription.Cancel();
                 }
@@ -235,8 +236,9 @@ namespace RfpProxy
                     data = await subscription.OnOmmMessageAsync(connection.Identifier, data, cancellationToken)
                         .ConfigureAwait(false);
                 }
-                catch
+                catch(Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     _subscriptions.TryRemove(subscription, out _);
                     subscription.Cancel();
                 }
