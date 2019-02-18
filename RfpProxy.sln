@@ -20,7 +20,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.Pcap", "RfpProxy.Pcap\RfpProxy.Pcap.csproj", "{4E77C8C0-46EB-4F22-B8FA-20E5538550E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfpProxy.Inject", "RfpProxy.Inject\RfpProxy.Inject.csproj", "{97C6D03B-5B18-4518-B596-5E8746E5AF78}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.Inject", "RfpProxy.Inject\RfpProxy.Inject.csproj", "{97C6D03B-5B18-4518-B596-5E8746E5AF78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfpProxy.ToggleLed", "RfpProxy.ToggleLed\RfpProxy.ToggleLed.csproj", "{D4FFAF39-3DF1-42CC-8592-8E1712479E53}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,6 +58,10 @@ Global
 		{97C6D03B-5B18-4518-B596-5E8746E5AF78}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97C6D03B-5B18-4518-B596-5E8746E5AF78}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97C6D03B-5B18-4518-B596-5E8746E5AF78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4FFAF39-3DF1-42CC-8592-8E1712479E53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4FFAF39-3DF1-42CC-8592-8E1712479E53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4FFAF39-3DF1-42CC-8592-8E1712479E53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4FFAF39-3DF1-42CC-8592-8E1712479E53}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
