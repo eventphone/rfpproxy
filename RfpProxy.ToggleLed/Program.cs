@@ -67,9 +67,9 @@ namespace RfpProxy.ToggleLed
                     while (!cts.IsCancellationRequested)
                     {
                         await client.WriteAsync(MessageDirection.ToRfp, 0, rfp, on, cts.Token);
-                        await Task.Delay(500, cts.Token);
+                        await Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
                         await client.WriteAsync(MessageDirection.ToRfp, 0, rfp, off, cts.Token);
-                        await Task.Delay(500, cts.Token);
+                        await Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
                     }
                 }
             }
