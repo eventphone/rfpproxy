@@ -229,6 +229,20 @@ namespace RfpProxy.Test
             Log(heartbeat);
         }
 
+        [Fact]
+        public void CanDecodeSysLedMessage()
+        {
+            var led = Decode<SysLedMessage>("01020004" +
+                                            "08010000");
+            Assert.False(led.Led1);
+            Assert.False(led.Led2);
+            Assert.False(led.Led3);
+            Assert.True(led.Led4);
+            Assert.Equal(SysLedMessage.ColorScheme.Green, led.Color);
+
+            Log(led);
+        }
+
         private T Decode<T>(string hex)
         {
             var data = HexEncoding.HexToByte(hex);
