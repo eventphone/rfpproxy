@@ -65,10 +65,10 @@ namespace RfpProxy
 
         public async Task<OmmMessage> WaitForReplyAsync(CancellationToken cancellationToken)
         {
-            var replied = await _receivedReply.WaitAsync(TimeSpan.FromMilliseconds(10), cancellationToken)
+            var replied = await _receivedReply.WaitAsync(TimeSpan.FromMilliseconds(100), cancellationToken)
                 .ConfigureAwait(false);
             if (!replied) 
-                throw new TimeoutException("client did not answer within 10ms");
+                throw new TimeoutException("client did not answer within 100ms");
             return _reply;
         }
     }

@@ -48,7 +48,7 @@ Example: `{"msg":"stay connected"}`
 * type:
   * always required - all other fields can be left empty for type `End`
   * Listen: you will only receive the message - no answer is expected
-  * Handle: you have 10ms to send a modified version of the message (or an empty message to suppress it if it is still empty after all other handlers)
+  * Handle: you have 100ms to send a modified version of the message (or an empty message to suppress it if it is still empty after all other handlers)
   * End: you are finished with your subscriptions
 * prio:
   * all subscriptions are processed in ascending priority
