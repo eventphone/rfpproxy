@@ -224,7 +224,8 @@ namespace RfpProxy
                     subscription.Cancel();
                 }
             }
-            await connection.SendToServerAsync(data, cancellationToken).ConfigureAwait(false);
+            if (!data.IsEmpty)
+                await connection.SendToServerAsync(data, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnServerMessageAsync(RfpConnection connection, ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
@@ -243,7 +244,8 @@ namespace RfpProxy
                     subscription.Cancel();
                 }
             }
-            await connection.SendToClientAsync(data, cancellationToken);
+            if (!data.IsEmpty)
+                await connection.SendToClientAsync(data, cancellationToken);
         }
     }
 }

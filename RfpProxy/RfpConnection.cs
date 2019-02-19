@@ -21,13 +21,13 @@ namespace RfpProxy
 
         public virtual ValueTask<int> SendToServerAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
         {
-            if (data.Length == 0) return new ValueTask<int>(0);
+            if (data.IsEmpty) return new ValueTask<int>(0);
             return Server.Client.SendAsync(data, SocketFlags.None, cancellationToken);
         }
 
         public virtual ValueTask<int> SendToClientAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
         {
-            if (data.Length == 0) return new ValueTask<int>(0);
+            if (data.IsEmpty) return new ValueTask<int>(0);
             return Client.Client.SendAsync(data, SocketFlags.None, cancellationToken);
         }
     }

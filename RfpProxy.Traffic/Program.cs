@@ -61,9 +61,9 @@ namespace RfpProxy.Traffic
                         Console.WriteLine(e.Message);
                     };
                     var rfp = new RfpIdentifier(HexEncoding.HexToByte(mac));
-                    await client.AddHandlerAsync(0, mac, "ffffffffffff", "010e000cac141701", "ffffffffffffffff", cts.Token);
+                    await client.AddHandlerAsync(0, mac, "ffffffffffff", "010e000cac14170100", "ffffffffffffffff0f", cts.Token);
                     await client.FinishHandshakeAsync(cts.Token);
-                    await client.WriteAsync(MessageDirection.ToRfp, 0, rfp, HexEncoding.HexToByte("010e000cac1417010000000000000000"), cts.Token);
+                    await client.WriteAsync(MessageDirection.ToRfp, 0, rfp, HexEncoding.HexToByte("010e000cac1417010f00000000000000"), cts.Token);
                     await client.RunAsync(cts.Token);
                 }
             }
@@ -77,22 +77,19 @@ namespace RfpProxy.Traffic
 
         class TrafficClient : ProxyClient
         {
-            private byte[] _ping;
+            private readonly byte[] _ping;
 
             public TrafficClient(string socket) : base(socket)
             {
                 _ping = HexEncoding.HexToByte("010e000c" +
                                               "ac141701" +
-                                              "0000000000000000");
+                                              "0f00000000000000");
             }
             
             protected override async Task OnMessageAsync(MessageDirection direction, uint messageId, RfpIdentifier rfp, Memory<byte> data, CancellationToken cancellationToken)
             {
                 await WriteAsync(direction, messageId, rfp, ReadOnlyMemory<byte>.Empty, cancellationToken);
-                if (direction == MessageDirection.ToOmm)
-                {
-                    await WriteAsync(MessageDirection.ToRfp, 0, rfp, _ping, cancellationToken);
-                }
+                await WriteAsync(MessageDirection.ToRfp, 0, rfp, _ping, cancellationToken);
             }
         }
     }

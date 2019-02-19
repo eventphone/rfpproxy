@@ -44,6 +44,8 @@ namespace RfpProxyLib
         public async Task FinishHandshakeAsync(CancellationToken cancellationToken)
         {
             await InitAsync(cancellationToken).ConfigureAwait(false);
+            if (_finished)
+                return;
             var eos = new Subscribe
             {
                 Type = SubscriptionType.End
@@ -51,6 +53,9 @@ namespace RfpProxyLib
             await _readLock.WaitAsync(cancellationToken);
             try
             {
+                if (_finished)
+                    return;
+                _finished = true;
                 using (var stream = new NetworkStream(_socket, false))
                 using (var writer = new StreamWriter(stream))
                 using (var reader = new StreamReader(stream))
@@ -137,6 +142,7 @@ namespace RfpProxyLib
         }
 
         private bool _initialized = false;
+        private bool _finished = false;
 
         private async Task InitAsync(CancellationToken cancellationToken)
         {

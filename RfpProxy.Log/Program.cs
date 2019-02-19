@@ -88,6 +88,8 @@ namespace RfpProxy.Log
 
             protected override Task OnMessageAsync(MessageDirection direction, uint messageId, RfpIdentifier rfp, Memory<byte> data, CancellationToken cancellationToken)
             {
+                if (data.IsEmpty)
+                    return Task.CompletedTask;
                 var message = AaMiDeMessage.Create(data);
                 string prefix;
                 if (direction == MessageDirection.FromOmm)
