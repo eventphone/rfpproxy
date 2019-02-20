@@ -90,7 +90,17 @@ namespace RfpProxy.Log
             {
                 if (data.IsEmpty)
                     return Task.CompletedTask;
-                var message = AaMiDeMessage.Create(data);
+                AaMiDeMessage message;
+                try
+                {
+                    message = AaMiDeMessage.Create(data);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Cannot parse {data.ToHex()}");
+                    Console.WriteLine(ex);
+                    return Task.CompletedTask;
+                }
                 string prefix;
                 if (direction == MessageDirection.FromOmm)
                 {
@@ -108,7 +118,7 @@ namespace RfpProxy.Log
                     Console.Write("\t");
                     int i = 0;
                     var span = data.Span;
-                    for (i = 0; i < span.Length-4; i += 4)
+                    for (; i < span.Length-4; i += 4)
                     {
                         Console.Write(span.Slice(i, 4).ToHex());
                         Console.Write(' ');
