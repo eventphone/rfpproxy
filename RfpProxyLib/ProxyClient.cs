@@ -50,7 +50,7 @@ namespace RfpProxyLib
             {
                 Type = SubscriptionType.End
             };
-            await _readLock.WaitAsync(cancellationToken);
+            await _readLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
                 if (_finished)
@@ -80,7 +80,7 @@ namespace RfpProxyLib
         public async Task RunAsync(CancellationToken cancellationToken)
         {
             await FinishHandshakeAsync(cancellationToken).ConfigureAwait(false);
-            await _readLock.WaitAsync(cancellationToken);
+            await _readLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
                 var length = new byte[4];
@@ -95,7 +95,7 @@ namespace RfpProxyLib
                     success = await FillBufferAsync(_socket, msg, cancellationToken).ConfigureAwait(false);
                     if (!success) return;
 
-                    await OnMessageAsync(msg, cancellationToken);
+                    await OnMessageAsync(msg, cancellationToken).ConfigureAwait(false);
                 }
             }
             finally
@@ -134,7 +134,7 @@ namespace RfpProxyLib
         {
             while (buffer.Length > 0)
             {
-                var bytesRead = await socket.ReceiveAsync(buffer, SocketFlags.None, cancellationToken);
+                var bytesRead = await socket.ReceiveAsync(buffer, SocketFlags.None, cancellationToken).ConfigureAwait(false);
                 if (bytesRead == 0) return false;
                 buffer = buffer.Slice(bytesRead);
             }
@@ -148,7 +148,7 @@ namespace RfpProxyLib
         {
             if (_initialized)
                 return;
-            await _readLock.WaitAsync(cancellationToken);
+            await _readLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
                 if (_initialized)

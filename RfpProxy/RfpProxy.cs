@@ -245,7 +245,7 @@ namespace RfpProxy
                 }
             }
             if (!data.IsEmpty)
-                await connection.SendToClientAsync(data, cancellationToken);
+                await connection.SendToClientAsync(data, cancellationToken).ConfigureAwait(false);
         }
     }
 }

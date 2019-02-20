@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipelines;
 using System.Net.Sockets;
@@ -35,9 +36,31 @@ namespace RfpProxy
         {
             try
             {
+                var tasks = new List<Task>();
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var result = await client.ReadAsync(cancellationToken).ConfigureAwait(false);
+                    var read = client.ReadAsync(cancellationToken);
+                    ReadResult result;
+                    if (read.IsCompleted)
+                    {
+                        result = await read;
+                    }
+                    else
+                    {
+                        var readTask = read.AsTask();
+                        tasks.Add(readTask);
+                        while (!read.IsCompleted)
+                        {
+                            var completed = await Task.WhenAny(tasks).ConfigureAwait(false);
+                            if (!read.IsCompleted)
+                            {
+                                tasks.Remove(completed);
+                                await completed.ConfigureAwait(false);
+                            }
+                        }
+                        tasks.Remove(readTask);
+                        result = await readTask.ConfigureAwait(false);
+                    }
                     var buffer = result.Buffer;
 
                     bool success;
@@ -62,7 +85,7 @@ namespace RfpProxy
                             }
                             else
                             {
-                                await _messageCallback(message, cancellationToken).ConfigureAwait(false);
+                                tasks.Add(_messageCallback(message, cancellationToken));
                             }
                             buffer = buffer.Slice(4).Slice(length);
                             success = true;
