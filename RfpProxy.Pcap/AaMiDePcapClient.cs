@@ -29,15 +29,15 @@ namespace RfpProxy.Pcap
             rfp.CopyTo(span.Slice(6));
             if (direction == MessageDirection.FromOmm)
             {
-                header[6] = 0x02;
+                span[6] = 0x02;
             }
             else
             {
-                header[0] = 0x02;
+                span[0] = 0x02;
             }
-            header[12] = 0xa0;
+            span[12] = 0x80;
 
-            span = span.Slice(12);
+            span = span.Slice(14);
             span[0] = 0x45;//verion + IHL
             span[1] = 0x10;//tos
             BinaryPrimitives.WriteUInt16BigEndian(span.Slice(2), (ushort) (PacketHeaderSize + data.Length)); //total length
