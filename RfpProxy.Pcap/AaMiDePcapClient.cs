@@ -35,7 +35,7 @@ namespace RfpProxy.Pcap
             {
                 span[0] = 0x02;
             }
-            span[12] = 0x80;
+            span[12] = 0x08;
 
             span = span.Slice(14);
             span[0] = 0x45;//verion + IHL
