@@ -10,15 +10,15 @@ build:
  script:
   - 'dotnet add RfpProxy/RfpProxy.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
   - 'dotnet add RfpProxy.Log/RfpProxy.Log.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
-#  - 'dotnet add RfpProxy.Pcap/RfpProxy.Pcap.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
+  - 'dotnet add RfpProxy.Pcap/RfpProxy.Pcap.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
   - 'dotnet add RfpProxy.Inject/RfpProxy.Inject.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
-  - 'dotnet add RfpProxy.Traffic/RfpProxy.Traffic.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
+#  - 'dotnet add RfpProxy.Traffic/RfpProxy.Traffic.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
   - 'dotnet restore'
   - 'dotnet publish -o ../publish/rfpproxy -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy/RfpProxy.csproj'
   - 'dotnet publish -o ../publish/rfpproxy.log -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy.Log/RfpProxy.Log.csproj'
-#  - 'dotnet publish -o ../publish/rfpproxy.pcap -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy.Pcap/RfpProxy.Pcap.csproj'
+  - 'dotnet publish -o ../publish/rfpproxy.pcap -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy.Pcap/RfpProxy.Pcap.csproj'
   - 'dotnet publish -o ../publish/rfpproxy.inject -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy.Inject/RfpProxy.Inject.csproj'
-  - 'dotnet publish -o ../publish/rfpproxy.traffic -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy.Traffic/RfpProxy.Traffic.csproj'
+#  - 'dotnet publish -o ../publish/rfpproxy.traffic -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy.Traffic/RfpProxy.Traffic.csproj'
  only:
   - master
  artifacts:
