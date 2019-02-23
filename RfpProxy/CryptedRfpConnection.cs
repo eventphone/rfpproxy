@@ -57,10 +57,10 @@ namespace RfpProxy
         private BlowFish _ommToRfpEncipher;
         private BlowFish _ommToRfpDecipher;
 
-        private int _rfpToOmmDecryptCount;
-        private int _rfpToOmmEncryptCount;
-        private int _ommToRfpDecryptCount;
-        private int _ommToRfpEncryptCount;
+        private int _rfpToOmmDecryptCount = -1;
+        private int _rfpToOmmEncryptCount = -1;
+        private int _ommToRfpDecryptCount = -2;
+        private int _ommToRfpEncryptCount = -2;
 
         public CryptedRfpConnection(TcpClient client, TcpClient server) : base(client, server)
         {

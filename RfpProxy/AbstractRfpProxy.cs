@@ -17,6 +17,7 @@ namespace RfpProxy
         protected override async Task ReadFromClientAsync(CryptedRfpConnection connection, PipeReader client, CancellationToken cancellationToken)
         {
             var sysInit = await ReadPacketAsync(0x0120, 0, client, cancellationToken).ConfigureAwait(false);
+            connection.RekeyRfpToOmmDecrypt(sysInit);
 
             var iv = connection.RfpToOmmIv;
             connection.RfpToOmmIv = ReadOnlyMemory<byte>.Empty;
@@ -28,11 +29,13 @@ namespace RfpProxy
         protected override async Task ReadFromServerAsync(CryptedRfpConnection connection, PipeReader server, CancellationToken cancellationToken)
         {
             var sysAuthenticate = await ReadPacketAsync(0x012d, 0x20, server, cancellationToken).ConfigureAwait(false);
+            connection.RekeyOmmToRfpDecrypt(sysAuthenticate);
             connection.InitRfpToOmmIv(sysAuthenticate.Slice(11, 8).Span);
 
             await OnServerMessageAsync(connection, sysAuthenticate, cancellationToken).ConfigureAwait(false);
 
             var ack = await ReadPacketAsync(0x01, 0x08, server, cancellationToken).ConfigureAwait(false);
+            connection.RekeyOmmToRfpDecrypt(ack);
             await OnServerMessageAsync(connection, ack, cancellationToken).ConfigureAwait(false);
 
             connection.InitOmmToRfpIv(sysAuthenticate.Slice(27, 8).Span);
