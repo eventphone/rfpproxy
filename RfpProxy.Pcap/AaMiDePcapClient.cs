@@ -64,8 +64,17 @@ namespace RfpProxy.Pcap
                 span[15] = 1;
             }
             span = span.Slice(20);
-            BinaryPrimitives.WriteUInt16BigEndian(span, 54321); //source port
-            BinaryPrimitives.WriteUInt16BigEndian(span.Slice(2), 16321); //destination port
+            if (direction == MessageDirection.ToOmm)
+            {
+                BinaryPrimitives.WriteUInt16BigEndian(span, 54321); //source port
+                BinaryPrimitives.WriteUInt16BigEndian(span.Slice(2), 16321); //destination port
+            }
+            else
+            {
+                BinaryPrimitives.WriteUInt16BigEndian(span, 16321); //source port
+                BinaryPrimitives.WriteUInt16BigEndian(span.Slice(2), 54321); //destination port
+
+            }
             var seq = _sequenceNumbers.AddOrUpdate(rfp, x => 1, (x, i) => ++i);
             BinaryPrimitives.WriteUInt32BigEndian(span.Slice(4), seq);
             span[12] = 0x50;//data offset
