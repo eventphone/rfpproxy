@@ -34,9 +34,9 @@ deploy:
  script:
   - 'rsync -av --delete --exclude rfpproxy publish/ /opt/rfpproxy/'
   - 'chmod +x /opt/rfpproxy/rfpproxy.log/rfpproxylog'
-#  - 'chmod +x /opt/rfpproxy/rfpproxy.pcap/rfpproxydump'
+  - 'chmod +x /opt/rfpproxy/rfpproxy.pcap/rfpproxydump'
   - 'chmod +x /opt/rfpproxy/rfpproxy.inject/rfpproxyinject'
-  - 'chmod +x /opt/rfpproxy/rfpproxy.traffic/rfpproxytraffic'
+#  - 'chmod +x /opt/rfpproxy/rfpproxy.traffic/rfpproxytraffic'
  only:
   - master
 deploy-proxy:
