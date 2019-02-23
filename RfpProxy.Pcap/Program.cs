@@ -57,6 +57,7 @@ namespace RfpProxy.Pcap
                 }
                 else
                 {
+                    filter = "0000";
                     client = new AaMiDePcapClient(socketname, filename);
                 }
                 using (var cts = new CancellationTokenSource())
