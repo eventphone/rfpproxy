@@ -38,9 +38,9 @@ namespace RfpProxy.Pcap
             span[12] = 0x08;
 
             span = span.Slice(14);
-            span[0] = 0x45;//verion + IHL
+            span[0] = 0x45;//version + IHL
             span[1] = 0x10;//tos
-            BinaryPrimitives.WriteUInt16BigEndian(span.Slice(2), (ushort) (PacketHeaderSize + data.Length)); //total length
+            BinaryPrimitives.WriteUInt16BigEndian(span.Slice(2), (ushort) (span.Length + data.Length)); //total length
             BinaryPrimitives.WriteUInt16BigEndian(span.Slice(4), (ushort) messageId); //identification
             BinaryPrimitives.WriteUInt16BigEndian(span.Slice(6), 0x4000); // flags
             span[8] = 0xff; //ttl
@@ -68,7 +68,7 @@ namespace RfpProxy.Pcap
             BinaryPrimitives.WriteUInt16BigEndian(span.Slice(2), 16321); //destination port
             var seq = _sequenceNumbers.AddOrUpdate(rfp, x => 1, (x, i) => ++i);
             BinaryPrimitives.WriteUInt32BigEndian(span.Slice(4), seq);
-            span[8] = 0x50;//data offset
+            span[12] = 0x50;//data offset
         }
     }
 }
