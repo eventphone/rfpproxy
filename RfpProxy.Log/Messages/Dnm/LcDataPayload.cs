@@ -97,7 +97,7 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public LcDataPayload(ReadOnlyMemory<byte> data):base(data)
         {
-            var span = Raw.Span;
+            var span = base.Raw.Span;
             Command = (span[0] & 0x2) == 0x2;
             SAPI = (byte) ((span[0] & 0xc) >> 2);
             LLN = (byte) ((span[0] & 0x70) >> 4);
@@ -213,7 +213,8 @@ namespace RfpProxy.Log.Messages.Dnm
                     throw new ArgumentOutOfRangeException();
             }
             writer.Write($" N({(ExtendedLength?0:1)}) M({(MoreData?1:0)}) L({PayloadLength})");
-            writer.Write($" Reserved({Raw.ToHex()})");
+            if (Raw.Length > 0)
+                writer.Write($" Reserved({Raw.ToHex()})");
         }
     }
 }
