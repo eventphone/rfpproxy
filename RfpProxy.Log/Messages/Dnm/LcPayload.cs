@@ -1,17 +1,21 @@
 ﻿using System;
+using System.IO;
 
 namespace RfpProxy.Log.Messages.Dnm
 {
     public abstract class LcPayload : DnmPayload
     {
-        public byte Reserved0 { get; }
+        public byte B { get; }
+
+        public string Channel { get; set; }
 
         public byte Length { get; }
 
         protected LcPayload(ReadOnlyMemory<byte> data) : base(data)
         {
             var span = data.Span;
-            Reserved0 = span[0];
+            B = (byte) (span[0] >> 4);
+            Channel = (span[0] & 0x0F) == 0 ? "Cs" : "Cf";
             if (data.Length <= 1)
             {
                 return;
@@ -26,6 +30,15 @@ namespace RfpProxy.Log.Messages.Dnm
                 if (base.Raw.Length < 2)
                     return Array.Empty<byte>();
                 return base.Raw.Slice(2);
+            }
+        }
+
+        public override void Log(TextWriter writer)
+        {
+            writer.Write($" B({B:x1}) Channel({Channel})");
+            if (Length > 0)
+            {
+                writer.Write($" Length({Length,3})");
             }
         }
     }
