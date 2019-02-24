@@ -29,6 +29,9 @@ namespace RfpProxy.Log.Messages.Dnm
         {
             switch (type)
             {
+                case DnmType.LcDataReq:
+                case DnmType.LcDataInd:
+                    return new LcDataPayload(data);
                 default:
                     return new UnknowLcPayload(data);
             }
