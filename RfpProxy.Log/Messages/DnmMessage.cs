@@ -75,7 +75,14 @@ namespace RfpProxy.Log.Messages
                     return new DnmRfpcMessage(data);
                 case DnmLayer.Lc:
                 case DnmLayer.Mac:
-                    return new DnmMessage(data);
+                    var type = (DnmType) data.Span[5];
+                    switch (type)
+                    {
+                        case DnmType.MacPageReq:
+                            return new MacPageReqMessage(data);
+                        default:
+                            return new DnmMessage(data);
+                    }
                 default:
                     throw new ArgumentOutOfRangeException();
             }
