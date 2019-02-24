@@ -12,7 +12,7 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public override void Log(TextWriter writer)
         {
-            writer.Write($"\tReserved0(0x{Reserved0:x2})");
+            writer.Write($" Reserved0(0x{Reserved0:x2})");
             if (Length > 0)
             {
                 writer.Write($" Length({Length,3}) Reserved2({Raw.ToHex()})");
