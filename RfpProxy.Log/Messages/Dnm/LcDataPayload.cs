@@ -103,6 +103,7 @@ namespace RfpProxy.Log.Messages.Dnm
             LLN = (byte) ((span[0] & 0x70) >> 4);
 
             var control = span[1];
+            //ETSI EN 300 175-4 7.11
             if ((control & 1) == 0)
             {
                 CommandType = LcCommandType.I;
@@ -165,7 +166,6 @@ namespace RfpProxy.Log.Messages.Dnm
                         CommandType = LcCommandType.UA;
                     }
                 }
-                throw new NotImplementedException();
             }
 
             ExtendedLength = (span[2] & 0x1) != 1;
