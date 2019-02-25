@@ -15,7 +15,7 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write(Raw.ToHex());
+            writer.Write($"Reserved({Raw.ToHex()})");
         }
     }
 }

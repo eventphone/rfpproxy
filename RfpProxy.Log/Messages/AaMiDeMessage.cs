@@ -92,22 +92,5 @@ namespace RfpProxy.Log.Messages
         {
             writer.Write($"{Type,-22}({Length,4}) ");
         }
-
-        public static void PrintIfNotZero(TextWriter writer, string prefix, ReadOnlySpan<byte> data)
-        {
-            bool hasData = false;
-            for (int i = 0; i < data.Length; i++)
-            {
-                if (data[i] != 0)
-                {
-                    hasData = true;
-                    break;
-                }
-            }
-            if (hasData)
-            {
-                writer.Write(prefix + data.ToHex());
-            }
-        }
     }
 }

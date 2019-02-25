@@ -28,7 +28,7 @@ namespace RfpProxy.Log.Messages
 
         public ColorScheme Color { get; }
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => !Raw.Span.IsEmpty();
         
         public SysLedMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LED, data)
         {

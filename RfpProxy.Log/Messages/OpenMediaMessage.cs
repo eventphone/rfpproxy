@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages
 {
@@ -11,23 +12,25 @@ namespace RfpProxy.Log.Messages
 
         public byte Flags { get; }
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => !Raw.Span.IsEmpty();
 
         public OpenMediaMessage(ReadOnlyMemory<byte> data) : base(MsgType.MEDIA_OPEN, data)
         {
-            var span = Raw.Span;
+            var span = base.Raw.Span;
             Codec = span[0];
             SlotCount = span[1];
             Flags = span[2];
         }
 
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(3);
+
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
             writer.Write($"codec({Codec}) slots({SlotCount}) flags({Flags})");
-            if (Raw.Length > 3)
+            if (!Raw.Span.IsEmpty())
             {
-                PrintIfNotZero(writer, " extra:", Raw.Slice(3).Span);
+                writer.Write($" extra({Raw.ToHex()})");
             }
         }
     }

@@ -95,7 +95,7 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public byte PayloadLength { get; }
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => !Raw.IsEmpty;
 
         public LcDataPayload(ReadOnlyMemory<byte> data):base(data)
         {

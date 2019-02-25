@@ -7,7 +7,7 @@ namespace RfpProxy.Log.Messages
 {
     public sealed class SysLicenseTimerMessage : AaMiDeMessage
     {
-        public ReadOnlyMemory<byte> Reserved1 { get; }
+        public ReadOnlyMemory<byte> Reserved { get; }
 
         public TimeSpan GracePeriod { get; }
 
@@ -16,11 +16,11 @@ namespace RfpProxy.Log.Messages
         /// </summary>
         public ReadOnlyMemory<byte> Md5 { get; }
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => !Reserved.Span.IsEmpty();
 
         public SysLicenseTimerMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LICENSE_TIMER, data)
         {
-            Reserved1 = Raw.Slice(0, 2);
+            Reserved = Raw.Slice(0, 2);
             var grace = BinaryPrimitives.ReadUInt16BigEndian(Raw.Slice(2).Span);
             GracePeriod = TimeSpan.FromMinutes(grace);
             Md5 = Raw.Slice(4);
@@ -29,7 +29,7 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Grace Period({GracePeriod}) Reserved1({Reserved1.ToHex()}) Md5({Md5.ToHex()})");
+            writer.Write($"Grace Period({GracePeriod}) Reserved({Reserved.ToHex()}) Md5({Md5.ToHex()})");
         }
     }
 }
