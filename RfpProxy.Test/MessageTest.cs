@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using RfpProxy.Log.Messages;
+using RfpProxy.Log.Messages.Dnm;
 using RfpProxyLib;
 using Xunit;
 using Xunit.Abstractions;
@@ -241,6 +242,14 @@ namespace RfpProxy.Test
             Assert.Equal(SysLedMessage.ColorScheme.Green, led.Color);
 
             Log(led);
+        }
+
+        [Fact]
+        public void CanDecodeLcDataReqMessage()
+        {
+            var lc = Decode<DnmMessage>("030100087905080003216101");
+
+            Log(lc);
         }
 
         private T Decode<T>(string hex)

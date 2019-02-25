@@ -27,6 +27,8 @@ namespace RfpProxy.Log.Messages.Dnm
 
         private static DnmPayload CreateLc(DnmType type, ReadOnlyMemory<byte> data)
         {
+            if (data.Length <= 1)
+                return new EmptyLcPayload(data);
             switch (type)
             {
                 case DnmType.LcDataReq:
