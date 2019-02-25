@@ -11,6 +11,8 @@ namespace RfpProxy.Log.Messages
 
         public byte Flags { get; }
 
+        public override bool HasUnknown => true;
+
         public OpenMediaMessage(ReadOnlyMemory<byte> data) : base(MsgType.MEDIA_OPEN, data)
         {
             var span = Raw.Span;
@@ -22,7 +24,7 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"codec:{Codec} slots:{SlotCount} flags:{Flags}");
+            writer.Write($"codec({Codec}) slots({SlotCount}) flags({Flags})");
             if (Raw.Length > 3)
             {
                 PrintIfNotZero(writer, " extra:", Raw.Slice(3).Span);

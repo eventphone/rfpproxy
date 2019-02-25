@@ -20,14 +20,16 @@ namespace RfpProxy.Log
             string filterMask = String.Empty;
             bool showHelp = false;
             bool logRaw = false;
+            bool unknown = false;
             var options = new OptionSet
             {
                 {"s|socket=", "socket path", x => socketname = x},
                 {"r|rfp=", "rfp MAC address", x => mac = x},
-                {"rm|rfpmask=", "rfp mask", x=>rfpMmask = x},
+                {"rm|rfpmask=", "rfp mask", x => rfpMmask = x},
                 {"f|filter=", "filter", x => filter = x},
-                {"fm|filtermask=", "filter mask", x=>filterMask = x},
-                {"raw", "log raw packets", x=>logRaw = x != null},
+                {"fm|filtermask=", "filter mask", x => filterMask = x},
+                {"raw", "log raw packets", x => logRaw = x != null},
+                {"u|unknown", "log only packets with unknown payload", x => unknown = x != null},
                 {"h|help", "show help", x => showHelp = x != null},
             };
             try
@@ -52,7 +54,7 @@ namespace RfpProxy.Log
             try
             {
                 using (var cts = new CancellationTokenSource())
-                using (var client = new LogClient(socketname, logRaw))
+                using (var client = new LogClient(socketname, logRaw, unknown))
                 {
                     Console.CancelKeyPress += (s, e) =>
                     {
@@ -80,10 +82,12 @@ namespace RfpProxy.Log
         class LogClient : ProxyClient
         {
             private readonly bool _logRaw;
+            private readonly bool _unknown;
 
-            public LogClient(string socket, bool logRaw) : base(socket)
+            public LogClient(string socket, bool logRaw, bool unknown) : base(socket)
             {
                 _logRaw = logRaw;
+                _unknown = unknown;
             }
 
             protected override Task OnMessageAsync(MessageDirection direction, uint messageId, RfpIdentifier rfp, Memory<byte> data, CancellationToken cancellationToken)
@@ -101,6 +105,8 @@ namespace RfpProxy.Log
                     Console.WriteLine(ex);
                     return Task.CompletedTask;
                 }
+                if (_unknown && !message.HasUnknown)
+                    return Task.CompletedTask;
                 string prefix;
                 if (direction == MessageDirection.FromOmm)
                 {

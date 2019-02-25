@@ -57,6 +57,8 @@ namespace RfpProxy.Log.Messages
 
         public DnmPayload Payload { get; }
 
+        public override bool HasUnknown => Payload.HasUnknown;
+
         public DnmMessage(ReadOnlyMemory<byte> data) : base(MsgType.DNM, data)
         {
             var span = base.Raw.Span;

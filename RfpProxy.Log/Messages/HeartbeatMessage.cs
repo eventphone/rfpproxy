@@ -8,6 +8,8 @@ namespace RfpProxy.Log.Messages
     {
         public TimeSpan Uptime { get; }
 
+        public override bool HasUnknown => false;
+
         public HeartbeatMessage(ReadOnlyMemory<byte> data):base(MsgType.HEARTBEAT, data)
         {
             var span = Raw.Span;

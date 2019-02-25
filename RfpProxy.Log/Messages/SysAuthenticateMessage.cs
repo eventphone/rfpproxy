@@ -14,6 +14,8 @@ namespace RfpProxy.Log.Messages
 
         public ReadOnlyMemory<byte> OmmIv { get; }
 
+        public override bool HasUnknown => true;
+
         public SysAuthenticateMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_AUTHENTICATE, data)
         {
             Reserved1 = Raw.Slice(0, 8);

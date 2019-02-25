@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.IO;
-using System.Text;
 using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages
 {
     public abstract class AaMiDeMessage
     {
+        public abstract bool HasUnknown { get; }
+
         public MsgType Type { get; }
 
         public ushort Length => BinaryPrimitives.ReadUInt16BigEndian(_data.Slice(2).Span);

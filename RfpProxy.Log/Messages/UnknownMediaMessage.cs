@@ -6,6 +6,8 @@ namespace RfpProxy.Log.Messages
 {
     public sealed class UnknownMediaMessage : MediaMessage
     {
+        public override bool HasUnknown => true;
+
         public UnknownMediaMessage(MsgType type, ReadOnlyMemory<byte> data) : base(type, data)
         {
         }

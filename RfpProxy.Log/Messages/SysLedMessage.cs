@@ -27,6 +27,8 @@ namespace RfpProxy.Log.Messages
         public bool Led4 { get; }
 
         public ColorScheme Color { get; }
+
+        public override bool HasUnknown => true;
         
         public SysLedMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LED, data)
         {

@@ -95,6 +95,8 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public byte PayloadLength { get; }
 
+        public override bool HasUnknown => true;
+
         public LcDataPayload(ReadOnlyMemory<byte> data):base(data)
         {
             var span = base.Raw.Span;

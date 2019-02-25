@@ -11,6 +11,8 @@ namespace RfpProxy.Log.Messages
 
         public ReadOnlyMemory<byte> Reserved { get; }
 
+        public override bool HasUnknown => true;
+
         public AckMessage(ReadOnlyMemory<byte> data):base(MsgType.ACK, data)
         {
             Message = (MsgType) BinaryPrimitives.ReadUInt16BigEndian(Raw.Slice(0, 2).Span);

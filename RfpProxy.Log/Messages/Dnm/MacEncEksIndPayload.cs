@@ -12,6 +12,8 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public MacEncEksIndFlag Flag { get; }
 
+        public override bool HasUnknown => false;
+
         public MacEncEksIndPayload(ReadOnlyMemory<byte> data):base(data)
         {
             Flag = (MacEncEksIndFlag) data.Span[0];

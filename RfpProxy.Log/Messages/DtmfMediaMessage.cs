@@ -7,6 +7,8 @@ namespace RfpProxy.Log.Messages
     {
         public char Key { get; }
 
+        public override bool HasUnknown => true;
+
         public DtmfMediaMessage(ReadOnlyMemory<byte> data) : base(MsgType.MEDIA_DTMF, data)
         {
             var key = Raw.Span[2];
@@ -16,7 +18,7 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Key: {Key}");
+            writer.Write($"Key({Key})");
             PrintIfNotZero(writer, " extra1:", Raw.Slice(0,2).Span);
             PrintIfNotZero(writer, " extra2:", Raw.Slice(3).Span);
         }

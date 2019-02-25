@@ -20,6 +20,8 @@ namespace RfpProxy.Log.Messages
 
         public ReadOnlyMemory<byte> Reserved2 { get; }
 
+        public override bool HasUnknown => true;
+
         public SysPasswdMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_PASSWD, data)
         {
             var span = Raw.Span;

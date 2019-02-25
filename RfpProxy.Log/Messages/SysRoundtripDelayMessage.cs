@@ -12,6 +12,8 @@ namespace RfpProxy.Log.Messages
 
         public DateTimeOffset Time2 { get; }
 
+        public override bool HasUnknown => false;
+
         public SysRoundtripDelayMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_ROUNDTRIP_DELAY, data)
         {
             var span = Raw.Span;

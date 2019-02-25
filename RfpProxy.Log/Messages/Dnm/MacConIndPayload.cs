@@ -16,6 +16,8 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public ReadOnlyMemory<byte> Reserved2 { get; }
 
+        public override bool HasUnknown => true;
+
         public MacConIndPayload(ReadOnlyMemory<byte> data) : base(data)
         {
             var span = data.Span;

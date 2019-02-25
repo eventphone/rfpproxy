@@ -7,6 +7,8 @@ namespace RfpProxy.Log.Messages
     {
         public string Url { get; }
 
+        public override bool HasUnknown => false;
+
         public SysCorefileUrlMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_COREFILE_URL, data)
         {
             Url = Raw.Span.CString();

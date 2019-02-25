@@ -22,6 +22,8 @@ namespace RfpProxy.Log.Messages
 
         public ReadOnlyMemory<byte> Reserved4 { get; }
 
+        public override bool HasUnknown => true;
+
         public SysInitMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_INIT, data)
         {
             Reserved1 = Raw.Slice(0x00, 0x08);

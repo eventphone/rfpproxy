@@ -6,6 +6,8 @@ namespace RfpProxy.Log.Messages.Dnm
 {
     public sealed class UnknowLcPayload : LcPayload
     {
+        public override bool HasUnknown => true;
+
         public UnknowLcPayload(ReadOnlyMemory<byte> data) : base(data)
         {
         }

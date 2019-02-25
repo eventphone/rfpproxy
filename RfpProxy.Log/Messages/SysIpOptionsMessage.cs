@@ -18,6 +18,8 @@ namespace RfpProxy.Log.Messages
 
         public ReadOnlyMemory<byte> Reserved { get; }
 
+        public override bool HasUnknown => true;
+
         public SysIpOptionsMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_IP_OPTIONS, data)
         {
             var span = Raw.Span;

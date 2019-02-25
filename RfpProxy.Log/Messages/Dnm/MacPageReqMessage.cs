@@ -15,6 +15,8 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public uint PMID { get; }
 
+        public override bool HasUnknown => true;
+
         public MacPageReqMessage(ReadOnlyMemory<byte> data) : base(MsgType.DNM, data)
         {
             var span = Raw.Span;

@@ -16,6 +16,8 @@ namespace RfpProxy.Log.Messages
         /// </summary>
         public ReadOnlyMemory<byte> Md5 { get; }
 
+        public override bool HasUnknown => true;
+
         public SysLicenseTimerMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LICENSE_TIMER, data)
         {
             Reserved1 = Raw.Slice(0, 2);

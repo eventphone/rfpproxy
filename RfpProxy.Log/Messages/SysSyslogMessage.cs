@@ -14,6 +14,8 @@ namespace RfpProxy.Log.Messages
 
         public ReadOnlyMemory<byte> Reserved { get; }
 
+        public override bool HasUnknown => true;
+
         public SysSyslogMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_SYSLOG, data)
         {
             var span = Raw.Span;
