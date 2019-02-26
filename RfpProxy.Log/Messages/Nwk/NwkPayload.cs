@@ -3,6 +3,19 @@ using System.IO;
 
 namespace RfpProxy.Log.Messages.Nwk
 {
+    public class NwkEmptyPayload : NwkPayload
+    {
+        public override bool HasUnknown => false;
+
+        public NwkEmptyPayload() : base(NwkProtocolDiscriminator.CISS, 0, false)
+        {
+        }
+
+        public override void Log(TextWriter writer)
+        {
+        }
+    }
+
     public abstract class NwkPayload
     {
         public NwkProtocolDiscriminator ProtocolDiscriminator { get; }
@@ -22,6 +35,7 @@ namespace RfpProxy.Log.Messages.Nwk
 
         public static NwkPayload Create(ReadOnlyMemory<byte> data)
         {
+            if (data.IsEmpty) return new NwkEmptyPayload();
             var pd = (NwkProtocolDiscriminator)(data.Span[0] & 0xf);
             var ti = (byte) ((data.Span[0] >> 4) & 0b0111);
             var f = (data.Span[0] & 0b1000_0000) == 0;

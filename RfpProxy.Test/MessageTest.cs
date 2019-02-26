@@ -320,6 +320,13 @@ namespace RfpProxy.Test
         }
 
         [Fact]
+        public void CanDecodeEmptyNwkMessage()
+        {
+            var dnm = Decode<DnmMessage>("030100087906090003238101");
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+        }
+        [Fact]
         public void CanDecodeNwkMMAuthenticationRequestMessage()
         {
             var dnm = Decode<DnmMessage>("03010023790506001e234a6d05400a030118180c08cf0b74164913db200e08ad256f18dff1af8d");
@@ -330,7 +337,7 @@ namespace RfpProxy.Test
             //Assert.False(dnm.HasUnknown);
         }
 
-        private T Decode<T>(string hex)
+        private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex);
             var message = AaMiDeMessage.Create(data);
