@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using RfpProxy.Log.Messages;
 using RfpProxy.Log.Messages.Dnm;
+using RfpProxy.Log.Messages.Nwk;
 using RfpProxyLib;
 using Xunit;
 using Xunit.Abstractions;
@@ -250,6 +251,83 @@ namespace RfpProxy.Test
             var lc = Decode<DnmMessage>("030100087905080003216101");
 
             Log(lc);
+        }
+
+        [Fact]
+        public void CanDecodeNwkCCSetupMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301002679060c00212102790305050880b01002869965170606a0a0102af12ce0807b06810031160101");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
+            Assert.Equal(NwkCCMessageType.Setup, nwk.Type);
+            Assert.False(dnm.HasUnknown);
+            Log(dnm);
+        }
+
+        [Fact]
+        public void CanDecodeNwkCCSetupServiceMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301002b79060600262102890305050880b01002869965170606a0a0102af12ce0b02c02188b7b06810031560106f0");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
+            Assert.Equal(NwkCCMessageType.Setup, nwk.Type);
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeNwkCCSetupAckMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301000a7905061005234009830d");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
+            Assert.Equal(NwkCCMessageType.SetupAck, nwk.Type);
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeNwkMMCipherRequestMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301000e7905060009234219054c19028198");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
+            Assert.Equal(NwkMMMessageType.CipherRequest, nwk.Type);
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeNwkCCConnectMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301000a79050610052344098307");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
+            Assert.Equal(NwkCCMessageType.Connect, nwk.Type);
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeNwkCCInfoMessage()
+        {
+            var dnm = Decode<DnmMessage>("030100197905060014234645837b7b0d81003120088110044e616d6500");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
+            Assert.Equal(NwkCCMessageType.Info, nwk.Type);
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeNwkMMAuthenticationRequestMessage()
+        {
+            var dnm = Decode<DnmMessage>("03010023790506001e234a6d05400a030118180c08cf0b74164913db200e08ad256f18dff1af8d");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
+            Assert.Equal(NwkMMMessageType.AuthenticationRequest, nwk.Type);
+            Log(dnm);
+            //Assert.False(dnm.HasUnknown);
         }
 
         private T Decode<T>(string hex)

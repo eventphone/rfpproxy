@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using RfpProxy.Log.Messages.Nwk;
 using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages.Dnm
@@ -95,7 +96,9 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public byte PayloadLength { get; }
 
-        public override bool HasUnknown => !Raw.IsEmpty;
+        public NwkPayload Payload { get; }
+
+        public override bool HasUnknown => Payload.HasUnknown;
 
         public LcDataPayload(ReadOnlyMemory<byte> data):base(data)
         {
@@ -172,10 +175,17 @@ namespace RfpProxy.Log.Messages.Dnm
 
             ExtendedLength = (span[2] & 0x1) != 1;
             MoreData = (span[2] & 0x2) == 0x2;
+            ReadOnlyMemory<byte> payloadData;
             if (!ExtendedLength)
             {
                 PayloadLength = (byte) (span[2] >> 2);
+                payloadData = base.Raw.Slice(3, PayloadLength);
             }
+            else
+            {
+                payloadData = base.Raw.Slice(4);
+            }
+            Payload = NwkPayload.Create(payloadData);
         }
 
         public override ReadOnlyMemory<byte> Raw
@@ -184,7 +194,7 @@ namespace RfpProxy.Log.Messages.Dnm
             {
                 if (ExtendedLength)
                     return base.Raw.Slice(4);
-                return base.Raw.Slice(3);
+                return base.Raw.Slice(3).Slice(PayloadLength);
             }
         }
 
@@ -215,8 +225,10 @@ namespace RfpProxy.Log.Messages.Dnm
                     throw new ArgumentOutOfRangeException();
             }
             writer.Write($" N({(ExtendedLength?0:1)}) M({(MoreData?1:0)}) L({PayloadLength})");
-            if (Raw.Length > 0)
+            if (!Raw.IsEmpty)
                 writer.Write($" Reserved({Raw.ToHex()})");
+
+            Payload.Log(writer);
         }
     }
 }
