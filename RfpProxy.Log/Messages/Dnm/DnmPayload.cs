@@ -14,20 +14,20 @@ namespace RfpProxy.Log.Messages.Dnm
             Raw = data;
         }
 
-        public static DnmPayload Create(DnmLayer layer, DnmType type, ReadOnlyMemory<byte> data)
+        public static DnmPayload Create(DnmLayer layer, DnmType type, ReadOnlyMemory<byte> data, NwkReassembler reassembler)
         {
             switch (layer)
             {
                 case DnmLayer.Mac:
                     return CreateMac(type, data);
                 case DnmLayer.Lc:
-                    return CreateLc(type, data);
+                    return CreateLc(type, data, reassembler);
                 default:
                     return new UnknownDnmPayload(data);
             }
         }
 
-        private static DnmPayload CreateLc(DnmType type, ReadOnlyMemory<byte> data)
+        private static DnmPayload CreateLc(DnmType type, ReadOnlyMemory<byte> data, NwkReassembler reassembler)
         {
             if (data.Length <= 1)
                 return new EmptyLcPayload(data);
@@ -35,7 +35,7 @@ namespace RfpProxy.Log.Messages.Dnm
             {
                 case DnmType.LcDataReq:
                 case DnmType.LcDataInd:
-                    return new LcDataPayload(data);
+                    return new LcDataPayload(data, reassembler);
                 default:
                     return new UnknowLcPayload(data);
             }

@@ -13,9 +13,12 @@ namespace RfpProxy.Test
     {
         private readonly ITestOutputHelper _output;
 
+        private readonly AaMiDeReassembler _reassembler;
+
         public MessageTest(ITestOutputHelper output)
         {
             _output = output;
+            _reassembler = new AaMiDeReassembler();
         }
 
         [Fact]
@@ -326,6 +329,7 @@ namespace RfpProxy.Test
             Log(dnm);
             Assert.False(dnm.HasUnknown);
         }
+
         [Fact]
         public void CanDecodeNwkMMAuthenticationRequestMessage()
         {
@@ -334,13 +338,36 @@ namespace RfpProxy.Test
             var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
             Assert.Equal(NwkMMMessageType.AuthenticationRequest, nwk.Type);
             Log(dnm);
-            //Assert.False(dnm.HasUnknown);
+            Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeFragmentedNwkMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301004779050510422340ff85550505a09400027b07015f720271b47709c08100315101205a007b69810031520102110e180400016e645c355801701d0a8e3c040531358b0b0100600623");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var fragment = Assert.IsType<NwkFragmentedPayload>(lc.Payload);
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+
+            dnm = Decode<DnmMessage>("0301004779050500422342ff23232323231c03534f531c074d414e444f574e630100451f900d506f43207a6976696c6c69616e0a4556454e5450484f4e4504343530320d003b0200002308");
+            lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            fragment = Assert.IsType<NwkFragmentedPayload>(lc.Payload);
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+
+            dnm = Decode<DnmMessage>("03010010790505100b234421c019022715372300");
+            lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
+            Log(dnm);
+            Assert.Equal(NwkMMMessageType.LocateAccept, nwk.Type);
+            Assert.False(dnm.HasUnknown);
         }
 
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex);
-            var message = AaMiDeMessage.Create(data);
+            var message = AaMiDeMessage.Create(data, _reassembler);
             return Assert.IsType<T>(message);
         }
 

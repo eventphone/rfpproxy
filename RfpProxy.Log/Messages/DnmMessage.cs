@@ -59,16 +59,18 @@ namespace RfpProxy.Log.Messages
 
         public override bool HasUnknown => Payload.HasUnknown;
 
-        public DnmMessage(ReadOnlyMemory<byte> data) : base(MsgType.DNM, data)
+        public DnmMessage(ReadOnlyMemory<byte> data, AaMiDeReassembler reassembler) : base(MsgType.DNM, data)
         {
             var span = base.Raw.Span;
             Layer = (DnmLayer) span[0];
             DnmType = (DnmType) span[1];
             MCEI = span[2];
-            Payload = DnmPayload.Create(Layer, DnmType, Raw);
+            var nwkReassembler = reassembler.GetNwk(MCEI);
+            Payload = DnmPayload.Create(Layer, DnmType, Raw, nwkReassembler);
+            reassembler.Return(MCEI, nwkReassembler);
         }
 
-        public static AaMiDeMessage CreateDnm(ReadOnlyMemory<byte> data)
+        public static AaMiDeMessage CreateDnm(ReadOnlyMemory<byte> data, AaMiDeReassembler reassembler)
         {
             var layer = (DnmLayer) data.Span[4];
             switch (layer)
@@ -83,7 +85,7 @@ namespace RfpProxy.Log.Messages
                         case DnmType.MacPageReq:
                             return new MacPageReqMessage(data);
                         default:
-                            return new DnmMessage(data);
+                            return new DnmMessage(data, reassembler);
                     }
                 default:
                     throw new ArgumentOutOfRangeException();

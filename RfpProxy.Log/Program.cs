@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -83,6 +84,7 @@ namespace RfpProxy.Log
         {
             private readonly bool _logRaw;
             private readonly bool _unknown;
+            private readonly Dictionary<RfpIdentifier, AaMiDeReassembler> _reassemblers = new Dictionary<RfpIdentifier, AaMiDeReassembler>();
 
             public LogClient(string socket, bool logRaw, bool unknown) : base(socket)
             {
@@ -95,9 +97,14 @@ namespace RfpProxy.Log
                 if (data.IsEmpty)
                     return Task.CompletedTask;
                 AaMiDeMessage message;
+                if (!_reassemblers.TryGetValue(rfp, out var reassembler))
+                {
+                    reassembler = new AaMiDeReassembler();
+                    _reassemblers.Add(rfp, reassembler);
+                }
                 try
                 {
-                    message = AaMiDeMessage.Create(data);
+                    message = AaMiDeMessage.Create(data, reassembler);
                 }
                 catch (Exception ex)
                 {

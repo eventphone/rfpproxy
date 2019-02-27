@@ -23,7 +23,7 @@ namespace RfpProxy.Log.Messages
             _data = data;
         }
 
-        public static AaMiDeMessage Create(ReadOnlyMemory<byte> data)
+        public static AaMiDeMessage Create(ReadOnlyMemory<byte> data, AaMiDeReassembler reassembler)
         {
             var type = (MsgType)BinaryPrimitives.ReadUInt16BigEndian(data.Slice(0, 2).Span);
             switch (type)
@@ -54,7 +54,7 @@ namespace RfpProxy.Log.Messages
                 case MsgType.MEDIA_DTMF:
                     return new DtmfMediaMessage(data);
                 case MsgType.DNM:
-                    return DnmMessage.CreateDnm(data);
+                    return DnmMessage.CreateDnm(data, reassembler);
                 case MsgType.SNMP_RFP_UPDATE:
                     return new SnmpRfpUpdateMessage(data);
                 case MsgType.SYS_AUTHENTICATE:

@@ -100,7 +100,7 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public override bool HasUnknown => Payload.HasUnknown;
 
-        public LcDataPayload(ReadOnlyMemory<byte> data):base(data)
+        public LcDataPayload(ReadOnlyMemory<byte> data, NwkReassembler reassembler):base(data)
         {
             var span = base.Raw.Span;
             Command = (span[0] & 0x2) == 0x2;
@@ -185,7 +185,16 @@ namespace RfpProxy.Log.Messages.Dnm
             {
                 payloadData = base.Raw.Slice(4);
             }
-            Payload = NwkPayload.Create(payloadData);
+            if (MoreData)
+            {
+                reassembler.AddFragment(LLN, payloadData);
+                Payload = new NwkFragmentedPayload(payloadData);
+            }
+            else
+            {
+                payloadData = reassembler.Reassemble(LLN, payloadData);
+                Payload = NwkPayload.Create(payloadData);
+            }
         }
 
         public override ReadOnlyMemory<byte> Raw
