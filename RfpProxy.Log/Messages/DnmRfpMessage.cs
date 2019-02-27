@@ -60,7 +60,7 @@ namespace RfpProxy.Log.Messages
 
         public Dictionary<RfpcKey, ReadOnlyMemory<byte>> Values { get; }
 
-        public override bool HasUnknown => Values.ContainsKey(RfpcKey.StatisticDataReset);
+        public override bool HasUnknown => DnmType == DnmRfpcType.StatisticsDataCfm;
 
         public DnmRfpcMessage(ReadOnlyMemory<byte> data) : base(MsgType.DNM, data)
         {

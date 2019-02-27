@@ -7,7 +7,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
     {
         public NwkDoubleByteElementType Type { get; }
 
-        protected NwkDoubleByteInformationElement(NwkDoubleByteElementType identifier, byte content)
+        protected NwkDoubleByteInformationElement(NwkDoubleByteElementType identifier)
         {
             Type = identifier;
         }
@@ -18,8 +18,9 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
             switch (type)
             {
                 case NwkDoubleByteElementType.BasicService:
-                    return new NwkBasicServiceInformationElement(content);
+                    return new NwkIeBasicService(content);
                 case NwkDoubleByteElementType.ReleaseReason:
+                    return new NwkIeReleaseReason(content);
                 case NwkDoubleByteElementType.Signal:
                 case NwkDoubleByteElementType.TimerRestart:
                 case NwkDoubleByteElementType.TestHookControl:

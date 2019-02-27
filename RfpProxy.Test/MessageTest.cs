@@ -364,6 +364,28 @@ namespace RfpProxy.Test
             Assert.False(dnm.HasUnknown);
         }
 
+        [Fact]
+        public void CanDecodeNwkMMAuthenticationReplyMessage()
+        {
+            var dnm = Decode<DnmMessage>("03010012790608000d21c42185410d04948d45b0f0f0");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
+            Assert.Equal(NwkMMMessageType.AuthenticationReply, nwk.Type);
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeNwkCCReleaseMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301000d7906090008210011034de200f0");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
+            Assert.Equal(NwkCCMessageType.Release, nwk.Type);
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+        }
+
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex);

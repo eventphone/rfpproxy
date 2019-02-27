@@ -3,7 +3,7 @@ using System.IO;
 
 namespace RfpProxy.Log.Messages.Nwk.InformationElements
 {
-    public sealed class NwkBasicServiceInformationElement : NwkDoubleByteInformationElement
+    public sealed class NwkIeBasicService : NwkDoubleByteInformationElement
     {
         public enum CallClassType : byte
         {
@@ -38,7 +38,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public override bool HasUnknown => false;
 
-        public NwkBasicServiceInformationElement(byte content) : base(NwkDoubleByteElementType.BasicService, content)
+        public NwkIeBasicService(byte content) : base(NwkDoubleByteElementType.BasicService)
         {
             CallClass = (CallClassType) (content >> 4);
             BasicService = (BasicServiceType) (content & 0xf);

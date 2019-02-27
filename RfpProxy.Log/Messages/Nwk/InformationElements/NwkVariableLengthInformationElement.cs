@@ -36,13 +36,14 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     return new NwkIePortableIdentity(data);
                 case NwkVariableLengthElementType.RAND:
                     return new NwkIeRand(data);
+                case NwkVariableLengthElementType.RES:
+                    return new NwkIeRes(data);
                 case NwkVariableLengthElementType.RS:
                     return new NwkIeRs(data);
                 case NwkVariableLengthElementType.InfoType:
                 case NwkVariableLengthElementType.IdentityType:
                 case NwkVariableLengthElementType.NwkAssignedIdentity:
                 case NwkVariableLengthElementType.AllocationType:
-                case NwkVariableLengthElementType.RES:
                 case NwkVariableLengthElementType.IWUAttributes:
                 case NwkVariableLengthElementType.CallAttributes:
                 case NwkVariableLengthElementType.ServiceChangeInfo:
