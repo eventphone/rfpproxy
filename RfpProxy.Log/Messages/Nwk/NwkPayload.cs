@@ -44,7 +44,7 @@ namespace RfpProxy.Log.Messages.Nwk
                 case NwkProtocolDiscriminator.MM:
                     return new NwkMMPayload(ti, f, data);
                 case NwkProtocolDiscriminator.CLMS:
-                    throw new NotImplementedException("CLMS");
+                    return NwkCLMSPayload.Create(ti, f, data);
                 case NwkProtocolDiscriminator.COMS:
                     return new NwkCOMSPayload(ti, f, data);
                 default:

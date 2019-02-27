@@ -385,6 +385,16 @@ namespace RfpProxy.Test
             Log(dnm);
             Assert.False(dnm.HasUnknown);
         }
+        
+        [Fact]
+        public void CanDecodeNwkCLMSMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301001279060a000d21061d060030421fa992f0f0f0");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkCLMSFixedPayload>(lc.Payload);
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+        }
 
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
