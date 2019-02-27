@@ -16,25 +16,30 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
         {
             switch (type)
             {
-                case NwkVariableLengthElementType.PortableIdentity:
-                    return new NwkIePortableIdentity(data);
-                case NwkVariableLengthElementType.FixedIdentity:
-                    return new NwkIeFixedIdentity(data);
-                case NwkVariableLengthElementType.Escape2Proprietary:
-                    return new NwkIeEscape2Proprietary(data);
-                case NwkVariableLengthElementType.MultiKeypad:
-                    return new NwkIeMultiKeypad(data);
-                case NwkVariableLengthElementType.CipherInfo:
-                    return new NwkIeCipherInfo(data);
                 case NwkVariableLengthElementType.AuthType:
                     return new NwkIeAuthType(data);
+                case NwkVariableLengthElementType.CipherInfo:
+                    return new NwkIeCipherInfo(data);
+                case NwkVariableLengthElementType.Duration:
+                    return new NwkIeDuration(data);
+                case NwkVariableLengthElementType.Escape2Proprietary:
+                    return new NwkIeEscape2Proprietary(data);
+                case NwkVariableLengthElementType.FixedIdentity:
+                    return new NwkIeFixedIdentity(data);
+                case NwkVariableLengthElementType.IWU2IWU:
+                    return new NwkIeIwu2Iwu(data);
+                case NwkVariableLengthElementType.LocationArea:
+                    return new NwkIeLocationArea(data);
+                case NwkVariableLengthElementType.MultiKeypad:
+                    return new NwkIeMultiKeypad(data);
+                case NwkVariableLengthElementType.PortableIdentity:
+                    return new NwkIePortableIdentity(data);
                 case NwkVariableLengthElementType.RAND:
                     return new NwkIeRand(data);
                 case NwkVariableLengthElementType.RS:
                     return new NwkIeRs(data);
                 case NwkVariableLengthElementType.InfoType:
                 case NwkVariableLengthElementType.IdentityType:
-                case NwkVariableLengthElementType.LocationArea:
                 case NwkVariableLengthElementType.NwkAssignedIdentity:
                 case NwkVariableLengthElementType.AllocationType:
                 case NwkVariableLengthElementType.RES:
@@ -69,11 +74,9 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                 case NwkVariableLengthElementType.CallingPartyName:
                 case NwkVariableLengthElementType.CalledPartyNumber:
                 case NwkVariableLengthElementType.CalledPartySubaddr:
-                case NwkVariableLengthElementType.Duration:
                 case NwkVariableLengthElementType.CalledPartyName:
                 case NwkVariableLengthElementType.SegmentedInfo:
                 case NwkVariableLengthElementType.Alphanumeric:
-                case NwkVariableLengthElementType.IWU2IWU:
                 case NwkVariableLengthElementType.ModelIdentifier:
                 case NwkVariableLengthElementType.IWUPacket:
                 case NwkVariableLengthElementType.CodecList:
