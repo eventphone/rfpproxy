@@ -102,18 +102,6 @@ namespace RfpProxy.Log
                     reassembler = new AaMiDeReassembler();
                     _reassemblers.Add(rfp, reassembler);
                 }
-                try
-                {
-                    message = AaMiDeMessage.Create(data, reassembler);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Cannot parse {data.ToHex()}");
-                    Console.WriteLine(ex);
-                    return Task.CompletedTask;
-                }
-                if (_unknown && !message.HasUnknown)
-                    return Task.CompletedTask;
                 string prefix;
                 if (direction == MessageDirection.FromOmm)
                 {
@@ -123,6 +111,18 @@ namespace RfpProxy.Log
                 {
                     prefix = "RFP:";
                 }
+                try
+                {
+                    message = AaMiDeMessage.Create(data, reassembler);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff} {prefix}{rfp} Cannot parse {data.ToHex()}");
+                    Console.WriteLine(ex);
+                    return Task.CompletedTask;
+                }
+                if (_unknown && !message.HasUnknown)
+                    return Task.CompletedTask;
                 Console.Write($"{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff} {prefix}{rfp} ");
                 message.Log(Console.Out);
                 Console.WriteLine();
