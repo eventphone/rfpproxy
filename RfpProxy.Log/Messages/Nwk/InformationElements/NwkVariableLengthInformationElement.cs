@@ -26,15 +26,18 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     return new NwkIeMultiKeypad(data);
                 case NwkVariableLengthElementType.CipherInfo:
                     return new NwkIeCipherInfo(data);
+                case NwkVariableLengthElementType.AuthType:
+                    return new NwkIeAuthType(data);
+                case NwkVariableLengthElementType.RAND:
+                    return new NwkIeRand(data);
+                case NwkVariableLengthElementType.RS:
+                    return new NwkIeRs(data);
                 case NwkVariableLengthElementType.InfoType:
                 case NwkVariableLengthElementType.IdentityType:
-                case NwkVariableLengthElementType.LocationAarea:
+                case NwkVariableLengthElementType.LocationArea:
                 case NwkVariableLengthElementType.NwkAssignedIdentity:
-                case NwkVariableLengthElementType.AuthType:
                 case NwkVariableLengthElementType.AllocationType:
-                case NwkVariableLengthElementType.RAND:
                 case NwkVariableLengthElementType.RES:
-                case NwkVariableLengthElementType.RS:
                 case NwkVariableLengthElementType.IWUAttributes:
                 case NwkVariableLengthElementType.CallAttributes:
                 case NwkVariableLengthElementType.ServiceChangeInfo:

@@ -6,7 +6,7 @@
         IdentityType = 0b00000010 ,
         PortableIdentity = 0b00000101 ,
         FixedIdentity = 0b00000110 ,
-        LocationAarea = 0b00000111 ,
+        LocationArea = 0b00000111 ,
         NwkAssignedIdentity = 0b00001001 ,
         AuthType = 0b00001010 ,
         AllocationType = 0b00001011 ,
