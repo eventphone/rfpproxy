@@ -84,7 +84,8 @@ namespace RfpProxy.Log
         {
             private readonly bool _logRaw;
             private readonly bool _unknown;
-            private readonly Dictionary<RfpIdentifier, AaMiDeReassembler> _reassemblers = new Dictionary<RfpIdentifier, AaMiDeReassembler>();
+            private readonly Dictionary<RfpIdentifier, AaMiDeReassembler> _rfpReassemblers = new Dictionary<RfpIdentifier, AaMiDeReassembler>();
+            private readonly Dictionary<RfpIdentifier, AaMiDeReassembler> _ommReassemblers = new Dictionary<RfpIdentifier, AaMiDeReassembler>();
 
             public LogClient(string socket, bool logRaw, bool unknown) : base(socket)
             {
@@ -97,18 +98,24 @@ namespace RfpProxy.Log
                 if (data.IsEmpty)
                     return Task.CompletedTask;
                 AaMiDeMessage message;
-                if (!_reassemblers.TryGetValue(rfp, out var reassembler))
-                {
-                    reassembler = new AaMiDeReassembler();
-                    _reassemblers.Add(rfp, reassembler);
-                }
                 string prefix;
+                AaMiDeReassembler reassembler;
                 if (direction == MessageDirection.FromOmm)
                 {
+                    if (!_ommReassemblers.TryGetValue(rfp, out reassembler))
+                    {
+                        reassembler = new AaMiDeReassembler();
+                        _ommReassemblers.Add(rfp, reassembler);
+                    }
                     prefix = "OMM:";
                 }
                 else
                 {
+                    if (!_rfpReassemblers.TryGetValue(rfp, out reassembler))
+                    {
+                        reassembler = new AaMiDeReassembler();
+                        _rfpReassemblers.Add(rfp, reassembler);
+                    }
                     prefix = "RFP:";
                 }
                 try
