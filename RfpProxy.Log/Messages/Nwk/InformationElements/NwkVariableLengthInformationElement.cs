@@ -20,6 +20,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     return new NwkIeAuthType(data);
                 case NwkVariableLengthElementType.CipherInfo:
                     return new NwkIeCipherInfo(data);
+                case NwkVariableLengthElementType.CodecList:
+                    return new NwkIeCodecList(data);
                 case NwkVariableLengthElementType.Duration:
                     return new NwkIeDuration(data);
                 case NwkVariableLengthElementType.Escape2Proprietary:
@@ -30,6 +32,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     return new NwkIeIwu2Iwu(data);
                 case NwkVariableLengthElementType.LocationArea:
                     return new NwkIeLocationArea(data);
+                case NwkVariableLengthElementType.ModelIdentifier:
+                    return new NwkIeModelIdentifier(data);
                 case NwkVariableLengthElementType.MultiKeypad:
                     return new NwkIeMultiKeypad(data);
                 case NwkVariableLengthElementType.PortableIdentity:
@@ -40,6 +44,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     return new NwkIeRes(data);
                 case NwkVariableLengthElementType.RS:
                     return new NwkIeRs(data);
+                case NwkVariableLengthElementType.TerminalCapability:
+                    return new NwkIeTerminalCapability(data);
                 case NwkVariableLengthElementType.InfoType:
                 case NwkVariableLengthElementType.IdentityType:
                 case NwkVariableLengthElementType.NwkAssignedIdentity:
@@ -66,7 +72,6 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                 case NwkVariableLengthElementType.Key:
                 case NwkVariableLengthElementType.RejectReason:
                 case NwkVariableLengthElementType.SetupCapability:
-                case NwkVariableLengthElementType.TerminalCapability:
                 case NwkVariableLengthElementType.End2EndCompatibility:
                 case NwkVariableLengthElementType.RateParameters:
                 case NwkVariableLengthElementType.TransitDelay:
@@ -78,9 +83,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                 case NwkVariableLengthElementType.CalledPartyName:
                 case NwkVariableLengthElementType.SegmentedInfo:
                 case NwkVariableLengthElementType.Alphanumeric:
-                case NwkVariableLengthElementType.ModelIdentifier:
                 case NwkVariableLengthElementType.IWUPacket:
-                case NwkVariableLengthElementType.CodecList:
                 case NwkVariableLengthElementType.EventsNotification:
                 case NwkVariableLengthElementType.CallInformation:
                 case NwkVariableLengthElementType.EscapeForExtension:

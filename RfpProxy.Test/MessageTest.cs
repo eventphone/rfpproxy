@@ -396,6 +396,38 @@ namespace RfpProxy.Test
             Assert.False(dnm.HasUnknown);
         }
 
+        [Fact]
+        public void CanDecodeNwkMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301001c7906090017a110510071050880b01002869965170606a0a0102af12c");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeNwkMMLocateRequestMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301004979060900442122ff0554050880b0100286996517060781a8902af12c2507015f631135151a012006648113000400000090048f78030031417c0490020084771dc081009401170bf0f0");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var fragment = Assert.IsType<NwkFragmentedPayload>(lc.Payload);
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+
+            dnm = Decode<DnmMessage>("0301004979060900442124ff4e474d414353464532300009372e302e5350313100007b2881003101027f0111095a380c050f7c7d77af160101550380480064010454010e62060030421fa9f0f0");
+            lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            fragment = Assert.IsType<NwkFragmentedPayload>(lc.Payload);
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+
+            dnm = Decode<DnmMessage>("0301000d790609000821260592f0f0f0f0");
+            lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
+            Log(dnm);
+            Assert.Equal(NwkMMMessageType.LocateRequest, nwk.Type);
+            Assert.False(dnm.HasUnknown);
+        }
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex);
