@@ -429,6 +429,18 @@ namespace RfpProxy.Test
             Assert.Equal(NwkMMMessageType.LocateRequest, nwk.Type);
             Assert.False(dnm.HasUnknown);
         }
+
+        [Fact]
+        public void CanDecodeNwkMMInfoSuggestMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301000d79050810082320150552010180");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
+            Log(dnm);
+            Assert.Equal(NwkMMMessageType.MMInfoSuggest, nwk.Type);
+            Assert.False(dnm.HasUnknown);
+        }
+
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex);

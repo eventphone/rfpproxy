@@ -28,6 +28,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     return new NwkIeEscape2Proprietary(data);
                 case NwkVariableLengthElementType.FixedIdentity:
                     return new NwkIeFixedIdentity(data);
+                case NwkVariableLengthElementType.InfoType:
+                    return new NwkIeInfoType(data);
                 case NwkVariableLengthElementType.IWU2IWU:
                     return new NwkIeIwu2Iwu(data);
                 case NwkVariableLengthElementType.LocationArea:
@@ -46,7 +48,6 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     return new NwkIeRs(data);
                 case NwkVariableLengthElementType.TerminalCapability:
                     return new NwkIeTerminalCapability(data);
-                case NwkVariableLengthElementType.InfoType:
                 case NwkVariableLengthElementType.IdentityType:
                 case NwkVariableLengthElementType.NwkAssignedIdentity:
                 case NwkVariableLengthElementType.AllocationType:
