@@ -36,7 +36,7 @@ namespace RfpProxy.Log.Messages.Nwk
             switch (pd)
             {
                 case NwkProtocolDiscriminator.LCE:
-                    throw new NotImplementedException("LCE");
+                    return NwkLCEPayload.Create(ti, f, data);
                 case NwkProtocolDiscriminator.CC:
                     return new NwkCCPayload(ti, f, data);
                 case NwkProtocolDiscriminator.CISS:

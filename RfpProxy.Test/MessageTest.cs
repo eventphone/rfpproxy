@@ -397,13 +397,14 @@ namespace RfpProxy.Test
         }
 
         [Fact]
-        public void CanDecodeNwkMessage()
+        public void CanDecodeNwkLCEPageResponseMessage()
         {
             var dnm = Decode<DnmMessage>("0301001c7906090017a110510071050880b01002869965170606a0a0102af12c");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
-
+            var nwk = Assert.IsType<NwkLCESFormatPayload>(lc.Payload);
             Log(dnm);
             Assert.False(dnm.HasUnknown);
+            Assert.Equal(NwkLCEMessageType.PageResponse, nwk.Type);
         }
 
         [Fact]
