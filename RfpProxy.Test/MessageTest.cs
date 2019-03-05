@@ -441,6 +441,15 @@ namespace RfpProxy.Test
             Assert.False(dnm.HasUnknown);
         }
 
+        [Fact]
+        public void CanDecodeSyncLength()
+        {
+            var sync = Decode<SyncMessage>("0302000b7d330810000ad00ad00200");
+            Assert.Equal(8, sync.PayloadLength);
+            Assert.Equal(sync.PayloadLength, sync.Reserved2.Length);
+            Log(sync);
+        }
+
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex);

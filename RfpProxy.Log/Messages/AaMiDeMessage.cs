@@ -83,6 +83,8 @@ namespace RfpProxy.Log.Messages
                     return new SysResetMessage(data);
                 case MsgType.HEARTBEAT:
                     return new HeartbeatMessage(data);
+                case MsgType.SYNC:
+                    return new SyncMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }
