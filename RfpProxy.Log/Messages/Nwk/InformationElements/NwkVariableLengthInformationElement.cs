@@ -20,6 +20,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     return new NwkIeAllocationType(data);
                 case NwkVariableLengthElementType.AuthType:
                     return new NwkIeAuthType(data);
+                case NwkVariableLengthElementType.CallingPartyNumber:
+                    return new NwkIeCallingPartyNumber(data);
                 case NwkVariableLengthElementType.CipherInfo:
                     return new NwkIeCipherInfo(data);
                 case NwkVariableLengthElementType.CodecList:
@@ -79,7 +81,6 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                 case NwkVariableLengthElementType.RateParameters:
                 case NwkVariableLengthElementType.TransitDelay:
                 case NwkVariableLengthElementType.WindowSize:
-                case NwkVariableLengthElementType.CallingPartyNumber:
                 case NwkVariableLengthElementType.CallingPartyName:
                 case NwkVariableLengthElementType.CalledPartyNumber:
                 case NwkVariableLengthElementType.CalledPartySubaddr:

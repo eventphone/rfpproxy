@@ -22,12 +22,13 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                 case NwkDoubleByteElementType.ReleaseReason:
                     return new NwkIeReleaseReason(content);
                 case NwkDoubleByteElementType.Signal:
+                    return new NwkIeSignal(content);
                 case NwkDoubleByteElementType.TimerRestart:
                 case NwkDoubleByteElementType.TestHookControl:
                 case NwkDoubleByteElementType.SingleDisplay:
                 case NwkDoubleByteElementType.SingleKeypad:
                 case NwkDoubleByteElementType.Reserved:
-                    throw  new NotImplementedException(type.ToString());
+                    return new NwkIeUnknowDouble(type, content);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
