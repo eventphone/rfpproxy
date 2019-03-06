@@ -450,6 +450,28 @@ namespace RfpProxy.Test
             Log(sync);
         }
 
+        [Fact]
+        public void CanDecodeLocateReject()
+        {
+            var dnm = Decode<DnmMessage>("0301000d79050d10081300158557600106");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
+            Log(dnm);
+            Assert.Equal(NwkMMMessageType.LocateReject, nwk.Type);
+            Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeKeyAllocate()
+        {
+            var dnm = Decode<DnmMessage>("0301002279050a101d13006905420b0201880c089e6f24f242c0b13b0e089e6f24f242c0253b");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
+            Log(dnm);
+            Assert.Equal(NwkMMMessageType.KeyAllocate, nwk.Type);
+            Assert.False(dnm.HasUnknown);
+        }
+
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex);

@@ -16,6 +16,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
         {
             switch (type)
             {
+                case NwkVariableLengthElementType.AllocationType:
+                    return new NwkIeAllocationType(data);
                 case NwkVariableLengthElementType.AuthType:
                     return new NwkIeAuthType(data);
                 case NwkVariableLengthElementType.CipherInfo:
@@ -42,6 +44,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     return new NwkIePortableIdentity(data);
                 case NwkVariableLengthElementType.RAND:
                     return new NwkIeRand(data);
+                case NwkVariableLengthElementType.RejectReason:
+                    return new NwkIeRejectReason(data);
                 case NwkVariableLengthElementType.RES:
                     return new NwkIeRes(data);
                 case NwkVariableLengthElementType.RS:
@@ -50,7 +54,6 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     return new NwkIeTerminalCapability(data);
                 case NwkVariableLengthElementType.IdentityType:
                 case NwkVariableLengthElementType.NwkAssignedIdentity:
-                case NwkVariableLengthElementType.AllocationType:
                 case NwkVariableLengthElementType.IWUAttributes:
                 case NwkVariableLengthElementType.CallAttributes:
                 case NwkVariableLengthElementType.ServiceChangeInfo:
@@ -71,7 +74,6 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                 case NwkVariableLengthElementType.ZAPfield:
                 case NwkVariableLengthElementType.ServiceClass:
                 case NwkVariableLengthElementType.Key:
-                case NwkVariableLengthElementType.RejectReason:
                 case NwkVariableLengthElementType.SetupCapability:
                 case NwkVariableLengthElementType.End2EndCompatibility:
                 case NwkVariableLengthElementType.RateParameters:
