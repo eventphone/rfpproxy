@@ -30,6 +30,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     return new NwkIeDuration(data);
                 case NwkVariableLengthElementType.Escape2Proprietary:
                     return new NwkIeEscape2Proprietary(data);
+                case NwkVariableLengthElementType.Facility:
+                    return new NwkIeFacility(data);
                 case NwkVariableLengthElementType.FixedIdentity:
                     return new NwkIeFixedIdentity(data);
                 case NwkVariableLengthElementType.InfoType:
@@ -62,7 +64,6 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                 case NwkVariableLengthElementType.ConnectionAttributes:
                 case NwkVariableLengthElementType.CallIdentity:
                 case NwkVariableLengthElementType.ConnectionIdentity:
-                case NwkVariableLengthElementType.Facility:
                 case NwkVariableLengthElementType.ProgressIndicator:
                 case NwkVariableLengthElementType.MMSGenericHeader:
                 case NwkVariableLengthElementType.MMSObjectHeader:

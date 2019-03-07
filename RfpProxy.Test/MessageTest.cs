@@ -451,7 +451,7 @@ namespace RfpProxy.Test
         }
 
         [Fact]
-        public void CanDecodeNwkMMLocateReject()
+        public void CanDecodeNwkMMLocateRejectMessage()
         {
             var dnm = Decode<DnmMessage>("0301000d79050d10081300158557600106");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
@@ -462,7 +462,7 @@ namespace RfpProxy.Test
         }
 
         [Fact]
-        public void CanDecodeNwkMMKeyAllocate()
+        public void CanDecodeNwkMMKeyAllocateMessage()
         {
             var dnm = Decode<DnmMessage>("0301002279050a101d13006905420b0201880c089e6f24f242c0b13b0e089e6f24f242c0253b");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
@@ -473,13 +473,24 @@ namespace RfpProxy.Test
         }
 
         [Fact]
-        public void CanDecodeNwkCCSetup()
+        public void CanDecodeNwkCCSetupMessage2()
         {
             var dnm = Decode<DnmMessage>("0301003579050c10302320b50305050880b01002869965170606a0a0102af12ce080e4406c1380393935363932393820444543542054656d70");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
             var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
             Log(dnm);
             Assert.Equal(NwkCCMessageType.Setup, nwk.Type);
+            Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeNwkCISSFacilityMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301002c790501002713229164621c2091a11d02013706060400856901033010a10480023830a2030a0101a303020100");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkCISSPayload>(lc.Payload);
+            Log(dnm);
+            Assert.Equal(NwkCISSMessageType.CISSFacility, nwk.Type);
             Assert.False(dnm.HasUnknown);
         }
 
