@@ -37,7 +37,7 @@ namespace RfpProxy.Log.Messages.Rfpc
 
         public uint GoodFrames { get; }
 
-        public override bool HasUnknown => !Reserved1.Span.IsEmpty() && !Reserved2.Span.IsEmpty();
+        public override bool HasUnknown => !Reserved1.Span.IsEmpty() || !Reserved2.Span.IsEmpty();
 
         public StatisticDataRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.StatisticData)
         {
