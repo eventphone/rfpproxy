@@ -185,14 +185,17 @@ namespace RfpProxy.Log.Messages.Dnm
             {
                 payloadData = base.Raw.Slice(4);
             }
+            var lln = LLN;
+            if (Command)
+                lln |= 0b1000;
             if (MoreData)
             {
-                reassembler.AddFragment(LLN, payloadData);
+                reassembler.AddFragment(lln, payloadData);
                 Payload = new NwkFragmentedPayload(payloadData);
             }
             else
             {
-                payloadData = reassembler.Reassemble(LLN, payloadData);
+                payloadData = reassembler.Reassemble(lln, payloadData);
                 Payload = NwkPayload.Create(payloadData);
             }
         }
