@@ -1,8 +1,10 @@
 using System;
 using System.IO;
+using System.Linq;
 using RfpProxy.Log.Messages;
 using RfpProxy.Log.Messages.Dnm;
 using RfpProxy.Log.Messages.Nwk;
+using RfpProxy.Log.Messages.Rfpc;
 using RfpProxyLib;
 using Xunit;
 using Xunit.Abstractions;
@@ -36,6 +38,7 @@ namespace RfpProxy.Test
             Assert.Equal(DnmRfpcType.InitReq, rfpc.DnmType);
 
             Log(rfpc);
+            //TODO Assert.False(rfpc.HasUnknown);
         }
 
         [Fact]
@@ -57,6 +60,7 @@ namespace RfpProxy.Test
             Assert.True(snmp.TrapEnabled);
             
             Log(snmp);
+            Assert.False(snmp.HasUnknown);
         }
 
         [Fact]
@@ -71,6 +75,7 @@ namespace RfpProxy.Test
             Assert.Equal("e8b35e55ab2b30a0", auth.OmmIv.ToHex());
 
             Log(auth);
+            //TODO Assert.False(auth.HasUnknown);
         }
 
         [Fact]
@@ -90,6 +95,7 @@ namespace RfpProxy.Test
             Assert.Equal("SIP-DECT 7.1-CK14", init.SwVersion);
 
             Log(init);
+            //TODO Assert.False(init.HasUnknown);
         }
 
         [Fact]
@@ -100,6 +106,7 @@ namespace RfpProxy.Test
             Assert.Equal(MsgType.SYS_INIT, ack.Message);
 
             Log(ack);
+            //TODO Assert.False(ack.HasUnknown);
         }
 
         [Fact]
@@ -110,6 +117,7 @@ namespace RfpProxy.Test
             Assert.Equal(TimeSpan.FromSeconds(15), interval.Interval);
 
             Log(interval);
+            //TODO Assert.False(interval.HasUnknown);
         }
 
         [Fact]
@@ -125,6 +133,7 @@ namespace RfpProxy.Test
             Assert.Equal(6, options.VoiceVlanPriority);
 
             Log(options);
+            //TODO Assert.False(options.HasUnknown);
         }
 
         [Fact]
@@ -138,6 +147,7 @@ namespace RfpProxy.Test
             Assert.Equal(443, http.Port);
 
             Log(http);
+            //TODO Assert.False(http.HasUnknown);
         }
 
         [Fact]
@@ -151,6 +161,7 @@ namespace RfpProxy.Test
             Assert.Equal(514, syslog.Port);
 
             Log(syslog);
+            //TODO Assert.False(syslog.HasUnknown);
         }
 
         [Fact]
@@ -161,6 +172,7 @@ namespace RfpProxy.Test
             Assert.Equal("tftp://172.20.5.6/abcdefgh", corefile.Url);
 
             Log(corefile);
+            Assert.False(corefile.HasUnknown);
         }
 
         [Fact]
@@ -180,6 +192,7 @@ namespace RfpProxy.Test
             Assert.True(passwd.IsRemoteAccessEnabled);
 
             Log(passwd);
+            //TODO Assert.False(passwd.HasUnknown);
         }
 
         [Fact]
@@ -193,6 +206,7 @@ namespace RfpProxy.Test
             Assert.Equal(TimeSpan.FromMilliseconds(0x23), rping.Rtt);
 
             Log(rping);
+            //TODO Assert.False(rping.HasUnknown);
         }
 
         [Fact]
@@ -210,6 +224,7 @@ namespace RfpProxy.Test
             Assert.NotEqual(rtdelay.Time1, rtdelay.Time2);
 
             Log(rtdelay);
+            Assert.False(rtdelay.HasUnknown);
         }
 
         [Fact]
@@ -220,6 +235,7 @@ namespace RfpProxy.Test
             Assert.Equal(SysResetMessage.ResetType.Reset, reset.Reset);
 
             Log(reset);
+            Assert.False(reset.HasUnknown);
         }
 
         [Fact]
@@ -232,6 +248,7 @@ namespace RfpProxy.Test
             Assert.Equal(34, heartbeat.Uptime.Minutes);
 
             Log(heartbeat);
+            Assert.False(heartbeat.HasUnknown);
         }
 
         [Fact]
@@ -246,6 +263,7 @@ namespace RfpProxy.Test
             Assert.Equal(SysLedMessage.ColorScheme.Green, led.Color);
 
             Log(led);
+            Assert.False(led.HasUnknown);
         }
 
         [Fact]
@@ -254,6 +272,7 @@ namespace RfpProxy.Test
             var lc = Decode<DnmMessage>("030100087905080003216101");
 
             Log(lc);
+            Assert.False(lc.HasUnknown);
         }
 
         [Fact]
@@ -262,9 +281,9 @@ namespace RfpProxy.Test
             var dnm = Decode<DnmMessage>("0301002679060c00212102790305050880b01002869965170606a0a0102af12ce0807b06810031160101");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
             var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
+            Log(dnm);
             Assert.Equal(NwkCCMessageType.Setup, nwk.Type);
             Assert.False(dnm.HasUnknown);
-            Log(dnm);
         }
 
         [Fact]
@@ -273,8 +292,8 @@ namespace RfpProxy.Test
             var dnm = Decode<DnmMessage>("0301002b79060600262102890305050880b01002869965170606a0a0102af12ce0b02c02188b7b06810031560106f0");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
             var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
-            Assert.Equal(NwkCCMessageType.Setup, nwk.Type);
             Log(dnm);
+            Assert.Equal(NwkCCMessageType.Setup, nwk.Type);
             Assert.False(dnm.HasUnknown);
         }
 
@@ -284,8 +303,8 @@ namespace RfpProxy.Test
             var dnm = Decode<DnmMessage>("0301000a7905061005234009830d");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
             var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
-            Assert.Equal(NwkCCMessageType.SetupAck, nwk.Type);
             Log(dnm);
+            Assert.Equal(NwkCCMessageType.SetupAck, nwk.Type);
             Assert.False(dnm.HasUnknown);
         }
 
@@ -295,8 +314,8 @@ namespace RfpProxy.Test
             var dnm = Decode<DnmMessage>("0301000e7905060009234219054c19028198");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
             var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
-            Assert.Equal(NwkMMMessageType.CipherRequest, nwk.Type);
             Log(dnm);
+            Assert.Equal(NwkMMMessageType.CipherRequest, nwk.Type);
             Assert.False(dnm.HasUnknown);
         }
 
@@ -306,8 +325,8 @@ namespace RfpProxy.Test
             var dnm = Decode<DnmMessage>("0301000a79050610052344098307");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
             var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
-            Assert.Equal(NwkCCMessageType.Connect, nwk.Type);
             Log(dnm);
+            Assert.Equal(NwkCCMessageType.Connect, nwk.Type);
             Assert.False(dnm.HasUnknown);
         }
 
@@ -317,8 +336,8 @@ namespace RfpProxy.Test
             var dnm = Decode<DnmMessage>("030100197905060014234645837b7b0d81003120088110044e616d6500");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
             var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
-            Assert.Equal(NwkCCMessageType.Info, nwk.Type);
             Log(dnm);
+            Assert.Equal(NwkCCMessageType.Info, nwk.Type);
             Assert.False(dnm.HasUnknown);
         }
 
@@ -336,8 +355,8 @@ namespace RfpProxy.Test
             var dnm = Decode<DnmMessage>("03010023790506001e234a6d05400a030118180c08cf0b74164913db200e08ad256f18dff1af8d");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
             var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
-            Assert.Equal(NwkMMMessageType.AuthenticationRequest, nwk.Type);
             Log(dnm);
+            Assert.Equal(NwkMMMessageType.AuthenticationRequest, nwk.Type);
             Assert.False(dnm.HasUnknown);
         }
 
@@ -346,13 +365,13 @@ namespace RfpProxy.Test
         {
             var dnm = Decode<DnmMessage>("0301004779050510422340ff85550505a09400027b07015f720271b47709c08100315101205a007b69810031520102110e180400016e645c355801701d0a8e3c040531358b0b0100600623");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
-            var fragment = Assert.IsType<NwkFragmentedPayload>(lc.Payload);
+            Assert.IsType<NwkFragmentedPayload>(lc.Payload);
             Log(dnm);
             Assert.False(dnm.HasUnknown);
 
             dnm = Decode<DnmMessage>("0301004779050500422342ff23232323231c03534f531c074d414e444f574e630100451f900d506f43207a6976696c6c69616e0a4556454e5450484f4e4504343530320d003b0200002308");
             lc = Assert.IsType<LcDataPayload>(dnm.Payload);
-            fragment = Assert.IsType<NwkFragmentedPayload>(lc.Payload);
+            Assert.IsType<NwkFragmentedPayload>(lc.Payload);
             Log(dnm);
             Assert.False(dnm.HasUnknown);
 
@@ -370,8 +389,8 @@ namespace RfpProxy.Test
             var dnm = Decode<DnmMessage>("03010012790608000d21c42185410d04948d45b0f0f0");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
             var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
-            Assert.Equal(NwkMMMessageType.AuthenticationReply, nwk.Type);
             Log(dnm);
+            Assert.Equal(NwkMMMessageType.AuthenticationReply, nwk.Type);
             Assert.False(dnm.HasUnknown);
         }
 
@@ -381,8 +400,8 @@ namespace RfpProxy.Test
             var dnm = Decode<DnmMessage>("0301000d7906090008210011034de200f0");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
             var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
-            Assert.Equal(NwkCCMessageType.Release, nwk.Type);
             Log(dnm);
+            Assert.Equal(NwkCCMessageType.Release, nwk.Type);
             Assert.False(dnm.HasUnknown);
         }
         
@@ -393,7 +412,7 @@ namespace RfpProxy.Test
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
             var nwk = Assert.IsType<NwkCLMSFixedPayload>(lc.Payload);
             Log(dnm);
-            Assert.False(dnm.HasUnknown);
+            //TODO Assert.False(dnm.HasUnknown);
         }
 
         [Fact]
@@ -412,13 +431,13 @@ namespace RfpProxy.Test
         {
             var dnm = Decode<DnmMessage>("0301004979060900442122ff0554050880b0100286996517060781a8902af12c2507015f631135151a012006648113000400000090048f78030031417c0490020084771dc081009401170bf0f0");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
-            var fragment = Assert.IsType<NwkFragmentedPayload>(lc.Payload);
+            Assert.IsType<NwkFragmentedPayload>(lc.Payload);
             Log(dnm);
             Assert.False(dnm.HasUnknown);
 
             dnm = Decode<DnmMessage>("0301004979060900442124ff4e474d414353464532300009372e302e5350313100007b2881003101027f0111095a380c050f7c7d77af160101550380480064010454010e62060030421fa9f0f0");
             lc = Assert.IsType<LcDataPayload>(dnm.Payload);
-            fragment = Assert.IsType<NwkFragmentedPayload>(lc.Payload);
+            Assert.IsType<NwkFragmentedPayload>(lc.Payload);
             Log(dnm);
             Assert.False(dnm.HasUnknown);
 
@@ -491,7 +510,18 @@ namespace RfpProxy.Test
             var nwk = Assert.IsType<NwkCISSPayload>(lc.Payload);
             Log(dnm);
             Assert.Equal(NwkCISSMessageType.CISSFacility, nwk.Type);
-            Assert.False(dnm.HasUnknown);
+            //TODO Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeRfpcStatisticsDataCfm()
+        {
+            var rfpc = Decode<DnmRfpcMessage>("0301004078171034b4bd3f0c7b05ee35ce03080000000000110300000000000000000000000000000000730000000000000049ba0c008f77e103f92a1606000000000000");
+            var stats = rfpc.Values.OfType<StatisticDataRfpcValue>().Single();
+            Log(rfpc);
+            Assert.False(stats.HasUnknown);
+            Assert.Equal(65107855u, stats.GoodFrames);
+            //TODO Assert.False(rfpc.HasUnknown);
         }
 
         private T Decode<T>(string hex) where T:AaMiDeMessage

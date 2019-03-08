@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using RfpProxyLib;
+using System.Linq;
+using RfpProxy.Log.Messages.Rfpc;
 
 namespace RfpProxy.Log.Messages
 {
@@ -44,12 +45,26 @@ namespace RfpProxy.Log.Messages
         SARI = 0x05,
         HigherLayerCapabilities = 0x06,
         ExtendedCapabilities = 0x07,
+        StatusInfo = 0x08,
         MacCapabilities = 0x0d,
         StatisticDataReset = 0x0f,
+        StatisticData = 0x10,
+        ErrorCause = 0x11,
         RfpFu6WindowSize = 0x12,
+        RfpToRfp = 0x14,
+        RfpTopo = 0x15,
+        LastError = 0x20,
+        PabxData = 0x21,
+        MoniData = 0x22,
+        LastErrorExt = 0x23,
+        FpgaRevision = 0x24,
+        RfpString = 0x25,
         RfpSiteLocation = 0x26,
         RfpPli = 0x27,
         ReflectingEnvironment = 0x28,
+        Extended2Capabilities = 0x29,
+        FrequencyBand = 0x2a,
+        RfPower = 0x2b,
     }
 
     public sealed class DnmRfpcMessage : AaMiDeMessage
@@ -58,16 +73,16 @@ namespace RfpProxy.Log.Messages
 
         public DnmRfpcType DnmType { get; }
 
-        public Dictionary<RfpcKey, ReadOnlyMemory<byte>> Values { get; }
+        public List<DnmRfpcValue> Values { get; }
 
-        public override bool HasUnknown => DnmType == DnmRfpcType.StatisticsDataCfm;
+        public override bool HasUnknown => Values.Any(x=>x.HasUnknown);
 
         public DnmRfpcMessage(ReadOnlyMemory<byte> data) : base(MsgType.DNM, data)
         {
             var span = base.Raw.Span;
             Layer = (DnmLayer) span[0];
             DnmType = (DnmRfpcType) span[1];
-            Values = new Dictionary<RfpcKey, ReadOnlyMemory<byte>>();
+            Values = new List<DnmRfpcValue>();
 
             var payload = Raw;
             while (payload.Length > 0)
@@ -75,7 +90,7 @@ namespace RfpProxy.Log.Messages
                 var key = (RfpcKey) payload.Span[0];
                 var length = payload.Span[1];
                 var value = payload.Slice(2, length);
-                Values.Add(key, value);
+                Values.Add(DnmRfpcValue.Create(key, value));
                 payload = payload.Slice(2).Slice(length);
             }
         }
@@ -86,9 +101,9 @@ namespace RfpProxy.Log.Messages
         {
             base.Log(writer);
             writer.Write($"Layer({Layer,-3:G}) Type({DnmType,-20:G})");
-            foreach (var kvp in Values)
+            foreach (var value in Values)
             {
-                writer.Write($" {kvp.Key}={kvp.Value.ToHex()}");
+                value.Log(writer);
             }
         }
     }
