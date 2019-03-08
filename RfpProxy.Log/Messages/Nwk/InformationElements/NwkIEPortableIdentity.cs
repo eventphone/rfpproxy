@@ -77,10 +77,10 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     writer.Write($" IPUI-{IPUIType:G}({Identity.ToHex()})");
                     break;
                 case PortableIdentityType.TPUI:
-                    writer.Write($" TPUI({Identity.ToHex().Substring(1)})");
+                    writer.Write($" TPUI-{TPUIType:G}({Identity.ToHex().Substring(1)})");
                     break;
                 case PortableIdentityType.IPEI:
-                    writer.Write($" {IdentityType:G}({Identity.ToHex()})");
+                    writer.Write($" IPEI({Identity.ToHex()})");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

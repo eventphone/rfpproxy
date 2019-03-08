@@ -144,7 +144,7 @@ namespace RfpProxy.Test
             Assert.Equal(6, options.VoiceVlanPriority);
 
             Log(options);
-            //TODO Assert.False(options.HasUnknown);
+            Assert.False(options.HasUnknown);
         }
 
         [Fact]
@@ -158,7 +158,7 @@ namespace RfpProxy.Test
             Assert.Equal(443, http.Port);
 
             Log(http);
-            //TODO Assert.False(http.HasUnknown);
+            Assert.False(http.HasUnknown);
         }
 
         [Fact]
@@ -172,7 +172,7 @@ namespace RfpProxy.Test
             Assert.Equal(514, syslog.Port);
 
             Log(syslog);
-            //TODO Assert.False(syslog.HasUnknown);
+            Assert.False(syslog.HasUnknown);
         }
 
         [Fact]
@@ -203,7 +203,7 @@ namespace RfpProxy.Test
             Assert.True(passwd.IsRemoteAccessEnabled);
 
             Log(passwd);
-            //TODO Assert.False(passwd.HasUnknown);
+            Assert.False(passwd.HasUnknown);
         }
 
         [Fact]
@@ -217,7 +217,7 @@ namespace RfpProxy.Test
             Assert.Equal(TimeSpan.FromMilliseconds(0x23), rping.Rtt);
 
             Log(rping);
-            //TODO Assert.False(rping.HasUnknown);
+            Assert.False(rping.HasUnknown);
         }
 
         [Fact]

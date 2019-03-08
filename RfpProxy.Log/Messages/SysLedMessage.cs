@@ -28,7 +28,7 @@ namespace RfpProxy.Log.Messages
 
         public ColorScheme Color { get; }
 
-        public override bool HasUnknown => !Raw.Span.IsEmpty();
+        public override bool HasUnknown => false;
         
         public SysLedMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LED, data)
         {
@@ -46,7 +46,7 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"LEDs({(Led1?'1':'0')}{(Led2?'1':'0')}{(Led3?'1':'0')}{(Led4?'1':'0')}) Color({Color}) Reserved({Raw.ToHex()})");
+            writer.Write($"LEDs({(Led1?'1':'0')}{(Led2?'1':'0')}{(Led3?'1':'0')}{(Led4?'1':'0')}) Color({Color})");
         }
     }
 }

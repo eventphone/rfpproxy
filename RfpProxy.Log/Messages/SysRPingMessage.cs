@@ -12,22 +12,22 @@ namespace RfpProxy.Log.Messages
 
         public TimeSpan Rtt { get; }
 
-        public ReadOnlyMemory<byte> Reserved { get;}
+        public ReadOnlyMemory<byte> Padding { get;}
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => false;
 
         public SysRPingMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_RPING, data)
         {
             var span = Raw.Span;
             Ip = new IPAddress(span.Slice(0, 4));
             Rtt = TimeSpan.FromMilliseconds(BinaryPrimitives.ReadUInt32BigEndian(span.Slice(4)));
-            Reserved = Raw.Slice(8);
+            Padding = Raw.Slice(8);
         }
 
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"IP({Ip}) Rtt({Rtt.TotalMilliseconds}ms) Reserved({Reserved.ToHex()})");
+            writer.Write($"IP({Ip}) Rtt({Rtt.TotalMilliseconds}ms)");
         }
     }
 }

@@ -16,9 +16,9 @@ namespace RfpProxy.Log.Messages
         
         public byte VoiceVlanPriority { get; }
 
-        public ReadOnlyMemory<byte> Reserved { get; }
+        public ReadOnlyMemory<byte> Padding { get; }
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => false;
 
         public SysIpOptionsMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_IP_OPTIONS, data)
         {
@@ -28,15 +28,14 @@ namespace RfpProxy.Log.Messages
             Ttl = span[2];
             SignalVlanPriority = span[3];
             VoiceVlanPriority = span[4];
-            Reserved = Raw.Slice(5);
+            Padding = Raw.Slice(5);
         }
 
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
             writer.Write($"VoiceTOS(0x{VoiceTos:x2}) SignalTOS(0x{SignalTos:x2}) TTL({Ttl}) ");
-            writer.Write($"SignalVlanPrio({SignalVlanPriority}) VoiceVlanPrio({VoiceVlanPriority}) ");
-            writer.Write($"Reserved({Reserved.ToHex()})");
+            writer.Write($"SignalVlanPrio({SignalVlanPriority}) VoiceVlanPrio({VoiceVlanPriority})");
         }
     }
 }

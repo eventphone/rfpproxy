@@ -12,22 +12,22 @@ namespace RfpProxy.Log.Messages
 
         public ushort Port { get; }
 
-        public ReadOnlyMemory<byte> Reserved { get; }
+        public ReadOnlyMemory<byte> Padding { get; }
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => false;
 
         public SysSyslogMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_SYSLOG, data)
         {
             var span = Raw.Span;
             Ip = new IPAddress(span.Slice(0,4));
             Port = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(4));
-            Reserved = Raw.Slice(6);
+            Padding = Raw.Slice(6);
         }
 
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Ip({Ip}) Port({Port}) Reserved({Reserved.ToHex()})");
+            writer.Write($"Ip({Ip}) Port({Port})");
         }
     }
 }
