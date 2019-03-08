@@ -42,6 +42,17 @@ namespace RfpProxy.Test
         }
 
         [Fact]
+        public void CanDecodeRfpActiveInd()
+        {
+            var rfpc = Decode<DnmRfpcMessage>("0301003c783002070300000211030003010c040510000000000d039003ff0602ce0007050011000000260200002701002a01012b010129050800801000280100");
+
+            Assert.Equal(DnmRfpcType.ActiveInd, rfpc.DnmType);
+
+            Log(rfpc);
+            //TODO Assert.False(rfpc.HasUnknown);
+        }
+
+        [Fact]
         public void CanDecodeSysSnmpMessage()
         {
             var snmp = Decode<SnmpRfpUpdateMessage>("0501014c" +

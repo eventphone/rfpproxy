@@ -11,8 +11,6 @@ namespace RfpProxy.Log.Messages.Rfpc
         [Flags]
         public enum MacCapabilities //: uint
         {
-            Unknown = 0b0001_0000_0000_0000_0000_0000,
-
             ExtendedFPInfo = 0b1000_0000_0000_0000_0000,
             DoubleDuplexBearerConnections = 0b0100_0000_0000_0000_0000,
             Reserved = 0b0010_0000_0000_0000_0000,
@@ -42,7 +40,7 @@ namespace RfpProxy.Log.Messages.Rfpc
         public MacCapabilitiesRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.MacCapabilities)
         {
             var span = data.Span;
-            Capabilities = (MacCapabilities) ((span[0] << 16) | (span[1] << 8) | (span[2]));
+            Capabilities = (MacCapabilities) (((span[0] & 0xf) << 16) | (span[1] << 8) | (span[2]));
         }
 
         public override void Log(TextWriter writer)
