@@ -62,7 +62,7 @@ namespace RfpProxy.Log.Messages
         RfpSiteLocation = 0x26,
         RfpPli = 0x27,
         ReflectingEnvironment = 0x28,
-        Extended2Capabilities = 0x29,
+        ExtendedCapabilities2 = 0x29,
         FrequencyBand = 0x2a,
         RfPower = 0x2b,
     }

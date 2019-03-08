@@ -26,6 +26,8 @@ namespace RfpProxy.Log.Messages.Rfpc
             {
                 case RfpcKey.ExtendedCapabilities:
                     return new ExtendedCapabilitiesRfpcValue(data);
+                case RfpcKey.ExtendedCapabilities2:
+                    return new ExtendedCapabilities2RfpcValue(data);
                 case RfpcKey.HigherLayerCapabilities:
                     return new HigherLayerCapabilitiesRfpcValue(data);
                 case RfpcKey.MacCapabilities:
@@ -55,7 +57,6 @@ namespace RfpProxy.Log.Messages.Rfpc
                 case RfpcKey.FpgaRevision:
                 case RfpcKey.RfpString:
                 case RfpcKey.RfpSiteLocation:
-                case RfpcKey.Extended2Capabilities:
                 case RfpcKey.FrequencyBand:
                 case RfpcKey.RfPower:
                 default:

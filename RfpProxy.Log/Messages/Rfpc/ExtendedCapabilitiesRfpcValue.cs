@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.IO;
-using System.Threading;
 
 namespace RfpProxy.Log.Messages.Rfpc
 {
