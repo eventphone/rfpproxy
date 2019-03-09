@@ -46,9 +46,10 @@ namespace RfpProxy.Log.Messages.Rfpc
                     return new SariRfpcValue(data);
                 case RfpcKey.StatisticData:
                     return new StatisticDataRfpcValue(data);
+                case RfpcKey.StatisticDataReset:
+                    return new StatisticDataResetRfpcValue(data);
                 case RfpcKey.Revision:
                 case RfpcKey.StatusInfo:
-                case RfpcKey.StatisticDataReset:
                 case RfpcKey.ErrorCause:
                 case RfpcKey.RfpFu6WindowSize:
                 case RfpcKey.RfpToRfp:

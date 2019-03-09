@@ -437,6 +437,17 @@ namespace RfpProxy.Test
             Assert.Equal(NwkCCMessageType.Release, nwk.Type);
             Assert.False(dnm.HasUnknown);
         }
+
+        [Fact]
+        public void CanDecodeNwkCCReleaseComMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301000c7905061007130011835ae220");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
+            Log(dnm);
+            Assert.Equal(NwkCCMessageType.ReleaseCom, nwk.Type);
+            Assert.False(dnm.HasUnknown);
+        }
         
         [Fact]
         public void CanDecodeNwkCLMSMessage()
@@ -543,6 +554,11 @@ namespace RfpProxy.Test
             var nwk = Assert.IsType<NwkCISSPayload>(lc.Payload);
             Log(dnm);
             Assert.Equal(NwkCISSMessageType.CISSFacility, nwk.Type);
+            dnm = Decode<DnmMessage>("0301003d7905021038238cd564627731c0810071100007011f01090307e30c02ffffffffffffffffffffffffffffffffffffffffffffffff000521383636360121");
+            lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            nwk = Assert.IsType<NwkCISSPayload>(lc.Payload);
+            Log(dnm);
+            Assert.Equal(NwkCISSMessageType.CISSFacility, nwk.Type);
             //TODO Assert.False(dnm.HasUnknown);
         }
 
@@ -555,6 +571,17 @@ namespace RfpProxy.Test
             Assert.False(stats.HasUnknown);
             Assert.Equal(65107855u, stats.GoodFrames);
             //TODO Assert.False(rfpc.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeRfpcStatisticsDataReq()
+        {
+            var rfpc = Decode<DnmRfpcMessage>("0301000878160f0400000000");
+            var stats = rfpc.Values.OfType<StatisticDataResetRfpcValue>().Single();
+            Log(rfpc);
+            Assert.False(stats.HasUnknown);
+            Assert.False(stats.Reset);
+            Assert.False(rfpc.HasUnknown);
         }
 
         private T Decode<T>(string hex) where T:AaMiDeMessage
