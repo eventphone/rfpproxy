@@ -32,18 +32,21 @@ namespace RfpProxy.Log.Messages.Rfpc
                     return new HigherLayerCapabilitiesRfpcValue(data);
                 case RfpcKey.MacCapabilities:
                     return new MacCapabilitiesRfpcValue(data);
+                case RfpcKey.NumberOfUpn:
+                    return new NumberOfUpnRfpcValue(data);
+                case RfpcKey.NumberOfBearer:
+                    return new NumberOfBearerRfpcValue(data);
                 case RfpcKey.ReflectingEnvironment:
                     return new ReflectingEnvironmentRfpcValue(data);
                 case RfpcKey.RFPI:
                     return new RfpiRfpcValue(data);
                 case RfpcKey.RfpPli:
                     return new RfpPliRfpcValue(data);
+                case RfpcKey.SARI:
+                    return new SariRfpcValue(data);
                 case RfpcKey.StatisticData:
                     return new StatisticDataRfpcValue(data);
-                case RfpcKey.NumberOfUpn:
                 case RfpcKey.Revision:
-                case RfpcKey.NumberOfBearer:
-                case RfpcKey.SARI:
                 case RfpcKey.StatusInfo:
                 case RfpcKey.StatisticDataReset:
                 case RfpcKey.ErrorCause:

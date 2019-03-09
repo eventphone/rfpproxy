@@ -74,7 +74,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
             switch (IdentityType)
             {
                 case PortableIdentityType.IPUI:
-                    writer.Write($" IPUI-{IPUIType:G}({Identity.ToHex()})");
+                    writer.Write($" IPUI-{IPUIType:G}({Identity.ToHex().Substring(1)})");
                     break;
                 case PortableIdentityType.TPUI:
                     writer.Write($" TPUI-{TPUIType:G}({Identity.ToHex().Substring(1)})");

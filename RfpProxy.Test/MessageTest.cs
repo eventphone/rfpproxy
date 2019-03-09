@@ -53,6 +53,28 @@ namespace RfpProxy.Test
         }
 
         [Fact]
+        public void CanDecodeRfpReadyInd()
+        {
+            var rfpc = Decode<DnmRfpcMessage>("0301001178010101010207020102031132dc03010c");
+
+            Assert.Equal(DnmRfpcType.ReadyInd, rfpc.DnmType);
+
+            Log(rfpc);
+            //TODO Assert.False(rfpc.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeRfpSariListReq()
+        {
+            var rfpc = Decode<DnmRfpcMessage>("0301000878050504102af12c");
+
+            Assert.Equal(DnmRfpcType.SariListReq, rfpc.DnmType);
+
+            Log(rfpc);
+            Assert.False(rfpc.HasUnknown);
+        }
+
+        [Fact]
         public void CanDecodeSysSnmpMessage()
         {
             var snmp = Decode<SnmpRfpUpdateMessage>("0501014c" +
