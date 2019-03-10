@@ -22,7 +22,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public ReadOnlyMemory<byte> Proprietary { get; }
 
-        public override bool HasUnknown => false;
+        public override bool HasUnknown => true;
 
         public NwkIeEscape2Proprietary(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.Escape2Proprietary)
         {
