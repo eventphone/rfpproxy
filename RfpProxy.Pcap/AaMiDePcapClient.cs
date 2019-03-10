@@ -8,7 +8,8 @@ namespace RfpProxy.Pcap
 {
     class AaMiDePcapClient : PcapClient
     {
-        private ConcurrentDictionary<RfpIdentifier, uint> _sequenceNumbers = new ConcurrentDictionary<RfpIdentifier, uint>();
+        private readonly ConcurrentDictionary<RfpIdentifier, int> _rfpSequenceNumbers = new ConcurrentDictionary<RfpIdentifier, int>();
+        private readonly ConcurrentDictionary<RfpIdentifier, int> _ommSequenceNumbers = new ConcurrentDictionary<RfpIdentifier, int>();
 
         public AaMiDePcapClient(string socket, string filename) : base(socket, filename)
         {
@@ -64,20 +65,29 @@ namespace RfpProxy.Pcap
                 span[15] = 1;
             }
             span = span.Slice(20);
+            int seq;
+            int ack;
             if (direction == MessageDirection.ToOmm)
             {
+                seq = _rfpSequenceNumbers.AddOrUpdate(rfp, x => data.Length, (x, i) => i+data.Length);
+                ack = _ommSequenceNumbers.GetOrAdd(rfp, 1);
                 BinaryPrimitives.WriteUInt16BigEndian(span, 54321); //source port
                 BinaryPrimitives.WriteUInt16BigEndian(span.Slice(2), 16321); //destination port
             }
             else
             {
+                seq = _ommSequenceNumbers.AddOrUpdate(rfp, x => data.Length, (x, i) => i+data.Length);
+                ack = _rfpSequenceNumbers.GetOrAdd(rfp, 1);
                 BinaryPrimitives.WriteUInt16BigEndian(span, 16321); //source port
                 BinaryPrimitives.WriteUInt16BigEndian(span.Slice(2), 54321); //destination port
 
             }
-            var seq = _sequenceNumbers.AddOrUpdate(rfp, x => 1, (x, i) => ++i);
-            BinaryPrimitives.WriteUInt32BigEndian(span.Slice(4), seq);
+            BinaryPrimitives.WriteInt32BigEndian(span.Slice(4), seq - data.Length);
+            BinaryPrimitives.WriteInt32BigEndian(span.Slice(8), ack);
             span[12] = 0x50;//data offset
+            span[13] = 0b0001_0000;//flags
+            span[14] = 0xff;//window size
+            span[15] = 0xff;
         }
     }
 }
