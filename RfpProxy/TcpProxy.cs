@@ -92,6 +92,7 @@ namespace RfpProxy
         private async Task HandleClientAsync(TcpClient client, CancellationToken cancellationToken)
         {
                 using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+                using (client)
                 using (var server = ConnectToServer(client))
                 {
                     await server.ConnectAsync(_server, _port).ConfigureAwait(false);
