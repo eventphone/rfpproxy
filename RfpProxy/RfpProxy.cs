@@ -121,39 +121,17 @@ namespace RfpProxy
             {
                 var clientConnection = new ClientConnection(client, OnSubscriptionMessageAsync);
                 var subscriptions = new List<Subscription>();
-                try
+                clientConnection.Subscribed += (s, e) =>
                 {
-                    using (var stream = new NetworkStream(client, FileAccess.ReadWrite, false))
-                    using (var reader = new StreamReader(stream))
-                    {
-                        await SendAsync(client, Serialize(new Hello("stay connected")), cancellationToken)
-                            .ConfigureAwait(false);
-                        while (true)
-                        {
-                            var text = await reader.ReadLineAsync().ConfigureAwait(false);
-                            Console.WriteLine($"new subscription: {text}");
-                            cancellationToken.ThrowIfCancellationRequested();
-                            var msg = Deserialize(text);
-                            if (msg.Type == SubscriptionType.End)
-                                break;
-                            var mac = HexEncoding.HexToByte(msg.Rfp.Filter);
-                            var macMask = HexEncoding.HexToByte(msg.Rfp.Mask);
-                            var filter = HexEncoding.HexToByte(msg.Message.Filter);
-                            var filterMask = HexEncoding.HexToByte(msg.Message.Mask);
-                            var subscription = new Subscription(clientConnection, cts, msg.Priority, mac, macMask, filter, filterMask, msg.Type == SubscriptionType.Handle);
-                            subscriptions.Add(subscription);
-                            _subscriptions.TryAdd(subscription, subscription);
-                        }
-                        await SendAsync(client, Serialize(new Hello("switching protocols")), cancellationToken)
-                            .ConfigureAwait(false);
-                    }
-                }
-                catch (Exception ex) when (client.Connected)
-                {
-                    await SendAsync(client, ex.Message, cancellationToken).ConfigureAwait(false);
-                    Console.WriteLine(ex);
-                    return;
-                }
+                    var msg = e.Subscription;
+                    var mac = HexEncoding.HexToByte(msg.Rfp.Filter);
+                    var macMask = HexEncoding.HexToByte(msg.Rfp.Mask);
+                    var filter = HexEncoding.HexToByte(msg.Message.Filter);
+                    var filterMask = HexEncoding.HexToByte(msg.Message.Mask);
+                    var subscription = new Subscription(clientConnection, cts, msg.Priority, mac, macMask, filter, filterMask, msg.Type == SubscriptionType.Handle);
+                    subscriptions.Add(subscription);
+                    _subscriptions.TryAdd(subscription, subscription);
+                };
                 await clientConnection.RunAsync(cancellationToken).ConfigureAwait(false);
                 cts.Cancel();
                 foreach (var subscription in subscriptions)
@@ -179,27 +157,6 @@ namespace RfpProxy
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message.Direction), "invalid message direction");
             }
-        }
-
-        private static string Serialize<T>(T message)
-        {
-            return JsonConvert.SerializeObject(message);
-        }
-
-        private static Subscribe Deserialize(string message)
-        {
-            return JsonConvert.DeserializeObject<Subscribe>(message);
-        }
-
-        private static Task SendAsync(Socket client, string message, CancellationToken cancellationToken)
-        {
-            var data = Encoding.UTF8.GetBytes(message + "\n");
-            return SendAsync(client, data, cancellationToken);
-        }
-
-        private static async Task SendAsync(Socket client, ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
-        {
-            await client.SendAsync(data, SocketFlags.None, cancellationToken).ConfigureAwait(false);
         }
 
         private static readonly ReadOnlyMemory<byte> SysInit = new byte[] {0x01, 0x20};
