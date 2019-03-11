@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.IO;
-using RfpProxyLib;
+using RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary;
 
 namespace RfpProxy.Log.Messages.Nwk.InformationElements
 {
@@ -20,9 +20,9 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
         /// </summary>
         public ushort EMC { get; }
 
-        public ReadOnlyMemory<byte> Proprietary { get; }
+        public NwkIeProprietaryContent Proprietary { get; }
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => Proprietary.HasUnknown;
 
         public NwkIeEscape2Proprietary(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.Escape2Proprietary)
         {
@@ -30,11 +30,11 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
             if (Discriminator == DiscriminatorType.EMC)
             {
                 EMC = BinaryPrimitives.ReadUInt16BigEndian(data.Span.Slice(1));
-                Proprietary = data.Slice(3);
+                Proprietary = NwkIeProprietaryContent.Create(EMC, data.Slice(3));
             }
             else
             {
-                Proprietary = data.Slice(1);
+                Proprietary = new UnknownProprietaryContent(data.Slice(1));
             }
         }
 
@@ -42,9 +42,10 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
         {
             base.Log(writer);
             if (Discriminator == DiscriminatorType.EMC)
-                writer.Write($" EMC({EMC:x4}) Proprietary({Proprietary.ToHex()})");
+                writer.Write($" EMC({EMC:x4})");
             else
-                writer.Write($" {Discriminator}({Proprietary.ToHex()})");
+                writer.Write($" {Discriminator}");
+            Proprietary.Log(writer);
         }
     }
 }
