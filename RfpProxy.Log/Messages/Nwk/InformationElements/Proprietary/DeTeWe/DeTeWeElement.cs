@@ -28,14 +28,16 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
         {
             switch (type)
             {
-                case DeTeWeType.DateTime:
-                    return new DateTimeDeTeWeElement(data);
                 case DeTeWeType.BtEthAddr:
                     return new BtEthAddrDeTeWeElement(data);
-                case DeTeWeType.HomeScreenText:
-                    return new HomeScreenTextDeTeWeElement(data);
+                case DeTeWeType.DateTime:
+                    return new DateTimeDeTeWeElement(data);
                 case DeTeWeType.Display:
                     return new DisplayDeTeWeElement(data);
+                case DeTeWeType.HomeScreenText:
+                    return new HomeScreenTextDeTeWeElement(data);
+                case DeTeWeType.SendText:
+                    return new SendTextDeTeWeElement(data);
                 default:
                     return new UnknownDeTeWeElement(type, data);
             }

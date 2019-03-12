@@ -66,6 +66,20 @@ namespace RfpProxy.Test
             Log(element);
         }
 
+        [Fact]
+        public void CanDecodeSendText()
+        {
+            var keys = Decode<SendTextDeTeWeElement>(DeTeWeType.SendText, "416263");
+            Log(keys);
+            Assert.Equal("Abc", keys.Text);
+            keys = Decode<SendTextDeTeWeElement>(DeTeWeType.SendText, "34353032");
+            Log(keys);
+            Assert.Equal("4502", keys.Text);
+            keys = Decode<SendTextDeTeWeElement>(DeTeWeType.SendText, "506f6320");
+            Log(keys);
+            Assert.Equal("Poc ", keys.Text);
+        }
+
         private static T Decode<T>(DeTeWeType type, string hex) where T:DeTeWeElement
         {
             var data = HexEncoding.HexToByte(hex.Replace(" ", String.Empty));
