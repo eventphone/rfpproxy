@@ -606,9 +606,16 @@ namespace RfpProxy.Test
             //TODO Assert.False(dnm.HasUnknown);
         }
 
+        [Fact]
+        public void CanDecodeCCReleaseComMessageWithoutIe()
+        {
+            var dnm = Decode<DnmMessage>("0301 000d 79060d0008210a11035a0000f0");
+            Log(dnm);
+        }
+
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
-            var data = HexEncoding.HexToByte(hex);
+            var data = HexEncoding.HexToByte(hex.Replace(" ", String.Empty));
             var message = AaMiDeMessage.Create(data, _reassembler);
             return Assert.IsType<T>(message);
         }

@@ -49,10 +49,13 @@ namespace RfpProxy.Log.Messages.Nwk
                 {
                     var type = (NwkVariableLengthElementType) current;
                     var length = span[i+1];
-                    var ie = NwkVariableLengthInformationElement.Create(type, data.Slice(i + 2, length));
-                    if (ie.HasUnknown)
-                        HasUnknown = true;
-                    InformationElements.Add(ie);
+                    if (length > 0) //EN ETSI 300 175-5 #7.5.1
+                    {
+                        var ie = NwkVariableLengthInformationElement.Create(type, data.Slice(i + 2, length));
+                        if (ie.HasUnknown)
+                            HasUnknown = true;
+                        InformationElements.Add(ie);
+                    }
                     i += length + 1;
                 }
             }
