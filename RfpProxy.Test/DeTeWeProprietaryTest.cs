@@ -80,6 +80,19 @@ namespace RfpProxy.Test
             Assert.Equal("Poc ", keys.Text);
         }
 
+        [Fact]
+        public void CanDecodeReserved1()
+        {
+            var res = Decode<Reserved1DeTeWeElement>(DeTeWeType.Reserved1, "063337313038383835353535343430506a616d670000");
+            Log(res);
+            Assert.Equal("\u000637108885555440Pjamg", res.Text1);
+            Assert.Equal(String.Empty, res.Text2);
+            res = Decode<Reserved1DeTeWeElement>(DeTeWeType.Reserved1, "06 3435303200 506f43207a6976696c6c69616e00");
+            Log(res);
+            Assert.Equal("\u00064502", res.Text1);
+            Assert.Equal("PoC zivillian", res.Text2);
+        }
+
         private static T Decode<T>(DeTeWeType type, string hex) where T:DeTeWeElement
         {
             var data = HexEncoding.HexToByte(hex.Replace(" ", String.Empty));

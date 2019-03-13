@@ -38,6 +38,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
                     return new HomeScreenTextDeTeWeElement(data);
                 case DeTeWeType.SendText:
                     return new SendTextDeTeWeElement(data);
+                case DeTeWeType.Reserved1:
+                    return new Reserved1DeTeWeElement(data);
                 default:
                     return new UnknownDeTeWeElement(type, data);
             }
