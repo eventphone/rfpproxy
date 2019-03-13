@@ -36,6 +36,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
                     return new DisplayDeTeWeElement(data);
                 case DeTeWeType.HomeScreenText:
                     return new HomeScreenTextDeTeWeElement(data);
+                case DeTeWeType.Mms:
+                    return new MmsDeTeWeElement(data);
                 case DeTeWeType.SendText:
                     return new SendTextDeTeWeElement(data);
                 case DeTeWeType.Reserved1:
