@@ -10,5 +10,6 @@
         Mms = 0x55,
         Reserved1 = 0x59,
         BtEthAddr = 0x62,
+        Display2 = 0xa0,
     }
 }

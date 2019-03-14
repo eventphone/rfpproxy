@@ -34,6 +34,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
                     return new DateTimeDeTeWeElement(data);
                 case DeTeWeType.Display:
                     return new DisplayDeTeWeElement(data);
+                case DeTeWeType.Display2:
+                    return new Display2DeTeWeElement(data);
                 case DeTeWeType.HomeScreenText:
                     return new HomeScreenTextDeTeWeElement(data);
                 case DeTeWeType.Language:

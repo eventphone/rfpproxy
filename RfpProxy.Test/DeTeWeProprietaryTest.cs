@@ -110,6 +110,18 @@ namespace RfpProxy.Test
             Assert.Equal("Test", mms.Message);
         }
 
+        [Fact]
+        public void CanDecodeDisplay2()
+        {
+            var dis = Decode<Display2DeTeWeElement>(DeTeWeType.Display2, "812a310a");
+            Log(dis);
+            Assert.Equal("*1\n", dis.Text);
+
+            dis = Decode<Display2DeTeWeElement>(DeTeWeType.Display2, "81506f43207a6976696c6c69616e0a0a42657365747a740a");
+            Log(dis);
+            Assert.Equal("PoC zivillian\n\nBesetzt\n", dis.Text);
+        }
+
         private static T Decode<T>(DeTeWeType type, string hex) where T:DeTeWeElement
         {
             var data = HexEncoding.HexToByte(hex.Replace(" ", String.Empty));
