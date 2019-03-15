@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using Mono.Options;
 using RfpProxyLib.Messages;
 using RfpProxy.Log.Messages;
 using RfpProxyLib;
+using System.Buffers.Binary;
 
 namespace RfpProxy.Log
 {
@@ -22,6 +24,7 @@ namespace RfpProxy.Log
             bool showHelp = false;
             bool logRaw = false;
             bool unknown = false;
+            string pcap = null;
             var options = new OptionSet
             {
                 {"s|socket=", "socket path", x => socketname = x},
@@ -31,6 +34,7 @@ namespace RfpProxy.Log
                 {"fm|filtermask=", "filter mask", x => filterMask = x},
                 {"raw", "log raw packets", x => logRaw = x != null},
                 {"u|unknown", "log only packets with unknown payload", x => unknown = x != null},
+                {"pcap=", "read packets from pcap file", x=>pcap = x},
                 {"h|help", "show help", x => showHelp = x != null},
             };
             try
@@ -63,6 +67,12 @@ namespace RfpProxy.Log
                         cts.Cancel();
                         client.Stop();
                     };
+                    if (pcap != null)
+                    {
+                        await ReadPcapAsync(pcap, client.OnMessage, cts.Token).ConfigureAwait(false);
+                        return;
+                    }
+
                     client.Log += (s, e) =>
                     {
                         Console.Write(e.Direction == LogDirection.Read ? "< " : "> ");
@@ -80,6 +90,53 @@ namespace RfpProxy.Log
             }
         }
 
+        static async Task ReadPcapAsync(string file, Action<MessageDirection, RfpIdentifier, ReadOnlyMemory<byte>> messageCallback, CancellationToken cancellationToken)
+        {
+            using (var s = File.OpenRead(file))
+            {
+                var pcapHeader = new byte[24];
+                var success = await FillBufferAsync(s, pcapHeader, cancellationToken).ConfigureAwait(false);
+                if (!success) return;
+                if (BinaryPrimitives.ReadUInt32BigEndian(pcapHeader) != 0xa1b2c3d4 || pcapHeader[23] != 0x01)
+                {
+                    Console.WriteLine("Invalid pcap file");
+                    return;
+                }
+                var packetHeader = new byte[16 + 54];
+                while (true)
+                {
+                    success = await FillBufferAsync(s, packetHeader, cancellationToken).ConfigureAwait(false);
+                    if (!success) return;
+                    var direction = packetHeader[16] == 0x02 ? MessageDirection.ToOmm : MessageDirection.FromOmm;
+                    RfpIdentifier rfp;
+                    if (direction == MessageDirection.FromOmm)
+                    {
+                        rfp = new RfpIdentifier(packetHeader.AsMemory(16, 6));
+                    }
+                    else
+                    {
+                        rfp = new RfpIdentifier(packetHeader.AsMemory(16 + 6, 6));
+                    }
+                    var length = BinaryPrimitives.ReadUInt32BigEndian(packetHeader.AsSpan(12));
+                    var data = new byte[length - 54];
+                    success = await FillBufferAsync(s, data, cancellationToken).ConfigureAwait(false);
+                    if (!success) return;
+                    messageCallback(direction, rfp, data);
+                }
+            }
+        }
+        
+        private static async Task<bool> FillBufferAsync(FileStream file, Memory<byte> buffer, CancellationToken cancellationToken)
+        {
+            while (buffer.Length > 0)
+            {
+                var bytesRead = await file.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
+                if (bytesRead == 0) return false;
+                buffer = buffer.Slice(bytesRead);
+            }
+            return true;
+        }
+
         class LogClient : ProxyClient
         {
             private readonly bool _logRaw;
@@ -95,8 +152,14 @@ namespace RfpProxy.Log
 
             protected override Task OnMessageAsync(MessageDirection direction, uint messageId, RfpIdentifier rfp, Memory<byte> data, CancellationToken cancellationToken)
             {
+                OnMessage(direction, rfp, data);
+                return Task.CompletedTask;
+            }
+
+            public void OnMessage(MessageDirection direction, RfpIdentifier rfp, ReadOnlyMemory<byte> data)
+            { 
                 if (data.IsEmpty)
-                    return Task.CompletedTask;
+                    return;
                 AaMiDeMessage message;
                 string prefix;
                 AaMiDeReassembler reassembler;
@@ -126,10 +189,10 @@ namespace RfpProxy.Log
                 {
                     Console.WriteLine($"{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff} {prefix}{rfp} Cannot parse {data.ToHex()}");
                     Console.WriteLine(ex);
-                    return Task.CompletedTask;
+                    return;
                 }
                 if (_unknown && !message.HasUnknown)
-                    return Task.CompletedTask;
+                    return;
                 Console.Write($"{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff} {prefix}{rfp} ");
                 message.Log(Console.Out);
                 Console.WriteLine();
@@ -145,7 +208,7 @@ namespace RfpProxy.Log
                     }
                     Console.WriteLine(span.Slice(i).ToHex());
                 }
-                return Task.CompletedTask;
+                return;
             }
         }
     }
