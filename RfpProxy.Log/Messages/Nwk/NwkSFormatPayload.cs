@@ -23,7 +23,7 @@ namespace RfpProxy.Log.Messages.Nwk
                 if ((current & 0x80) != 0)
                 {
                     //fixed length
-                    if ((current & 0b1110_0000) != 0)
+                    if ((current & 0xf0) == 0xe0)
                     {
                         //double byte
                         var identifier = (byte) (current & 0xf);
