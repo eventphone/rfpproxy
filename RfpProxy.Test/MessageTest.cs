@@ -613,6 +613,15 @@ namespace RfpProxy.Test
             Log(dnm);
         }
 
+        [Fact]
+        public void CanDecodeMacInfoIndMessage()
+        {
+            var dnm = Decode<DnmMessage>("03010034 7a1c010002c9004672616d65734f4b3d323839204672616d65734d555445443d302042484f3d302042484f4661696c65643d3000");
+            var info = Assert.IsType<MacInfoIndPayload>(dnm.Payload);
+            Log(dnm);
+            Assert.False(info.HasUnknown);
+        }
+
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex.Replace(" ", String.Empty));
