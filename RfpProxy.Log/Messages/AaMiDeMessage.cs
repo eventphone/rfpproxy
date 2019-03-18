@@ -43,7 +43,6 @@ namespace RfpProxy.Log.Messages
                 case MsgType.MEDIA_REDIRECT_STOP:
                 case MsgType.MEDIA_RESTART:
                 case MsgType.MEDIA_START:
-                case MsgType.MEDIA_STATISTICS:
                 case MsgType.MEDIA_STOP:
                 case MsgType.MEDIA_TONE2:
                 case MsgType.MEDIA_TRACE_PPN:
@@ -53,6 +52,8 @@ namespace RfpProxy.Log.Messages
                     return new OpenMediaMessage(data);
                 case MsgType.MEDIA_DTMF:
                     return new DtmfMediaMessage(data);
+                case MsgType.MEDIA_STATISTICS:
+                    return new StatisticsMediaMessage(data);
                 case MsgType.DNM:
                     return DnmMessage.CreateDnm(data, reassembler);
                 case MsgType.SNMP_RFP_UPDATE:
@@ -87,6 +88,10 @@ namespace RfpProxy.Log.Messages
                     return new SyncMessage(data);
                 case MsgType.SYS_NEW_SW:
                     return new SysNewSwMessage(data);
+                case MsgType.SYS_OMM_CONTROL:
+                    return new SysOmmControlMessage(data);
+                case MsgType.SYS_MAX_CHANNELS:
+                    return new SysMaxChannelsMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }

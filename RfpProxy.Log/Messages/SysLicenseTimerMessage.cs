@@ -7,6 +7,9 @@ namespace RfpProxy.Log.Messages
 {
     public sealed class SysLicenseTimerMessage : AaMiDeMessage
     {
+        /// <summary>
+        /// Padding
+        /// </summary>
         public ReadOnlyMemory<byte> Reserved { get; }
 
         public TimeSpan GracePeriod { get; }
@@ -16,7 +19,7 @@ namespace RfpProxy.Log.Messages
         /// </summary>
         public ReadOnlyMemory<byte> Md5 { get; }
 
-        public override bool HasUnknown => !Reserved.Span.IsEmpty();
+        public override bool HasUnknown => false;
 
         public SysLicenseTimerMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LICENSE_TIMER, data)
         {

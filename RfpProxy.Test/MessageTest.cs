@@ -622,6 +622,20 @@ namespace RfpProxy.Test
             Assert.False(info.HasUnknown);
         }
 
+        [Fact]
+        public void CanDecodeMediaStatisticsMessage()
+        {
+            var stats = Decode<StatisticsMediaMessage>(
+                "0205 0024" +
+                "f919 0000" +
+                "0200" +
+                "00007200" +
+                "00004047" +
+                "0000560000002135000000000000be310000ac141702");
+            Log(stats);
+            //TODO Assert.False(stats.HasUnknown);
+        }
+
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex.Replace(" ", String.Empty));

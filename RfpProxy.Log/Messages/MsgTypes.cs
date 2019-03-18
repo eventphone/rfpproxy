@@ -8,7 +8,9 @@ namespace RfpProxy.Log.Messages
 
         SYS_IP_OPTIONS = 0x0101,
         SYS_LED = 0x0102,
+        SYS_SPY = 0x0104,
         SYS_HEARTBEAT_INTERVAL = 0x0105,
+        SYS_RSX = 0x0106,
         SYS_SYSLOG = 0x0107,
         SYS_MAX_CHANNELS = 0x0108,
         SYS_HTTP_SET = 0x0109,
