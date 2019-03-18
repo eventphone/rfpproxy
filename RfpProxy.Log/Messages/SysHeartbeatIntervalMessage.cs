@@ -8,9 +8,12 @@ namespace RfpProxy.Log.Messages
     {
         public TimeSpan Interval { get; }
 
+        /// <summary>
+        /// Padding
+        /// </summary>
         public ReadOnlyMemory<byte> Reserved { get; }
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => false;
 
         public SysHeartbeatIntervalMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_HEARTBEAT_INTERVAL, data)
         {
