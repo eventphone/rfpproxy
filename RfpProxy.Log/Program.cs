@@ -90,7 +90,7 @@ namespace RfpProxy.Log
             }
         }
 
-        static async Task ReadPcapAsync(string file, Action<MessageDirection, RfpIdentifier, ReadOnlyMemory<byte>> messageCallback, CancellationToken cancellationToken)
+        static async Task ReadPcapAsync(string file, Action<MessageDirection, RfpIdentifier, ReadOnlyMemory<byte>, DateTimeOffset> messageCallback, CancellationToken cancellationToken)
         {
             using (var s = File.OpenRead(file))
             {
@@ -121,7 +121,9 @@ namespace RfpProxy.Log
                     var data = new byte[length - 54];
                     success = await FillBufferAsync(s, data, cancellationToken).ConfigureAwait(false);
                     if (!success) return;
-                    messageCallback(direction, rfp, data);
+                    var seconds = BinaryPrimitives.ReadUInt32BigEndian(packetHeader);
+                    var milliseconds = BinaryPrimitives.ReadUInt32BigEndian(packetHeader.AsSpan(4)) / 1000;
+                    messageCallback(direction, rfp, data, DateTimeOffset.FromUnixTimeSeconds(seconds).AddMilliseconds(milliseconds));
                 }
             }
         }
@@ -152,11 +154,11 @@ namespace RfpProxy.Log
 
             protected override Task OnMessageAsync(MessageDirection direction, uint messageId, RfpIdentifier rfp, Memory<byte> data, CancellationToken cancellationToken)
             {
-                OnMessage(direction, rfp, data);
+                OnMessage(direction, rfp, data, DateTimeOffset.Now);
                 return Task.CompletedTask;
             }
 
-            public void OnMessage(MessageDirection direction, RfpIdentifier rfp, ReadOnlyMemory<byte> data)
+            public void OnMessage(MessageDirection direction, RfpIdentifier rfp, ReadOnlyMemory<byte> data, DateTimeOffset timestamp)
             { 
                 if (data.IsEmpty)
                     return;
@@ -187,13 +189,13 @@ namespace RfpProxy.Log
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff} {prefix}{rfp} Cannot parse {data.ToHex()}");
+                    Console.WriteLine($"{timestamp:yyyy/MM/dd HH:mm:ss.fff} {prefix}{rfp} Cannot parse {data.ToHex()}");
                     Console.WriteLine(ex);
                     return;
                 }
                 if (_unknown && !message.HasUnknown)
                     return;
-                Console.Write($"{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff} {prefix}{rfp} ");
+                Console.Write($"{timestamp:yyyy/MM/dd HH:mm:ss.fff} {prefix}{rfp} ");
                 message.Log(Console.Out);
                 Console.WriteLine();
                 if (_logRaw)
