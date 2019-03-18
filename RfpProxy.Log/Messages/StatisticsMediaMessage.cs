@@ -23,7 +23,7 @@ namespace RfpProxy.Log.Messages
 
         public uint MaxJitter { get; }
 
-        public IPAddress OmmIp { get; }
+        public IPAddress RtpIp { get; }
 
         public override bool HasUnknown => true;
 
@@ -38,7 +38,7 @@ namespace RfpProxy.Log.Messages
             ReceivedBytes = BinaryPrimitives.ReadUInt32LittleEndian(span.Slice(18));
             LostPackets = BinaryPrimitives.ReadUInt32LittleEndian(span.Slice(22));
             MaxJitter = BinaryPrimitives.ReadUInt32LittleEndian(span.Slice(26));
-            OmmIp = new IPAddress(span.Slice(30, 4));
+            RtpIp = new IPAddress(span.Slice(30, 4));
         }
 
         public override void Log(TextWriter writer)
@@ -48,7 +48,7 @@ namespace RfpProxy.Log.Messages
             writer.Write($"Tx({TransmittedPackets}p/{TransmittedBytes}b) ");
             writer.Write($"Rx({ReceivedPackets}p/{ReceivedBytes}b) ");
             writer.Write($"Lost({LostPackets}p) Jitter({MaxJitter}) ");
-            writer.Write($"Omm({OmmIp}) ");
+            writer.Write($"RtpIp({RtpIp}) ");
             writer.Write($"Reserved({Reserved:x4})");
         }
     }
