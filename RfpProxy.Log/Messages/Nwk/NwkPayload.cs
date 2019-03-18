@@ -13,7 +13,7 @@ namespace RfpProxy.Log.Messages.Nwk
 
         public abstract bool HasUnknown { get; }
 
-        public NwkPayload(NwkProtocolDiscriminator pd, byte ti, bool f)
+        protected NwkPayload(NwkProtocolDiscriminator pd, byte ti, bool f)
         {
             ProtocolDiscriminator = pd;
             TransactionIdentifier = ti;

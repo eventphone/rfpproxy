@@ -28,20 +28,26 @@ namespace RfpProxy.Log.Messages.Rfpc
                     return new ExtendedCapabilitiesRfpcValue(data);
                 case RfpcKey.ExtendedCapabilities2:
                     return new ExtendedCapabilities2RfpcValue(data);
+                case RfpcKey.FrequencyBand:
+                    return new ByteRfpcValue(RfpcKey.FrequencyBand, data);
                 case RfpcKey.HigherLayerCapabilities:
                     return new HigherLayerCapabilitiesRfpcValue(data);
                 case RfpcKey.MacCapabilities:
                     return new MacCapabilitiesRfpcValue(data);
                 case RfpcKey.NumberOfUpn:
-                    return new NumberOfUpnRfpcValue(data);
+                    return new ByteRfpcValue(RfpcKey.NumberOfUpn, data);
                 case RfpcKey.NumberOfBearer:
-                    return new NumberOfBearerRfpcValue(data);
+                    return new ByteRfpcValue(RfpcKey.NumberOfBearer, data);
                 case RfpcKey.ReflectingEnvironment:
                     return new ReflectingEnvironmentRfpcValue(data);
+                case RfpcKey.RfpFu6WindowSize:
+                    return new ByteRfpcValue(RfpcKey.RfpFu6WindowSize, data);
                 case RfpcKey.RFPI:
                     return new RfpiRfpcValue(data);
                 case RfpcKey.RfpPli:
                     return new RfpPliRfpcValue(data);
+                case RfpcKey.RfPower:
+                    return new ByteRfpcValue(RfpcKey.RfPower, data);
                 case RfpcKey.SARI:
                     return new SariRfpcValue(data);
                 case RfpcKey.StatisticData:
@@ -51,7 +57,6 @@ namespace RfpProxy.Log.Messages.Rfpc
                 case RfpcKey.Revision:
                 case RfpcKey.StatusInfo:
                 case RfpcKey.ErrorCause:
-                case RfpcKey.RfpFu6WindowSize:
                 case RfpcKey.RfpToRfp:
                 case RfpcKey.RfpTopo:
                 case RfpcKey.LastError:
@@ -61,8 +66,6 @@ namespace RfpProxy.Log.Messages.Rfpc
                 case RfpcKey.FpgaRevision:
                 case RfpcKey.RfpString:
                 case RfpcKey.RfpSiteLocation:
-                case RfpcKey.FrequencyBand:
-                case RfpcKey.RfPower:
                 default:
                     return new UnknownDnmRfpcValue(type, data);
             }
