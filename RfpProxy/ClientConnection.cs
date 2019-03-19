@@ -78,6 +78,7 @@ namespace RfpProxy
             }
             catch (OperationCanceledException ex)
             {
+                Console.WriteLine("cancelled in ClientConnection.HandshakeAsync");
                 client.Complete(ex);
             }
             catch (Exception ex) when (Socket.Connected)
@@ -157,6 +158,7 @@ namespace RfpProxy
             }
             catch (OperationCanceledException ex)
             {
+                Console.WriteLine("cancelled in ClientConnection.ReadPipeAsync");
                 client.Complete(ex);
             }
         }

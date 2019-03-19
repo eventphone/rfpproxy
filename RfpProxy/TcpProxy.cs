@@ -72,6 +72,7 @@ namespace RfpProxy
             }
             catch (TaskCanceledException)
             {
+                Console.WriteLine("cancelled in TcpProxy.RunAsync");
             }
             finally
             {

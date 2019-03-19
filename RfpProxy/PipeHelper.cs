@@ -30,6 +30,7 @@ namespace RfpProxy
             }
             catch (OperationCanceledException ex)
             {
+                Console.WriteLine("cancelled in PipeHelper.FillPipeAsync");
                 socket.Close();
                 writer.Complete(ex);
             }

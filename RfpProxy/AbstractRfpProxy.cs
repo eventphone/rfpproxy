@@ -88,6 +88,7 @@ namespace RfpProxy
             }
             catch (OperationCanceledException ex)
             {
+                Console.WriteLine("cancelled in AbstractRfpProxy.ReadAsync");
                 reader.Complete(ex);
             }
         }

@@ -105,6 +105,7 @@ namespace RfpProxy
             }
             catch (TaskCanceledException)
             {
+                Console.WriteLine("cancelled in RfpProxy.RunInternalAsync");
             }
             finally
             {
