@@ -151,7 +151,7 @@ namespace RfpProxy.Test
             Assert.Equal(TimeSpan.FromSeconds(15), interval.Interval);
 
             Log(interval);
-            //TODO Assert.False(interval.HasUnknown);
+            Assert.False(interval.HasUnknown);
         }
 
         [Fact]
@@ -317,7 +317,7 @@ namespace RfpProxy.Test
             var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
             Log(dnm);
             Assert.Equal(NwkCCMessageType.Setup, nwk.Type);
-            //todo Assert.False(dnm.HasUnknown);
+            Assert.False(dnm.HasUnknown);
         }
 
         [Fact]
@@ -425,7 +425,7 @@ namespace RfpProxy.Test
             var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
             Log(dnm);
             Assert.Equal(NwkMMMessageType.AuthenticationReply, nwk.Type);
-            //todo Assert.False(dnm.HasUnknown);
+            Assert.False(dnm.HasUnknown);
         }
 
         [Fact]
@@ -684,7 +684,7 @@ namespace RfpProxy.Test
             nwk = Assert.IsType<NwkCISSPayload>(lc.Payload);
             Log(dnm);
             Assert.Equal(NwkCISSMessageType.CISSFacility, nwk.Type);
-            //TODO Assert.False(dnm.HasUnknown);
+            Assert.False(dnm.HasUnknown);
         }
 
         [Fact]
