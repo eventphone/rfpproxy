@@ -8,8 +8,6 @@ namespace RfpProxy.Log.Messages.Sync
     {
         public SyncMessageType SyncType { get; }
 
-        public bool CfmRequired { get; }
-
         public byte PayloadLength { get; }
 
         protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(3);
@@ -24,9 +22,10 @@ namespace RfpProxy.Log.Messages.Sync
         {
             base.Log(writer);
             if (Enum.IsDefined(typeof(SyncMessageType), SyncType))
-                writer.Write($"{SyncType:G}({PayloadLength})");
+                writer.Write($"{SyncType:G}");
             else
-                writer.Write($"{SyncType:x}({PayloadLength})");
+                writer.Write($"{SyncType:x}");
+            writer.Write($"({PayloadLength}):");
         }
 
         public static SyncMessage Create(ReadOnlyMemory<byte> data)
@@ -43,6 +42,7 @@ namespace RfpProxy.Log.Messages.Sync
                 case SyncMessageType.GetReqRssiCompInd:
                 case SyncMessageType.StartMacMasterInd:
                 case SyncMessageType.StartMacMasterCfm:
+                case SyncMessageType.StartMacSlaveModeCfm:
                     return new EmptySyncMessage(type, data);
                 case SyncMessageType.GetReqRssiCompCfm:
                     return new GetReqRssiCompCfmSyncMessage(data);
@@ -54,6 +54,10 @@ namespace RfpProxy.Log.Messages.Sync
                     return new FreqCtrlModeIndSyncMessage(data);
                 case SyncMessageType.FreqCtrlModeCfm:
                     return new FreqCtrlModeCfmSyncMessage(data);
+                case SyncMessageType.SetReportLimit:
+                    return new SetReportLimitSyncMessage(data);
+                case SyncMessageType.StartMacSlaveModeInd:
+                    return new StartMacSlaveModeIndSyncMessage(data);
                 default:
                     return new UnknownSyncMessage(type, data);
             }

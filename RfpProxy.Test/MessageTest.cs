@@ -614,6 +614,32 @@ namespace RfpProxy.Test
         }
 
         [Fact]
+        public void CanDecodeSyncSetReportLimitMessage()
+        {
+            var sync = Decode<SetReportLimitSyncMessage>("03020005 7d1a0204 28");
+            Log(sync);
+            //TODO Assert.False(sync.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeSyncStartMacSlaveModeIndMessage()
+        {
+            var sync = Decode<StartMacSlaveModeIndSyncMessage>("03020005 7d1d0200 00");
+            Log(sync);
+            Assert.Equal(0, sync.Rfp);
+            Assert.False(sync.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeSyncStartMacSlaveModeCfmMessage()
+        {
+            var sync = Decode<EmptySyncMessage>("03020003 7d2400");
+            Log(sync);
+            Assert.Equal(SyncMessageType.StartMacSlaveModeCfm, sync.SyncType);
+            Assert.False(sync.HasUnknown);
+        }
+
+        [Fact]
         public void CanDecodeSyncFreqCtrlModeCfmMessage()
         {
             var sync = Decode<FreqCtrlModeCfmSyncMessage>("03020009 7d160602 08800880 10");
