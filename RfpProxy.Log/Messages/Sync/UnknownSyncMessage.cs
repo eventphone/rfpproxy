@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages.Sync
 {
@@ -12,12 +10,6 @@ namespace RfpProxy.Log.Messages.Sync
 
         public UnknownSyncMessage(SyncMessageType type, ReadOnlyMemory<byte> data):base(type, data)
         {
-        }
-
-        public override void Log(TextWriter writer)
-        {
-            base.Log(writer);
-            writer.Write($" Reserved({Raw.ToHex()})");
         }
     }
 }

@@ -22,7 +22,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 
         public string Message { get; }
 
-        public ReadOnlyMemory<byte> Reserved4 { get; }
+        public override ReadOnlyMemory<byte> Raw { get; }
 
         public override bool HasUnknown => true;
 
@@ -56,7 +56,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
             Message = Encoding.UTF8.GetString(data.Span.Slice(1, length));
             data = data.Slice(1).Slice(length);
 
-            Reserved4 = data;
+            Raw = data;
         }
 
         public override void Log(TextWriter writer)
@@ -74,9 +74,6 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
             writer.Write($" Reserved3({Reserved3.ToHex()})");
 
             writer.Write($" SenderUri({SenderUri}) SenderName({SenderName}) Message({Message})");
-
-            if (!Reserved4.IsEmpty)
-                writer.Write($" Reserved4({Reserved4.ToHex()})");
         }
     }
 }

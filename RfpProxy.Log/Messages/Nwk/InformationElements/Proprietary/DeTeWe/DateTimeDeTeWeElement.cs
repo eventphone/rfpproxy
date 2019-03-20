@@ -15,6 +15,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 
         public override bool HasUnknown => true;
 
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(8);
+
         public DateTimeDeTeWeElement(ReadOnlyMemory<byte> data):base(DeTeWeType.DateTime, data)
         {
             var span = data.Span;

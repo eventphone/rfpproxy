@@ -13,6 +13,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public override bool HasUnknown => true;
 
+        public override ReadOnlyMemory<byte> Raw => ReadOnlyMemory<byte>.Empty;
+
         public NwkIeFacility(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.Facility, data)
         {
             var span = data.Span;

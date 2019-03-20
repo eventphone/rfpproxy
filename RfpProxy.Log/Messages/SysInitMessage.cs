@@ -20,20 +20,19 @@ namespace RfpProxy.Log.Messages
 
         public string SwVersion { get; }
 
-        public ReadOnlyMemory<byte> Reserved4 { get; }
-
         public override bool HasUnknown => true;
+
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(0xf4);
 
         public SysInitMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_INIT, data)
         {
-            Reserved1 = Raw.Slice(0x00, 0x08);
-            Mac = new PhysicalAddress(Raw.Slice(0x08, 0x06).ToArray());
-            Reserved2 = Raw.Slice(0x0e, 0x08);
-            Capabilities = BinaryPrimitives.ReadUInt16BigEndian(Raw.Slice(0x16).Span);
-            Reserved3 = Raw.Slice(0x18, 0x4c);
+            Reserved1 = base.Raw.Slice(0x00, 0x08);
+            Mac = new PhysicalAddress(base.Raw.Slice(0x08, 0x06).ToArray());
+            Reserved2 = base.Raw.Slice(0x0e, 0x08);
+            Capabilities = BinaryPrimitives.ReadUInt16BigEndian(base.Raw.Slice(0x16).Span);
+            Reserved3 = base.Raw.Slice(0x18, 0x4c);
 
-            SwVersion = Raw.Slice(0x64, 0x90).Span.CString();
-            Reserved4 = Raw.Slice(0xf4, 0x0f);
+            SwVersion = base.Raw.Slice(0x64, 0x90).Span.CString();
         }
 
         public override void Log(TextWriter writer)
@@ -42,7 +41,6 @@ namespace RfpProxy.Log.Messages
             writer.Write($"Reserved1({Reserved1.ToHex()}) MAC({Mac}) ");
             writer.Write($"Reserved2({Reserved2.ToHex()}) Capabilities({Capabilities:x2}) ");
             writer.Write($"Reserved3({Reserved3.ToHex()}) SW Version({SwVersion}) ");
-            writer.Write($"Reserved4({Reserved4.ToHex()})");
         }
     }
 }

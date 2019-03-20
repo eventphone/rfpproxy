@@ -98,6 +98,8 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public NwkPayload Payload { get; }
 
+        public override ReadOnlyMemory<byte> Raw => ReadOnlyMemory<byte>.Empty;
+
         public override bool HasUnknown => Payload.HasUnknown;
 
         public LcDataPayload(ReadOnlyMemory<byte> data, NwkReassembler reassembler):base(data)
@@ -197,16 +199,6 @@ namespace RfpProxy.Log.Messages.Dnm
             {
                 payloadData = reassembler.Reassemble(lln, payloadData);
                 Payload = NwkPayload.Create(payloadData);
-            }
-        }
-
-        public override ReadOnlyMemory<byte> Raw
-        {
-            get
-            {
-                if (ExtendedLength)
-                    return base.Raw.Slice(4);
-                return base.Raw.Slice(3).Slice(PayloadLength);
             }
         }
 

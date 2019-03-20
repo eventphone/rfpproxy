@@ -23,7 +23,7 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Message({Message}) CallId({CallId:x4}) Reserved({Raw.ToHex()})");
+            writer.Write($"Message({Message}) CallId({CallId:x4})");
         }
     }
 }

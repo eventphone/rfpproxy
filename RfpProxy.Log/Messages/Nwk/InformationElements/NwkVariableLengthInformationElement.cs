@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages.Nwk.InformationElements
 {
@@ -106,6 +107,10 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
         public override void Log(TextWriter writer)
         {
             writer.Write($"\t\t{Type,-20}:");
+            if (HasUnknown && !Raw.IsEmpty)
+            {
+                writer.Write($" Reserved({Raw.ToHex()})");
+            }
         }
     }
 }

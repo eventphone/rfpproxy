@@ -25,6 +25,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 
         public override bool HasUnknown => true;
 
+        public override ReadOnlyMemory<byte> Raw { get; }
+
         public DisplayDeTeWeElement(ReadOnlyMemory<byte> data) : base(DeTeWeType.Display, data)
         {
             Reserved = BinaryPrimitives.ReadUInt16BigEndian(data.Span);
@@ -37,6 +39,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
                 Values.Add(Encoding.UTF8.GetString(value.Span));
                 data = data.Slice(1).Slice(length);
             }
+            Raw = data;
         }
 
         public override void Log(TextWriter writer)

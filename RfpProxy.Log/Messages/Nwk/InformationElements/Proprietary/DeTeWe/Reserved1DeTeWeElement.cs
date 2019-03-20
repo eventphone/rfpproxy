@@ -10,7 +10,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
         
         public string Text2 { get; }
 
-        public ReadOnlyMemory<byte> Reserved { get; }
+        public override ReadOnlyMemory<byte> Raw { get; }
 
         public override bool HasUnknown => true;
 
@@ -21,15 +21,13 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
             data = data.Slice(eos + 1);
             Text2 = data.Span.CString();
             eos = data.Span.IndexOf((byte) 0);
-            Reserved = data.Slice(eos + 1);
+            Raw = data.Slice(eos + 1);
         }
 
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
             writer.Write($"({Text1}|{Text2})");
-            if (!Reserved.IsEmpty)
-                writer.Write($" Reserved({Reserved.ToHex()})");
         }
     }
 }

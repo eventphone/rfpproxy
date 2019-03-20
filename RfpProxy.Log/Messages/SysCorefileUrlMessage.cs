@@ -9,9 +9,11 @@ namespace RfpProxy.Log.Messages
 
         public override bool HasUnknown => false;
 
+        protected override ReadOnlyMemory<byte> Raw => ReadOnlyMemory<byte>.Empty;
+
         public SysCorefileUrlMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_COREFILE_URL, data)
         {
-            Url = Raw.Span.CString();
+            Url = base.Raw.Span.CString();
         }
 
         public override void Log(TextWriter writer)

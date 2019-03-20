@@ -58,6 +58,8 @@ namespace RfpProxy.Log.Messages
 
         public DnmPayload Payload { get; }
 
+        protected override ReadOnlyMemory<byte> Raw => ReadOnlyMemory<byte>.Empty;
+
         public override bool HasUnknown => Payload.HasUnknown;
 
         public DnmMessage(ReadOnlyMemory<byte> data, AaMiDeReassembler reassembler) : base(MsgType.DNM, data)
@@ -67,7 +69,7 @@ namespace RfpProxy.Log.Messages
             DnmType = (DnmType) span[1];
             MCEI = span[2];
             var nwkReassembler = reassembler.GetNwk(MCEI);
-            Payload = DnmPayload.Create(Layer, DnmType, Raw, nwkReassembler);
+            Payload = DnmPayload.Create(Layer, DnmType, base.Raw.Slice(3), nwkReassembler);
             reassembler.Return(MCEI, nwkReassembler);
         }
 
@@ -92,8 +94,6 @@ namespace RfpProxy.Log.Messages
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(3);
 
         public override void Log(TextWriter writer)
         {

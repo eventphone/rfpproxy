@@ -27,6 +27,8 @@ namespace RfpProxy.Log.Messages
 
         public override bool HasUnknown => true;
 
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(34);
+
         public StatisticsMediaMessage(ReadOnlyMemory<byte> data):base(MsgType.MEDIA_STATISTICS, data)
         {
             var span = base.Raw.Span;

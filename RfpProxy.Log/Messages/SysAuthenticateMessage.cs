@@ -16,12 +16,14 @@ namespace RfpProxy.Log.Messages
 
         public override bool HasUnknown => true;
 
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(32);
+
         public SysAuthenticateMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_AUTHENTICATE, data)
         {
-            Reserved1 = Raw.Slice(0, 8);
-            RfpIv = Raw.Slice(8, 8);
-            Reserved2 = Raw.Slice(16, 8);
-            OmmIv = Raw.Slice(24, 8);
+            Reserved1 = base.Raw.Slice(0, 8);
+            RfpIv = base.Raw.Slice(8, 8);
+            Reserved2 = base.Raw.Slice(16, 8);
+            OmmIv = base.Raw.Slice(24, 8);
         }
 
         public override void Log(TextWriter writer)

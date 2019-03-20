@@ -8,7 +8,7 @@ namespace RfpProxy.Log.Messages.Rfpc
     {
         public ReadOnlyMemory<byte> Sari { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw=> ReadOnlyMemory<byte>.Empty;
 
         public SariRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.SARI, data)
         {

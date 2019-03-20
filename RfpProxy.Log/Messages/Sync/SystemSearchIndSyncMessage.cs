@@ -9,9 +9,11 @@ namespace RfpProxy.Log.Messages.Sync
 
         public override bool HasUnknown => true;
 
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(1);
+
         public SystemSearchIndSyncMessage(ReadOnlyMemory<byte> data):base(SyncMessageType.SystemSearchInd, data)
         {
-            Mode = Raw.Span[0];
+            Mode = base.Raw.Span[0];
         }
 
         public override void Log(TextWriter writer)
