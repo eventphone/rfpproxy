@@ -5,6 +5,7 @@ using RfpProxy.Log.Messages;
 using RfpProxy.Log.Messages.Dnm;
 using RfpProxy.Log.Messages.Nwk;
 using RfpProxy.Log.Messages.Rfpc;
+using RfpProxy.Log.Messages.Sync;
 using RfpProxyLib;
 using Xunit;
 using Xunit.Abstractions;
@@ -507,10 +508,134 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecodeSyncLength()
         {
-            var sync = Decode<SyncMessage>("0302000b7d330810000ad00ad00200");
+            var sync = Decode<UnknownSyncMessage>("0302000b7d330810000ad00ad00200");
             Assert.Equal(8, sync.PayloadLength);
-            Assert.Equal(sync.PayloadLength, sync.Reserved2.Length);
+            Assert.Equal(sync.PayloadLength, sync.Reserved.Length);
             Log(sync);
+        }
+
+        [Fact]
+        public void CanDecodeSyncSetFrequencyMessage()
+        {
+            var sync = Decode<SetFrequencySyncMessage>("030200057d18020a5d");
+            Log(sync);
+            Assert.False(sync.HasUnknown);
+            Assert.Equal(0xa5du, sync.Frequency);
+        }
+
+        [Fact]
+        public void CanDecodeSyncResetMacIndMessage()
+        {
+            var sync = Decode<EmptySyncMessage>("03020003 7d1b00");
+            Log(sync);
+            Assert.False(sync.HasUnknown);
+            Assert.Equal(SyncMessageType.ResetMacInd, sync.SyncType);
+        }
+
+        [Fact]
+        public void CanDecodeSyncResetMacCfmMessage()
+        {
+            var sync = Decode<EmptySyncMessage>("03020003 7d2100");
+            Log(sync);
+            Assert.False(sync.HasUnknown);
+            Assert.Equal(SyncMessageType.ResetMacCfm, sync.SyncType);
+        }
+
+        [Fact]
+        public void CanDecodeSyncGetReqRssiCompIndMessage()
+        {
+            var sync = Decode<EmptySyncMessage>("03020003 7d0e00");
+            Log(sync);
+            Assert.False(sync.HasUnknown);
+            Assert.Equal(SyncMessageType.GetReqRssiCompInd, sync.SyncType);
+        }
+
+        [Fact]
+        public void CanDecodeSyncSystemSearchIndMessage()
+        {
+            var sync = Decode<SystemSearchIndSyncMessage>("03020004 7d1e0103");
+            Log(sync);
+            Assert.Equal(SyncMessageType.SystemSearchInd, sync.SyncType);
+            //TODO Assert.False(sync.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeSyncSystemSearchCfmMessage()
+        {
+            var sync = Decode<SystemSearchCfmSyncMessage>("03020003 7d1f00");
+            Log(sync);
+            Assert.False(sync.HasUnknown);
+            Assert.Equal(SyncMessageType.SystemSearchCfm, sync.SyncType);
+
+            sync = Decode<SystemSearchCfmSyncMessage>("03020004 7d1f0100");
+            Log(sync);
+            Assert.Empty(sync.Rssi);
+
+            sync = Decode<SystemSearchCfmSyncMessage>("03020008 7d1f0501 00004100");
+            Log(sync);
+            var (rfpn,rssi) = Assert.Single(sync.Rssi);
+            Assert.Equal(0, rfpn);
+            Assert.Equal(65, rssi);
+        }
+
+        [Fact]
+        public void CanDecodeSyncGetReqRssiCompCfmMessage()
+        {
+            var sync = Decode<GetReqRssiCompCfmSyncMessage>("03020005 7d0f0210 00");
+            Log(sync);
+            Assert.Equal(SyncMessageType.GetReqRssiCompCfm, sync.SyncType);
+            //TODO Assert.False(sync.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeSyncStartMacMasterIndMessage()
+        {
+            var sync = Decode<EmptySyncMessage>("03020003 7d1c00");
+            Log(sync);
+            Assert.Equal(SyncMessageType.StartMacMasterInd, sync.SyncType);
+            Assert.False(sync.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeSyncStartMacMasterCfmMessage()
+        {
+            var sync = Decode<EmptySyncMessage>("03020003 7d2200");
+            Log(sync);
+            Assert.Equal(SyncMessageType.StartMacMasterCfm, sync.SyncType);
+            Assert.False(sync.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeSyncFreqCtrlModeIndMessage()
+        {
+            var sync = Decode<FreqCtrlModeIndSyncMessage>("03020004 7d150102");
+            Log(sync);
+            //TODO Assert.False(sync.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeSyncFreqCtrlModeCfmMessage()
+        {
+            var sync = Decode<FreqCtrlModeCfmSyncMessage>("03020009 7d160602 08800880 10");
+            Log(sync);
+            Assert.Equal(2176, sync.Ppm);
+            Assert.Equal(2176, sync.Avg);
+            //TODO Assert.False(sync.HasUnknown);
+
+            sync = Decode<FreqCtrlModeCfmSyncMessage>("03020009 7d160601 0a300a30 04");
+            Log(sync);
+            //TODO Assert.False(sync.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeOffsetIndSyncMessage()
+        {
+            var sync = Decode<OffsetIndSyncMessage>("0302000b7d2c0801004cfffd430701");
+            Log(sync);
+            Assert.Equal(-3, sync.Offset);
+            Assert.Equal(67, sync.Rssi);
+            Assert.Equal(0x07, sync.QtSyncCheck);
+            //TODO Assert.False(sync.HasUnknown);
         }
 
         [Fact]

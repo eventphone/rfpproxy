@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.IO;
+using RfpProxy.Log.Messages.Sync;
 using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages
@@ -85,7 +86,7 @@ namespace RfpProxy.Log.Messages
                 case MsgType.HEARTBEAT:
                     return new HeartbeatMessage(data);
                 case MsgType.SYNC:
-                    return new SyncMessage(data);
+                    return SyncMessage.Create(data);
                 case MsgType.SYS_NEW_SW:
                     return new SysNewSwMessage(data);
                 case MsgType.SYS_OMM_CONTROL:

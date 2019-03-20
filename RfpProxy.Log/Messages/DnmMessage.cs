@@ -42,6 +42,7 @@ namespace RfpProxy.Log.Messages
         Mac = 0x7a,
         Unknown1 = 0x7B,
         Unknown2 = 0x7C, //HO???
+        Sync = 0x7d,
     }
 
     public sealed class DnmMessage : AaMiDeMessage
