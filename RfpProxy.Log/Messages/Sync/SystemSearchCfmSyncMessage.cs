@@ -8,13 +8,13 @@ namespace RfpProxy.Log.Messages.Sync
     {
         public (ushort,ushort)[] Rssi { get; }
 
-        public override bool HasUnknown => false;
+        protected override ReadOnlyMemory<byte> Raw =>base.Raw.Slice(Rssi == null ? 0 : 1).Slice(4 * Rssi?.Length ?? 0);
 
         public SystemSearchCfmSyncMessage(ReadOnlyMemory<byte> data):base(SyncMessageType.SystemSearchCfm, data)
         {
-            if (Raw.IsEmpty)
+            if (base.Raw.IsEmpty)
                 return;
-            var span = Raw.Span;
+            var span = base.Raw.Span;
             var count = span[0];
             span = span.Slice(1);
             Rssi = new (ushort, ushort)[count];

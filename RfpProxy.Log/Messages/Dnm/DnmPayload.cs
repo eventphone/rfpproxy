@@ -5,7 +5,7 @@ namespace RfpProxy.Log.Messages.Dnm
 {
     public abstract class DnmPayload
     {
-        public abstract bool HasUnknown {get; }
+        public virtual bool HasUnknown => !Raw.IsEmpty;
 
         public virtual ReadOnlyMemory<byte> Raw { get; }
 

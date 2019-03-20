@@ -16,7 +16,6 @@ namespace RfpProxy.Log.Messages.Nwk
 
         public override void Log(TextWriter writer)
         {
-            base.Log(writer);
             writer.Write(" Fragmented");
         }
     }

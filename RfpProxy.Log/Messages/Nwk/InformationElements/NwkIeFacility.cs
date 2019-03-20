@@ -13,7 +13,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public override bool HasUnknown => true;
 
-        public NwkIeFacility(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.Facility)
+        public NwkIeFacility(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.Facility, data)
         {
             var span = data.Span;
             HasValidServiceDiscriminator = span[0] == 0x91;

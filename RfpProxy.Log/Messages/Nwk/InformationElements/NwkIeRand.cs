@@ -10,7 +10,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public override bool HasUnknown => false;
 
-        public NwkIeRand(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.RAND)
+        public NwkIeRand(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.RAND, data)
         {
             Rand = data;
         }

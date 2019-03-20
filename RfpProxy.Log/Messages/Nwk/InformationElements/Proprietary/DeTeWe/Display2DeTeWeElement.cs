@@ -13,7 +13,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 
         public override bool HasUnknown => true;
 
-        public Display2DeTeWeElement(ReadOnlyMemory<byte> data):base(DeTeWeType.Display2)
+        public Display2DeTeWeElement(ReadOnlyMemory<byte> data):base(DeTeWeType.Display2, data)
         {
             if (data.Span[0] == 0x81)
             {

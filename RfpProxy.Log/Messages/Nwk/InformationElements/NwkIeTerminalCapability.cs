@@ -292,7 +292,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public override bool HasUnknown { get; }
 
-        public NwkIeTerminalCapability(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.TerminalCapability)
+        public NwkIeTerminalCapability(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.TerminalCapability, data)
         {
             var span = data.Span;
             Tone = (ToneCapabilities)((span[0] & 0x70) >> 4);

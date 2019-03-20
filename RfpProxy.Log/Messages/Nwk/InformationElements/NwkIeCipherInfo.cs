@@ -36,9 +36,9 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public byte KeyNumber { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => Algorithm == CipherAlgorithm.Proprietary ? base.Raw.Slice(3) : base.Raw.Slice(2);
 
-        public NwkIeCipherInfo(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.CipherInfo)
+        public NwkIeCipherInfo(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.CipherInfo, data)
         {
             var span = data.Span;
             Enabled = (span[0] & 0x80) == 0;

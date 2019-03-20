@@ -117,7 +117,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public override bool HasUnknown { get; }
 
-        public NwkIePortableIdentity(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.PortableIdentity)
+        public NwkIePortableIdentity(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.PortableIdentity, data)
         {
             var span = data.Span;
             IdentityType = (PortableIdentityType) span[0];

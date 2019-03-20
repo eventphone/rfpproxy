@@ -32,9 +32,9 @@ namespace RfpProxy.Log.Messages.Rfpc
 
         public HigherLayerCapabilities Capabilities { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(2);
 
-        public HigherLayerCapabilitiesRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.HigherLayerCapabilities)
+        public HigherLayerCapabilitiesRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.HigherLayerCapabilities, data)
         {
             Capabilities = (HigherLayerCapabilities) BinaryPrimitives.ReadUInt16BigEndian(data.Span);
         }

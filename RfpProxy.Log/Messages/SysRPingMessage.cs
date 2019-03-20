@@ -2,7 +2,6 @@
 using System.Buffers.Binary;
 using System.IO;
 using System.Net;
-using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages
 {
@@ -12,16 +11,18 @@ namespace RfpProxy.Log.Messages
 
         public TimeSpan Rtt { get; }
 
-        public ReadOnlyMemory<byte> Padding { get;}
-
         public override bool HasUnknown => false;
+
+        /// <summary>
+        /// padding
+        /// </summary>
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(8);
 
         public SysRPingMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_RPING, data)
         {
-            var span = Raw.Span;
+            var span = base.Raw.Span;
             Ip = new IPAddress(span.Slice(0, 4));
             Rtt = TimeSpan.FromMilliseconds(BinaryPrimitives.ReadUInt32BigEndian(span.Slice(4)));
-            Padding = Raw.Slice(8);
         }
 
         public override void Log(TextWriter writer)

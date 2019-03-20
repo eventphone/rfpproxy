@@ -14,7 +14,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 
         public override bool HasUnknown => true;
 
-        public Reserved1DeTeWeElement(ReadOnlyMemory<byte> data):base(DeTeWeType.Reserved1)
+        public Reserved1DeTeWeElement(ReadOnlyMemory<byte> data):base(DeTeWeType.Reserved1, data)
         {
             Text1 = data.Span.CString();
             var eos = data.Span.IndexOf((byte) 0);

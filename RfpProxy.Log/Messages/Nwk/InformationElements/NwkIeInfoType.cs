@@ -39,9 +39,9 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public IList<ParameterType> InfoTypes { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw { get; }
 
-        public NwkIeInfoType(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.InfoType)
+        public NwkIeInfoType(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.InfoType, data)
         {
             InfoTypes = new List<ParameterType>();
             var span = data.Span;
@@ -49,8 +49,12 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
             {
                 InfoTypes.Add((ParameterType)(span[0] & 0x7f));
                 if (span[0] >= 128)
+                {
+                    Raw = data.Slice(1);
                     break;
+                }
                 span = span.Slice(1);
+                data = data.Slice(1);
             };
         }
 

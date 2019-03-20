@@ -7,11 +7,11 @@ namespace RfpProxy.Log.Messages
     {
         public ResetType Reset { get; }
 
-        public override bool HasUnknown => false;
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(1);
 
         public SysResetMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_RESET, data)
         {
-            Reset = (ResetType) Raw.Span[0];
+            Reset = (ResetType) base.Raw.Span[0];
         }
 
         public override void Log(TextWriter writer)

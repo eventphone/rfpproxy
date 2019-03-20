@@ -16,7 +16,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public ReadOnlyMemory<byte> Reserved { get; }
 
-        public NwkIeLocationArea(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.LocationArea)
+        public NwkIeLocationArea(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.LocationArea, data)
         {
             var span = data.Span;
             HasExtendedLocationInformation = (span[0] & 0x80) != 0;

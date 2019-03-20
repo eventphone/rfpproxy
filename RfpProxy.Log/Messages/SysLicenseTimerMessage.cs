@@ -19,20 +19,20 @@ namespace RfpProxy.Log.Messages
         /// </summary>
         public ReadOnlyMemory<byte> Md5 { get; }
 
-        public override bool HasUnknown => false;
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(20);
 
         public SysLicenseTimerMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LICENSE_TIMER, data)
         {
-            Reserved = Raw.Slice(0, 2);
-            var grace = BinaryPrimitives.ReadUInt16BigEndian(Raw.Slice(2).Span);
+            Reserved = base.Raw.Slice(0, 2);
+            var grace = BinaryPrimitives.ReadUInt16BigEndian(base.Raw.Slice(2).Span);
             GracePeriod = TimeSpan.FromMinutes(grace);
-            Md5 = Raw.Slice(4);
+            Md5 = base.Raw.Slice(4,16);
         }
 
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Grace Period({GracePeriod}) Reserved({Reserved.ToHex()}) Md5({Md5.ToHex()})");
+            writer.Write($"Padding({Reserved.ToHex()}) Grace Period({GracePeriod}) Md5({Md5.ToHex()})");
         }
     }
 }

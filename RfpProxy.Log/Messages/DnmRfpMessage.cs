@@ -77,6 +77,8 @@ namespace RfpProxy.Log.Messages
 
         public override bool HasUnknown => Values.Any(x=>x.HasUnknown);
 
+        protected override ReadOnlyMemory<byte> Raw { get; }
+
         public DnmRfpcMessage(ReadOnlyMemory<byte> data) : base(MsgType.DNM, data)
         {
             var span = base.Raw.Span;
@@ -84,7 +86,7 @@ namespace RfpProxy.Log.Messages
             DnmType = (DnmRfpcType) span[1];
             Values = new List<DnmRfpcValue>();
 
-            var payload = Raw;
+            var payload = base.Raw.Slice(2);
             while (payload.Length > 0)
             {
                 var key = (RfpcKey) payload.Span[0];
@@ -93,9 +95,8 @@ namespace RfpProxy.Log.Messages
                 Values.Add(DnmRfpcValue.Create(key, value));
                 payload = payload.Slice(2).Slice(length);
             }
+            Raw = payload;
         }
-
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(2);
 
         public override void Log(TextWriter writer)
         {

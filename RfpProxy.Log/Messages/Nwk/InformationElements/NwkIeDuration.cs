@@ -30,9 +30,9 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public TimeSpan Duration { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(2);
 
-        public NwkIeDuration(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.Duration)
+        public NwkIeDuration(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.Duration, data)
         {
             var span = data.Span;
             LockLimits = (LockLimitsType) ((span[0] >> 4) & 0x7);

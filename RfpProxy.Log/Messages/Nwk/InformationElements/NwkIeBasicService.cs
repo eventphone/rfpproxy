@@ -36,7 +36,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public BasicServiceType BasicService { get; }
 
-        public override bool HasUnknown => false;
+        public override bool HasUnknown => !Enum.IsDefined(typeof(CallClassType), CallClass) || !Enum.IsDefined(typeof(BasicServiceType), BasicService);
 
         public NwkIeBasicService(byte content) : base(NwkDoubleByteElementType.BasicService)
         {

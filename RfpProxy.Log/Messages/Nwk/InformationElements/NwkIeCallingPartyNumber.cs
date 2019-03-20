@@ -62,7 +62,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public override bool HasUnknown => false;
 
-        public NwkIeCallingPartyNumber(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.CallingPartyNumber)
+        public NwkIeCallingPartyNumber(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.CallingPartyNumber, data)
         {
             var span = data.Span;
             NumberType = (NumberTypeCoding) ((span[0] & 0x70) >> 4);

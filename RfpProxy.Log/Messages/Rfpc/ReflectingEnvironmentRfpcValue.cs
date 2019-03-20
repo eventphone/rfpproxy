@@ -7,9 +7,9 @@ namespace RfpProxy.Log.Messages.Rfpc
     {
         public bool ReflectingEnvironment { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(1);
 
-        public ReflectingEnvironmentRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.ReflectingEnvironment)
+        public ReflectingEnvironmentRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.ReflectingEnvironment, data)
         {
             ReflectingEnvironment = data.Span[0] != 0;
         }

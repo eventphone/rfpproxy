@@ -24,7 +24,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public override bool HasUnknown => Proprietary.HasUnknown;
 
-        public NwkIeEscape2Proprietary(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.Escape2Proprietary)
+        public NwkIeEscape2Proprietary(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.Escape2Proprietary, data)
         {
             Discriminator = (DiscriminatorType) data.Span[0];
             if (Discriminator == DiscriminatorType.EMC)

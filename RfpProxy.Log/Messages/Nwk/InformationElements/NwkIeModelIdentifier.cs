@@ -10,7 +10,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public override bool HasUnknown => false;
 
-        public NwkIeModelIdentifier(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.ModelIdentifier)
+        public NwkIeModelIdentifier(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.ModelIdentifier, data)
         {
             Model = data;
         }

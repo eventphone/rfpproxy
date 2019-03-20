@@ -13,7 +13,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 
         public override bool HasUnknown => true;
 
-        public HomeScreenTextDeTeWeElement(ReadOnlyMemory<byte> data) : base(DeTeWeType.HomeScreenText)
+        public HomeScreenTextDeTeWeElement(ReadOnlyMemory<byte> data) : base(DeTeWeType.HomeScreenText, data)
         {
             Reserved = data.Span[0];
             data = data.Slice(1);

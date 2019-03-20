@@ -14,7 +14,7 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public MacDisIndReason Reason { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => base.Raw.IsEmpty ? base.Raw : base.Raw.Slice(1);
 
         public MacDisIndPayload(ReadOnlyMemory<byte> data) : base(data)
         {

@@ -6,11 +6,11 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 {
     public class UnknownDeTeWeElement : DeTeWeElement
     {
-        public ReadOnlyMemory<byte> Raw { get; }
+        public override ReadOnlyMemory<byte> Raw { get; }
 
         public override bool HasUnknown => true;
 
-        public UnknownDeTeWeElement(DeTeWeType type, ReadOnlyMemory<byte> data):base(type)
+        public UnknownDeTeWeElement(DeTeWeType type, ReadOnlyMemory<byte> data):base(type, data)
         {
             Raw = data;
         }

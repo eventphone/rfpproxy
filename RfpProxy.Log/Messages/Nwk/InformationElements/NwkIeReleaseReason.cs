@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace RfpProxy.Log.Messages.Nwk.InformationElements
 {
@@ -41,7 +42,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public ReleaseReason Reason { get; }
 
-        public override bool HasUnknown => false;
+        public override bool HasUnknown => !Enum.IsDefined(typeof(ReleaseReason), Reason);
 
         public NwkIeReleaseReason(byte content):base(NwkDoubleByteElementType.ReleaseReason)
         {

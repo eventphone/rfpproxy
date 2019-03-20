@@ -42,9 +42,9 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public Reason RejectReason { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(1);
 
-        public NwkIeRejectReason(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.RejectReason)
+        public NwkIeRejectReason(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.RejectReason, data)
         {
             RejectReason = (Reason) data.Span[0];
         }

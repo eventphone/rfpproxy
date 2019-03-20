@@ -61,9 +61,9 @@ namespace RfpProxy.Log.Messages.Rfpc
 
         public ExtendedVoiceServices ExtendedVoiceServicesSupported { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(5);
 
-        public ExtendedCapabilities2RfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.ExtendedCapabilities2)
+        public ExtendedCapabilities2RfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.ExtendedCapabilities2, data)
         {
             var span = data.Span;
             MacCapabilities = (ExtendedMacCapability) (((span[0] & 0xf) << 8) | span[1]);

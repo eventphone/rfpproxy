@@ -9,12 +9,13 @@ namespace RfpProxy.Log.Messages
 
         public byte Sessions { get; }
 
-        public override bool HasUnknown => false;
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(2);
 
         public SysMaxChannelsMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_MAX_CHANNELS, data)
         {
-            Dsp = Raw.Span[0];
-            Sessions = Raw.Span[1];
+            var span = base.Raw.Span;
+            Dsp = span[0];
+            Sessions = span[1];
         }
 
         public override void Log(TextWriter writer)

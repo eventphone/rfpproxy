@@ -26,7 +26,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 
         public override bool HasUnknown => true;
 
-        public MmsDeTeWeElement(ReadOnlyMemory<byte> data):base(DeTeWeType.Mms)
+        public MmsDeTeWeElement(ReadOnlyMemory<byte> data):base(DeTeWeType.Mms, data)
         {
             SubType = BinaryPrimitives.ReadUInt16BigEndian(data.Span);
             data = data.Slice(2);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages.Rfpc
 {
@@ -7,17 +8,28 @@ namespace RfpProxy.Log.Messages.Rfpc
     {
         public RfpcKey Type { get; }
 
-        public abstract bool HasUnknown { get; }
+        public virtual bool HasUnknown => !Raw.IsEmpty;
 
-        protected DnmRfpcValue(RfpcKey type)
+        public virtual ReadOnlyMemory<byte> Raw { get; }
+
+        protected DnmRfpcValue(RfpcKey type, ReadOnlyMemory<byte> data)
         {
             Type = type;
+            Raw = data;
         }
 
         public virtual void Log(TextWriter writer)
         {
             writer.WriteLine();
             writer.Write($"\t{Type,-23}:");
+            if (!Raw.IsEmpty)
+            {
+                if (HasUnknown)
+                    writer.Write(" Reserved");
+                else
+                    writer.Write(" Padding");
+                writer.Write($"({Raw.ToHex()})");
+            }
         }
 
         public static DnmRfpcValue Create(RfpcKey type, ReadOnlyMemory<byte> data)

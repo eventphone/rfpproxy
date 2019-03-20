@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages
 {
@@ -11,20 +10,19 @@ namespace RfpProxy.Log.Messages
         /// <summary>
         /// Padding
         /// </summary>
-        public ReadOnlyMemory<byte> Reserved { get; }
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(1);
 
         public override bool HasUnknown => false;
 
         public SysHeartbeatIntervalMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_HEARTBEAT_INTERVAL, data)
         {
-            Interval = TimeSpan.FromSeconds(Raw.Span[0]);
-            Reserved = Raw.Slice(1);
+            Interval = TimeSpan.FromSeconds(base.Raw.Span[0]);
         }
 
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Interval({Interval}) Reserved({Reserved.ToHex()})");
+            writer.Write($"Interval({Interval})");
         }
     }
 }

@@ -28,9 +28,9 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 
         public LanguageCode Language { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(1);
 
-        public LanguageDeTeWeElement(ReadOnlyMemory<byte> data):base(DeTeWeType.Language)
+        public LanguageDeTeWeElement(ReadOnlyMemory<byte> data):base(DeTeWeType.Language, data)
         {
             if (data.Length != 1)
             {

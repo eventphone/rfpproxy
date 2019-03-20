@@ -57,7 +57,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public override bool HasUnknown => ProtocolDiscriminator != ProtocolDiscriminatorType.UserSpecific || Discriminator != DiscriminatorType.EMC;
 
-        public NwkIeIwu2Iwu(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.IWU2IWU)
+        public NwkIeIwu2Iwu(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.IWU2IWU, data)
         {
             var span = data.Span;
             Send = (span[0] & 0x40) != 0;

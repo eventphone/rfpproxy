@@ -7,9 +7,9 @@ namespace RfpProxy.Log.Messages.Rfpc
     {
         public byte LengthIndicator { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(1);
 
-        public RfpPliRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.RfpPli)
+        public RfpPliRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.RfpPli, data)
         {
             LengthIndicator = data.Span[0];
         }

@@ -69,21 +69,24 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public IList<Codec> Codecs { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw { get; }
 
-        public NwkIeCodecList(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.CodecList)
+        public NwkIeCodecList(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.CodecList, data)
         {
             var span = data.Span;
             Negotiation = (span[0] & 0x10)!= 0;
             Codecs = new List<Codec>();
             span = span.Slice(1);
+            data = data.Slice(1);
             do
             {
                 Codecs.Add(new Codec(span));
                 if (span[2] >= 128)
                     break;
                 span = span.Slice(3);
+                data = data.Slice(3);
             } while (true);
+            Raw = data;
         }
 
         public override void Log(TextWriter writer)

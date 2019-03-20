@@ -18,14 +18,15 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
         
         public ReadOnlyMemory<byte> Identity { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw { get; }
 
-        public NwkIeFixedIdentity(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.FixedIdentity)
+        public NwkIeFixedIdentity(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.FixedIdentity, data)
         {
             var span = data.Span;
             IdentityType = (FixedIdentityType) span[0];
             var length = (span[1] & 0x7f) / 8;
             Identity = data.Slice(2, length);
+            Raw = data.Slice(2).Slice(length);
         }
 
         public override void Log(TextWriter writer)

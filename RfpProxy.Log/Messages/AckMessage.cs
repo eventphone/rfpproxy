@@ -11,21 +11,19 @@ namespace RfpProxy.Log.Messages
 
         public ushort CallId { get; }
 
-        public ReadOnlyMemory<byte> Reserved { get; }
-
-        public override bool HasUnknown => true;
-
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(4);
+        
         public AckMessage(ReadOnlyMemory<byte> data):base(MsgType.ACK, data)
         {
-            Message = (MsgType) BinaryPrimitives.ReadUInt16BigEndian(Raw.Span);
-            CallId = BinaryPrimitives.ReadUInt16LittleEndian(Raw.Span.Slice(2));
-            Reserved = Raw.Slice(4);
+            var span = base.Raw.Span;
+            Message = (MsgType) BinaryPrimitives.ReadUInt16BigEndian(span);
+            CallId = BinaryPrimitives.ReadUInt16LittleEndian(span.Slice(2));
         }
 
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Message({Message}) CallId({CallId:x4}) Reserved({Reserved.ToHex()})");
+            writer.Write($"Message({Message}) CallId({CallId:x4}) Reserved({Raw.ToHex()})");
         }
     }
 }

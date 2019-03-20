@@ -15,14 +15,16 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public uint PMID { get; }
 
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(6);
+
         public override bool HasUnknown => true;
 
         public MacPageReqMessage(ReadOnlyMemory<byte> data) : base(MsgType.DNM, data)
         {
-            var span = Raw.Span;
+            var span = base.Raw.Span;
             Layer = (DnmLayer) span[0];
             DnmType = (DnmType) span[1];
-            Reserved = Raw.Slice(2,2);
+            Reserved = base.Raw.Slice(2,2);
             PMID = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(4));
         }
 

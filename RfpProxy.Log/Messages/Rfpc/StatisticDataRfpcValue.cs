@@ -41,7 +41,7 @@ namespace RfpProxy.Log.Messages.Rfpc
 
         public override bool HasUnknown => !Reserved1.Span.IsEmpty() || !Reserved2.Span.IsEmpty();
 
-        public StatisticDataRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.StatisticData)
+        public StatisticDataRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.StatisticData, data)
         {
             var span = data.Span;
             BmcConnections01_03 = BinaryPrimitives.ReadUInt16LittleEndian(span);

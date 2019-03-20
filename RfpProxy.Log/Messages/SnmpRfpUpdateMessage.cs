@@ -20,7 +20,7 @@ namespace RfpProxy.Log.Messages
 
         public bool TrapEnabled { get; }
 
-        public override bool HasUnknown => false;
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(0x14a);
 
         public SnmpRfpUpdateMessage(ReadOnlyMemory<byte> data):base(MsgType.SNMP_RFP_UPDATE, data)
         {

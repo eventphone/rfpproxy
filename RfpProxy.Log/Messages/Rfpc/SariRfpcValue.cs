@@ -10,7 +10,7 @@ namespace RfpProxy.Log.Messages.Rfpc
 
         public override bool HasUnknown => false;
 
-        public SariRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.SARI)
+        public SariRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.SARI, data)
         {
             Sari = data;
         }

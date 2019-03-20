@@ -39,7 +39,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public ReadOnlyMemory<byte> Keys { get; }
 
-        public NwkIeMultiKeypad(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.MultiKeypad)
+        public NwkIeMultiKeypad(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.MultiKeypad, data)
         {
             Keys = data;
         }

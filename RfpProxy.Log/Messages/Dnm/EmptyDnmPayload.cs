@@ -5,8 +5,6 @@ namespace RfpProxy.Log.Messages.Dnm
 {
     public sealed class EmptyDnmPayload : DnmPayload
     {
-        public override bool HasUnknown => false;
-
         public EmptyDnmPayload(ReadOnlyMemory<byte> data) : base(data)
         {
             if (Raw.Length > 0)

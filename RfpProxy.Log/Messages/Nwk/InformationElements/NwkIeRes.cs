@@ -10,7 +10,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
         
         public override bool HasUnknown => false;
 
-        public NwkIeRes(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.RES)
+        public NwkIeRes(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.RES, data)
         {
             Res = data;
         }

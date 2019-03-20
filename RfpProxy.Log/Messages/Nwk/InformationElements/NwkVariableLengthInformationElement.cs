@@ -7,9 +7,14 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
     {
         public NwkVariableLengthElementType Type { get; }
 
-        protected NwkVariableLengthInformationElement(NwkVariableLengthElementType type)
+        public override bool HasUnknown => !Raw.IsEmpty;
+
+        public virtual ReadOnlyMemory<byte> Raw { get; }
+
+        protected NwkVariableLengthInformationElement(NwkVariableLengthElementType type, ReadOnlyMemory<byte> data)
         {
             Type = type;
+            Raw = data;
         }
 
         public static NwkVariableLengthInformationElement Create(NwkVariableLengthElementType type, ReadOnlyMemory<byte> data)

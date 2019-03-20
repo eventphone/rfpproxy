@@ -12,11 +12,11 @@ namespace RfpProxy.Log.Messages
 
         public DateTimeOffset Time2 { get; }
 
-        public override bool HasUnknown => false;
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(16);
 
         public SysRoundtripDelayMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_ROUNDTRIP_DELAY, data)
         {
-            var span = Raw.Span;
+            var span = base.Raw.Span;
             
             var seconds = BinaryPrimitives.ReadUInt32BigEndian(span);
             var nseconds = BinaryPrimitives.ReadUInt32BigEndian(span.Slice(4));

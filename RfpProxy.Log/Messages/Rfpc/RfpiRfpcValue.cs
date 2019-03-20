@@ -87,10 +87,10 @@ namespace RfpProxy.Log.Messages.Rfpc
         public byte Rpn { get; }
 
         public ReadOnlyMemory<byte> Pari { get; }
-        
-        public override bool HasUnknown => false;
 
-        public RfpiRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.RFPI)
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(5);
+
+        public RfpiRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.RFPI, data)
         {
             var span = data.Span;
             HasSARIs = span[0] >= 128;

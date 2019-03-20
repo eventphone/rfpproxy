@@ -56,7 +56,7 @@ namespace RfpProxy.Log.Messages.Rfpc
 
         public override bool HasUnknown => WirelessRelayStations != 0;
 
-        public ExtendedCapabilitiesRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.ExtendedCapabilities)
+        public ExtendedCapabilitiesRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.ExtendedCapabilities, data)
         {
             var span = data.Span;
             WirelessRelayStations = (byte) (((span[0] & 0xf) << 2) | (span[1] >> 6));

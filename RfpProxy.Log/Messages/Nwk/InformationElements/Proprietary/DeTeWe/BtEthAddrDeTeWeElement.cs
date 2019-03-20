@@ -6,13 +6,12 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 {
     public class BtEthAddrDeTeWeElement : DeTeWeElement
     {
-        public ReadOnlyMemory<byte> Address { get; }
+        public ReadOnlyMemory<byte> Address => base.Raw.Slice(0, 6);
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(6);
 
-        public BtEthAddrDeTeWeElement(ReadOnlyMemory<byte> data) : base(DeTeWeType.BtEthAddr)
+        public BtEthAddrDeTeWeElement(ReadOnlyMemory<byte> data) : base(DeTeWeType.BtEthAddr, data)
         {
-            Address = data;
         }
 
         public override void Log(TextWriter writer)

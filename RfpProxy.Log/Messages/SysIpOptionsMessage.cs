@@ -16,19 +16,21 @@ namespace RfpProxy.Log.Messages
         
         public byte VoiceVlanPriority { get; }
 
-        public ReadOnlyMemory<byte> Padding { get; }
+        /// <summary>
+        /// padding
+        /// </summary>
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(5);
 
         public override bool HasUnknown => false;
 
         public SysIpOptionsMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_IP_OPTIONS, data)
         {
-            var span = Raw.Span;
+            var span = base.Raw.Span;
             VoiceTos = span[0];
             SignalTos = span[1];
             Ttl = span[2];
             SignalVlanPriority = span[3];
             VoiceVlanPriority = span[4];
-            Padding = Raw.Slice(5);
         }
 
         public override void Log(TextWriter writer)

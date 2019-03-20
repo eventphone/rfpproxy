@@ -8,20 +8,20 @@ namespace RfpProxy.Log.Messages
 {
     public abstract class AaMiDeMessage
     {
-        public abstract bool HasUnknown { get; }
+        public virtual bool HasUnknown => !Raw.IsEmpty;
 
         public MsgType Type { get; }
 
-        public ushort Length => BinaryPrimitives.ReadUInt16BigEndian(_data.Slice(2).Span);
+        public ushort Length { get; }
 
-        private readonly ReadOnlyMemory<byte> _data;
-
-        protected virtual ReadOnlyMemory<byte> Raw => _data.Slice(4);
+        protected virtual ReadOnlyMemory<byte> Raw { get; }
 
         protected AaMiDeMessage(MsgType type, ReadOnlyMemory<byte> data)
         {
             Type = type;
-            _data = data;
+            var span = data.Span;
+            Length = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(2));
+            Raw = data.Slice(4);
         }
 
         public static AaMiDeMessage Create(ReadOnlyMemory<byte> data, AaMiDeReassembler reassembler)
@@ -101,6 +101,14 @@ namespace RfpProxy.Log.Messages
         public virtual void Log(TextWriter writer)
         {
             writer.Write($"{Type,-22}({Length,4}) ");
+            if (!Raw.IsEmpty)
+            {
+                if (HasUnknown)
+                    writer.Write("Reserved");
+                else
+                    writer.Write("Padding");
+                writer.Write($"({Raw.ToHex()}) ");
+            }
         }
     }
 }

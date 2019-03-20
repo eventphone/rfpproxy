@@ -10,7 +10,7 @@ namespace RfpProxy.Log.Messages.Rfpc
 
         public override bool HasUnknown => true;
 
-        public UnknownDnmRfpcValue(RfpcKey type, ReadOnlyMemory<byte> data):base(type)
+        public UnknownDnmRfpcValue(RfpcKey type, ReadOnlyMemory<byte> data):base(type, data)
         {
             Value = data;
         }

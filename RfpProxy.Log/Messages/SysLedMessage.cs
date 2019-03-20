@@ -28,6 +28,11 @@ namespace RfpProxy.Log.Messages
 
         public ColorScheme Color { get; }
 
+        /// <summary>
+        /// padding
+        /// </summary>
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(2);
+
         public override bool HasUnknown => false;
         
         public SysLedMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LED, data)
@@ -40,8 +45,6 @@ namespace RfpProxy.Log.Messages
             Led4 = (led & 0x8) != 0;
             Color = (ColorScheme) color;
         }
-
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(2);
 
         public override void Log(TextWriter writer)
         {

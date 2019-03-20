@@ -238,8 +238,13 @@ namespace RfpProxy.Log.Messages.Dnm
             }
             writer.Write($" N({(ExtendedLength?0:1)}) M({(MoreData?1:0)}) L({PayloadLength})");
             if (!Raw.IsEmpty)
-                writer.Write($" Reserved({Raw.ToHex()})");
-
+            {
+                if (HasUnknown)
+                    writer.Write(" Reserved");
+                else
+                    writer.Write(" Padding");
+                writer.Write($"({Raw.ToHex()})");
+            }
             Payload.Log(writer);
         }
     }

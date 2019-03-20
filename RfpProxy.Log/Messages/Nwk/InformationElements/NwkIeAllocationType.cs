@@ -27,9 +27,9 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public Relation AcRelation { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(2);
 
-        public NwkIeAllocationType(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.AllocationType)
+        public NwkIeAllocationType(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.AllocationType, data)
         {
             var span = data.Span;
             AlgorithmIdentifier = (AlgorithmIdentifierCode) span[0];

@@ -10,7 +10,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 
         public override bool HasUnknown => false;
 
-        public SendTextDeTeWeElement(ReadOnlyMemory<byte> data):base(DeTeWeType.SendText)
+        public SendTextDeTeWeElement(ReadOnlyMemory<byte> data):base(DeTeWeType.SendText, data)
         {
             Text = Encoding.UTF8.GetString(data.Span);
         }

@@ -58,9 +58,9 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public ushort DefaultCipherKey { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => Def ? base.Raw.Slice(5) : base.Raw.Slice(3);
 
-        public NwkIeAuthType(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.AuthType)
+        public NwkIeAuthType(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.AuthType, data)
         {
             var span = data.Span;
             Algorithm = (AuthenticationAlgorithm) span[0];

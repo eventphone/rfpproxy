@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 {
@@ -7,17 +8,28 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
     {
         public DeTeWeType Type { get; }
         
-        public abstract bool HasUnknown { get; }
+        public virtual ReadOnlyMemory<byte> Raw { get; }
 
-        protected DeTeWeElement(DeTeWeType type)
+        public virtual bool HasUnknown => !Raw.IsEmpty;
+
+        protected DeTeWeElement(DeTeWeType type, ReadOnlyMemory<byte> data)
         {
             Type = type;
+            Raw = data;
         }
 
         public virtual void Log(TextWriter writer)
         {
             writer.WriteLine();
             writer.Write("\t\t\t");
+            if (!Raw.IsEmpty)
+            {
+                if (HasUnknown)
+                    writer.Write("Reserved");
+                else
+                    writer.Write("Padding");
+                writer.Write($"({Raw.ToHex()}) ");
+            }
             if (Enum.IsDefined(typeof(DeTeWeType), Type))
                 writer.Write(Type.ToString("G"));
             else
@@ -42,6 +54,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
                         return new HomeScreenTextDeTeWeElement(data);
                     case DeTeWeType.Language:
                         return new LanguageDeTeWeElement(data);
+                    case DeTeWeType.PrepareDial:
+                        throw new NotImplementedException();
                     case DeTeWeType.Mms:
                         return new MmsDeTeWeElement(data);
                     case DeTeWeType.SendText:

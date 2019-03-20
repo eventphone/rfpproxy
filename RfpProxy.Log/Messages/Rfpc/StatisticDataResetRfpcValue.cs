@@ -7,9 +7,9 @@ namespace RfpProxy.Log.Messages.Rfpc
     {
         public bool Reset { get; }
 
-        public override bool HasUnknown => false;
-        
-        public StatisticDataResetRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.StatisticDataReset)
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(1);
+
+        public StatisticDataResetRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.StatisticDataReset, data)
         {
             Reset = data.Span[0] != 0;
         }

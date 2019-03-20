@@ -10,7 +10,7 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public byte Id { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(9);
 
         public MacEncKeyReqPayload(ReadOnlyMemory<byte> data) : base(data)
         {

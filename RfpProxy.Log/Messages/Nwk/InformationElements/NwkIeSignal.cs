@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace RfpProxy.Log.Messages.Nwk.InformationElements
 {
@@ -31,7 +32,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public SignalCoding Signal { get; }
 
-        public override bool HasUnknown => false;
+        public override bool HasUnknown => !Enum.IsDefined(typeof(SignalCoding), Signal);
 
         public NwkIeSignal(byte content):base(NwkDoubleByteElementType.Signal)
         {
