@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.IO;
-using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages.Sync
 {
     public sealed class OffsetIndSyncMessage : SyncMessage
     {
-        public ReadOnlyMemory<byte> Reserved1 { get; }
+        public byte Reserved1 { get; }
+
+        /// <summary>
+        /// rpn, not omm rfp id
+        /// </summary>
+        public ushort Rpn { get; }
 
         public int Offset { get; }
 
@@ -22,7 +26,8 @@ namespace RfpProxy.Log.Messages.Sync
         public OffsetIndSyncMessage(ReadOnlyMemory<byte> data):base(SyncMessageType.PhaseOfsWithRssiInd, data)
         {
             var span = base.Raw.Span;
-            Reserved1 = base.Raw.Slice(0, 3);
+            Reserved1 = span[0];
+            Rpn = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(1));
             Offset = BinaryPrimitives.ReadInt16BigEndian(span.Slice(3));
             Rssi = span[5];
             QtSyncCheck = span[6];
@@ -31,7 +36,7 @@ namespace RfpProxy.Log.Messages.Sync
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($" Reserved1({Reserved1.ToHex()}) Offset({Offset,2}) RSSI({Rssi}) QT-Sync-Check({QtSyncCheck:x2})");
+            writer.Write($" Reserved1({Reserved1:x2}) RPN({Rpn:x4}) Offset({Offset*48,4}ns) RSSI({Rssi}) QT-Sync-Check({QtSyncCheck:x2})");
         }
     }
 }

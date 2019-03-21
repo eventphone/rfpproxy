@@ -94,7 +94,7 @@ namespace RfpProxy.Test
             Assert.True(snmp.TrapEnabled);
             
             Log(snmp);
-            //TODO Assert.False(snmp.HasUnknown);
+            Assert.False(snmp.HasUnknown);
         }
 
         [Fact]
