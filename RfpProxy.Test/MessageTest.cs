@@ -788,6 +788,19 @@ namespace RfpProxy.Test
             //TODO Assert.False(stats.HasUnknown);
         }
 
+        [Fact]
+        public void CanDecodeMacHoInProgressMessage()
+        {
+            var ind = Decode<DnmMessage>("03010008 7a0b0400 027b0201");
+            Log(ind);
+
+            var res = Decode<DnmMessage>("0301000e 7a0c0400 00000000 00000000 00ff");
+            Log(res);
+
+            //todo Assert.False(ind.HasUnknown);
+            //todo Assert.False(res.HasUnknown);
+        }
+
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex.Replace(" ", String.Empty));

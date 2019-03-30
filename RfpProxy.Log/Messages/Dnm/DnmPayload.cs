@@ -57,6 +57,10 @@ namespace RfpProxy.Log.Messages.Dnm
                     return new MacEncEksIndPayload(data);
                 case DnmType.MacInfoInd:
                     return new MacInfoIndPayload(data);
+                case DnmType.HoInProgressInd:
+                    return new MacHoInProgressIndPayload(data);
+                case DnmType.HoInProgressRes:
+                    return new MacHoInProgressResPayload(data);
                 default:
                     return new UnknownDnmPayload(data);
             }
