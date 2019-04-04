@@ -6,37 +6,61 @@ namespace RfpProxy.Log.Messages.Sync
 {
     public sealed class OffsetIndSyncMessage : SyncMessage
     {
-        public byte Reserved1 { get; }
+        public byte Count { get; }
 
-        /// <summary>
-        /// rpn, not omm rfp id
-        /// </summary>
-        public ushort Rpn { get; }
+        public OffsetInd[] RFPs { get; }
 
-        public int Offset { get; }
-
-        public byte Rssi { get; }
-
-        public byte QtSyncCheck { get; }
-
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(7);
-
-        public override bool HasUnknown => true;
-
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(1 + Count * 6);
+        
         public OffsetIndSyncMessage(ReadOnlyMemory<byte> data):base(SyncMessageType.PhaseOfsWithRssiInd, data)
         {
             var span = base.Raw.Span;
-            Reserved1 = span[0];
-            Rpn = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(1));
-            Offset = BinaryPrimitives.ReadInt16BigEndian(span.Slice(3));
-            Rssi = span[5];
-            QtSyncCheck = span[6];
+            Count = span[0];
+            RFPs = new OffsetInd[Count];
+            span = span.Slice(1);
+            for (int i = 0; i < RFPs.Length; i++)
+            {
+                var rpn = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(0));
+                var offset = BinaryPrimitives.ReadInt16BigEndian(span.Slice(2));
+                var rssi = span[4];
+                var qtSyncCheck = span[5];
+                RFPs[i] = new OffsetInd(rpn, offset, rssi, qtSyncCheck);
+                span = span.Slice(6);
+            }
         }
 
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($" Reserved1({Reserved1:x2}) RPN({Rpn:x4}) Offset({Offset*48,4}ns) RSSI({Rssi}) QT-Sync-Check({QtSyncCheck:x2})");
+            for (int i = 0; i < RFPs.Length; i++)
+            {
+                var rfp = RFPs[i];
+                writer.WriteLine();
+                writer.Write($"\t\tRPN({rfp.Rpn:x4}) Offset({rfp.Offset*48,4}ns) RSSI({rfp.Rssi}) QT-Sync-Check({rfp.QtSyncCheck:x2})");
+            }
+        }
+
+        public class OffsetInd
+        {
+            public OffsetInd(ushort rpn, int offset, byte rssi, byte qtSyncCheck)
+            {
+                Rpn = rpn;
+                Offset = offset;
+                Rssi = rssi;
+                QtSyncCheck = qtSyncCheck;
+            }
+
+            /// <summary>
+            /// rpn, not omm rfp id
+            /// </summary>
+            public ushort Rpn { get; }
+
+            public int Offset { get; }
+
+            public byte Rssi { get; }
+
+            public byte QtSyncCheck { get; }
+
         }
     }
 }

@@ -658,9 +658,11 @@ namespace RfpProxy.Test
         {
             var sync = Decode<OffsetIndSyncMessage>("0302000b7d2c0801004cfffd430701");
             Log(sync);
-            Assert.Equal(-3, sync.Offset);
-            Assert.Equal(67, sync.Rssi);
-            Assert.Equal(0x07, sync.QtSyncCheck);
+            Assert.Equal(1, sync.Count);
+            var rfp = Assert.Single(sync.RFPs);
+            Assert.Equal(-3, rfp.Offset);
+            Assert.Equal(67, rfp.Rssi);
+            Assert.Equal(0x07, rfp.QtSyncCheck);
             //TODO Assert.False(sync.HasUnknown);
         }
 
@@ -799,6 +801,28 @@ namespace RfpProxy.Test
 
             //todo Assert.False(ind.HasUnknown);
             //todo Assert.False(res.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeSyncPhaseOfsWithRssiIndMessage()
+        {
+            var sync = Decode<OffsetIndSyncMessage>("03020011 7d2c0e02 004c0000 46000044 ffff4607 00");
+            Assert.Equal(2, sync.Count);
+            Assert.Equal(2, sync.RFPs.Length);
+            var rfp = sync.RFPs[0];
+            Assert.Equal(0x4c, rfp.Rpn);
+            Assert.Equal(70, rfp.Rssi);
+            Assert.Equal(0, rfp.Offset);
+            Assert.Equal(0, rfp.QtSyncCheck);
+
+            rfp = sync.RFPs[1];
+            Assert.Equal(0x44, rfp.Rpn);
+            Assert.Equal(70, rfp.Rssi);
+            Assert.Equal(-1, rfp.Offset);
+            Assert.Equal(7, rfp.QtSyncCheck);
+
+            Log(sync);
+            //TODO Assert.False(sync.HasUnknown);
         }
 
         private T Decode<T>(string hex) where T:AaMiDeMessage
