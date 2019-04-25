@@ -49,6 +49,8 @@ namespace RfpProxy.Log.Messages
                 case MsgType.MEDIA_TRACE_PPN:
                 case MsgType.MEDIA_VIDEO_STATE:
                     return new UnknownMediaMessage(type, data);
+                case MsgType.MEDIA_CONF:
+                    return new MediaConfMessage(data);
                 case MsgType.MEDIA_OPEN:
                     return new OpenMediaMessage(data);
                 case MsgType.MEDIA_DTMF:

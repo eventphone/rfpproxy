@@ -839,6 +839,23 @@ namespace RfpProxy.Test
             Assert.False(dnm.HasUnknown);
         }
 
+        [Fact]
+        public void CanDecodeMediaConfMessage()
+        {
+            var media = Decode<MediaConfMessage>(
+                "020100a4 4eb40000 14000100 08080000 00000000 00000000 00000000 00000000" +
+                "00000000 00000000 00000000 00000000 00000000 00000000 00000065 65000200" +
+                "a30e0101 3c003fc6 3fc70000 ac141702 2aaa2aab ac141702 2aaa2aab 03010000" +
+                "7d85a30e 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
+                "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
+                "00000000 00000000");
+
+            Assert.Equal(2, media.MCEI);
+
+            Log(media);
+            //TODO Assert.False(media.HasUnknown);
+        }
+
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex.Replace(" ", String.Empty));

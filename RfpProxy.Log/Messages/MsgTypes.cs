@@ -33,7 +33,7 @@ namespace RfpProxy.Log.Messages
         SYS_LICENSE_TIMER = 0x0134,
 
         MEDIA_OPEN = 0x0200,
-        MEDIA_UNKNOWN = 0x0201,
+        MEDIA_CONF = 0x0201,
         MEDIA_CLOSE = 0x0202,
         MEDIA_START = 0x0203,
         MEDIA_STOP = 0x0204,
