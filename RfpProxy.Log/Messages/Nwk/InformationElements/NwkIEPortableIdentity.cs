@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Buffers.Binary;
-using System.Collections;
 using System.IO;
 using RfpProxyLib;
 
@@ -117,6 +116,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public override bool HasUnknown { get; }
 
+        public override ReadOnlyMemory<byte> Raw { get; }
+
         public NwkIePortableIdentity(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.PortableIdentity, data)
         {
             var span = data.Span;
@@ -125,18 +126,17 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
             var length = bitCount / 8;
             switch (IdentityType)
             {
+                case PortableIdentityType.IPEI:
                 case PortableIdentityType.IPUI:
                     Ipui = new IPUI(data.Slice(2), bitCount);
+                    Raw = Ipui.Raw;
                     HasUnknown = Ipui.HasUnknown;
-                    break;
-                case PortableIdentityType.IPEI:
-                    Identity = data.Slice(2, length);
-                    HasUnknown = true;
                     break;
                 case PortableIdentityType.TPUI:
                     TPUIType = (TPUITypeCoding) (span[2] >> 4);
                     HasUnknown = (span[1] & 0x7f) != 20;
                     Identity = data.Slice(2);
+                    Raw = ReadOnlyMemory<byte>.Empty;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -156,7 +156,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     writer.Write($" TPUI-{TPUIType:G}({Identity.ToHex().Substring(1)})");
                     break;
                 case PortableIdentityType.IPEI:
-                    writer.Write($" IPEI({Identity.ToHex()})");
+                    writer.Write($" IPEI({Ipui})");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

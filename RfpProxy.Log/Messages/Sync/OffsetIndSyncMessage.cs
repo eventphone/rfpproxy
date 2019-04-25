@@ -36,7 +36,7 @@ namespace RfpProxy.Log.Messages.Sync
             {
                 var rfp = RFPs[i];
                 writer.WriteLine();
-                writer.Write($"\t\tRPN({rfp.Rpn:x4}) Offset({rfp.Offset*48,4}ns) RSSI({rfp.Rssi}) QT-Sync-Check({rfp.QtSyncCheck:x2})");
+                writer.Write($"\tRPN({rfp.Rpn:x4}) Offset({rfp.Offset*48,4}ns) RSSI({rfp.Rssi}) QT-Sync-Check({rfp.QtSyncCheck:x2})");
             }
         }
 

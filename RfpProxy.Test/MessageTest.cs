@@ -4,6 +4,7 @@ using System.Linq;
 using RfpProxy.Log.Messages;
 using RfpProxy.Log.Messages.Dnm;
 using RfpProxy.Log.Messages.Nwk;
+using RfpProxy.Log.Messages.Nwk.InformationElements;
 using RfpProxy.Log.Messages.Rfpc;
 using RfpProxy.Log.Messages.Sync;
 using RfpProxyLib;
@@ -823,6 +824,19 @@ namespace RfpProxy.Test
 
             Log(sync);
             //TODO Assert.False(sync.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeNwkCISSRegisterMessage()
+        {
+            var dnm = Decode<DnmMessage>("03010026 79060100 21110279 64640507 90a800b6 25bf577b 11810002 3b090319 04190004 1018015b 0102");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var ciss = Assert.IsType<NwkCISSPayload>(lc.Payload);
+            var ipei = ciss.InformationElements.OfType<NwkIePortableIdentity>().Single();
+            Assert.Equal("02914 0376663 7", ipei.Ipui.ToString());
+
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
         }
 
         private T Decode<T>(string hex) where T:AaMiDeMessage
