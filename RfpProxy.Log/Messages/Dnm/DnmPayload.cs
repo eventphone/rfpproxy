@@ -19,7 +19,7 @@ namespace RfpProxy.Log.Messages.Dnm
             switch (layer)
             {
                 case DnmLayer.Mac:
-                    return CreateMac(type, data);
+                    return CreateMac(type, data, reassembler);
                 case DnmLayer.Lc:
                     return CreateLc(type, data, reassembler);
                 default:
@@ -41,13 +41,14 @@ namespace RfpProxy.Log.Messages.Dnm
             }
         }
 
-        private static DnmPayload CreateMac(DnmType type, ReadOnlyMemory<byte> data)
+        private static DnmPayload CreateMac(DnmType type, ReadOnlyMemory<byte> data, NwkReassembler reassembler)
         {
             switch (type)
             {
                 case DnmType.MacConInd:
                     return new MacConIndPayload(data);
                 case DnmType.MacDisInd:
+                    reassembler.Clear();
                     return new MacDisIndPayload(data);
                 case DnmType.MacDisReq:
                     return new EmptyDnmPayload(data);
@@ -61,6 +62,8 @@ namespace RfpProxy.Log.Messages.Dnm
                     return new MacHoInProgressIndPayload(data);
                 case DnmType.HoInProgressRes:
                     return new MacHoInProgressResPayload(data);
+                case DnmType.HoFailedInd:
+                    return new MacHoFailedIndPayload(data);
                 default:
                     return new UnknownDnmPayload(data);
             }

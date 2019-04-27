@@ -62,6 +62,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     return new NwkIeRs(data);
                 case NwkVariableLengthElementType.TerminalCapability:
                     return new NwkIeTerminalCapability(data);
+                case NwkVariableLengthElementType.FeatureActivate:
+                    return new NwkIeFeatureActivate(data);
                 case NwkVariableLengthElementType.IdentityType:
                 case NwkVariableLengthElementType.NwkAssignedIdentity:
                 case NwkVariableLengthElementType.IWUAttributes:
@@ -76,7 +78,6 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                 case NwkVariableLengthElementType.MMSExtendedHeader:
                 case NwkVariableLengthElementType.TimeDate:
                 case NwkVariableLengthElementType.MultiDisplay:
-                case NwkVariableLengthElementType.FeatureActivate:
                 case NwkVariableLengthElementType.FeatureIndicate:
                 case NwkVariableLengthElementType.NetworkParameter:
                 case NwkVariableLengthElementType.ExtHOindicator:

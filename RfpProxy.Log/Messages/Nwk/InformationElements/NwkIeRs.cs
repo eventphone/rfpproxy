@@ -8,7 +8,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
     {
         public ReadOnlyMemory<byte> Rs { get; }
 
-        public override bool HasUnknown => false;
+        public override ReadOnlyMemory<byte> Raw => ReadOnlyMemory<byte>.Empty;
 
         public NwkIeRs(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.RS, data)
         {

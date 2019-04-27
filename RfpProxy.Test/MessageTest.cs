@@ -805,6 +805,17 @@ namespace RfpProxy.Test
         }
 
         [Fact]
+        public void CanDecodeMacHoFailedMessage()
+        {
+            var dnm = Decode<DnmMessage>("03010004 7a0d0501");
+
+            var ind = Assert.IsType<MacHoFailedIndPayload>(dnm.Payload);
+            Assert.Equal(MacHoFailedIndPayload.HoFailedReason.SetupFailed, ind.Reason);
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
         public void CanDecodeSyncPhaseOfsWithRssiIndMessage()
         {
             var sync = Decode<OffsetIndSyncMessage>("03020011 7d2c0e02 004c0000 46000044 ffff4607 00");
@@ -854,6 +865,19 @@ namespace RfpProxy.Test
 
             Log(media);
             //TODO Assert.False(media.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeNwkIEFeatureAvtivate()
+        {
+            var dnm = Decode<DnmMessage>("0301000d 79060600 08112215 64623801 b0");
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var ciss = Assert.IsType<NwkCISSPayload>(lc.Payload);
+            var ie = Assert.Single(ciss.InformationElements);
+            var feature = Assert.IsType<NwkIeFeatureActivate>(ie);
+            
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
         }
 
         private T Decode<T>(string hex) where T:AaMiDeMessage

@@ -12,7 +12,7 @@ namespace RfpProxyLib
         {
             if (identifier.Length != Length)
                 throw new ArgumentOutOfRangeException(nameof(identifier), $"identifier must be {Length} bytes");
-            _identifier = identifier;
+            _identifier = identifier.ToArray();
         }
 
         public bool Matches(RfpIdentifier other, ReadOnlySpan<byte> mask)

@@ -100,8 +100,8 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public override ReadOnlyMemory<byte> Raw => ReadOnlyMemory<byte>.Empty;
 
-        public override bool HasUnknown => Payload.HasUnknown;
-
+        public override bool HasUnknown => Payload.HasUnknown || (SAPI != 1 && SAPI != 3);
+        
         public LcDataPayload(ReadOnlyMemory<byte> data, NwkReassembler reassembler):base(data)
         {
             var span = base.Raw.Span;
@@ -192,14 +192,14 @@ namespace RfpProxy.Log.Messages.Dnm
                 lln |= 0b1000;
             if (MoreData)
             {
-                reassembler.AddFragment(lln, payloadData);
+                reassembler.AddFragment(lln, Ns, payloadData);
                 Payload = new NwkFragmentedPayload(payloadData);
             }
             else
             {
                 if (CommandType == LcCommandType.I) // ETSI EN 300 175-4 V2.4.0 section 7.7.2
                 {
-                    payloadData = reassembler.Reassemble(lln, payloadData);
+                    payloadData = reassembler.Reassemble(lln, Ns, payloadData);
                 }
                 Payload = NwkPayload.Create(payloadData);
             }
