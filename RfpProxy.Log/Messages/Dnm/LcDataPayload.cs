@@ -197,11 +197,13 @@ namespace RfpProxy.Log.Messages.Dnm
             }
             else
             {
+                bool retransmit = false;
                 if (CommandType == LcCommandType.I) // ETSI EN 300 175-4 V2.4.0 section 7.7.2
                 {
-                    payloadData = reassembler.Reassemble(lln, Ns, payloadData);
+                    payloadData = reassembler.Reassemble(lln, Ns, payloadData, out retransmit);
                 }
                 Payload = NwkPayload.Create(payloadData);
+                Payload.WasRetransmitted = retransmit;
             }
         }
 

@@ -18,8 +18,7 @@ namespace RfpProxy.Log.Messages
         {
             if (reassembler.IsEmpty)
             {
-                if (_reassemblers.ContainsKey(mcei))
-                    _reassemblers.Remove(mcei);
+                _reassemblers.Remove(mcei);
             }
             else
             {

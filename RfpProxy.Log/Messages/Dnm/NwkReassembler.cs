@@ -26,8 +26,9 @@ namespace RfpProxy.Log.Messages.Dnm
             _fragments[lln][ns] = fragment;
         }
 
-        public ReadOnlyMemory<byte> Reassemble(byte lln, byte ns, in ReadOnlyMemory<byte> fragment)
+        public ReadOnlyMemory<byte> Reassemble(byte lln, byte ns, in ReadOnlyMemory<byte> fragment, out bool retransmit)
         {
+            retransmit = false;
             if (!_fragments.ContainsKey(lln))
             {
                 if (_retransmits.TryGetValue(lln, out var fragments))
@@ -39,13 +40,13 @@ namespace RfpProxy.Log.Messages.Dnm
                         {
                             if (previous.Span.SequenceEqual(fragment.Span))
                             {
-                                if (Debugger.IsAttached)
-                                    Debugger.Break();//todo mark as retransmit
+                                retransmit = true;
+                                _fragments.Add(lln, fragments);
+                                _retransmits.Remove(lln);
                             }
                         }
                     }
                 }
-                return fragment;
             }
             //todo validate
             _fragments[lln][ns] = fragment;

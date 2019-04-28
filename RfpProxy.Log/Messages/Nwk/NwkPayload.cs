@@ -13,6 +13,8 @@ namespace RfpProxy.Log.Messages.Nwk
 
         public abstract bool HasUnknown { get; }
 
+        public bool WasRetransmitted { get; set; }
+
         protected NwkPayload(NwkProtocolDiscriminator pd, byte ti, bool f)
         {
             ProtocolDiscriminator = pd;
@@ -58,6 +60,8 @@ namespace RfpProxy.Log.Messages.Nwk
         {
             writer.WriteLine();
             writer.Write($"\t{ProtocolDiscriminator,4}({(TransactionFlag?'o':'d')}{TransactionIdentifier})");
+            if (WasRetransmitted)
+                writer.Write(" Retransmit");
         }
     }
 }
