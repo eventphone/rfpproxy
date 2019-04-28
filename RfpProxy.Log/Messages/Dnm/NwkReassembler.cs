@@ -48,6 +48,8 @@ namespace RfpProxy.Log.Messages.Dnm
                     }
                 }
             }
+            if (!_fragments.ContainsKey(lln))
+                return fragment;
             //todo validate
             _fragments[lln][ns] = fragment;
             var size = _fragments[lln].Sum(x => x.Length);
