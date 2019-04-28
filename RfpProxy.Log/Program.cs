@@ -9,6 +9,7 @@ using RfpProxyLib.Messages;
 using RfpProxy.Log.Messages;
 using RfpProxyLib;
 using System.Buffers.Binary;
+using RfpProxy.Log.Messages.Dnm;
 
 namespace RfpProxy.Log
 {
@@ -192,6 +193,27 @@ namespace RfpProxy.Log
                     Console.WriteLine($"{timestamp:yyyy/MM/dd HH:mm:ss.fff} {prefix}{rfp} Cannot parse {data.ToHex()}");
                     Console.WriteLine(ex);
                     return;
+                }
+                if (message is DnmMessage dnm)
+                {
+                    if (dnm.Payload is MacDisIndPayload)
+                    {
+                        bool clearReassembler;
+                        if (direction == MessageDirection.FromOmm)
+                        {
+                            clearReassembler = _rfpReassemblers.TryGetValue(rfp, out reassembler);
+                        }
+                        else
+                        {
+                            clearReassembler = _ommReassemblers.TryGetValue(rfp, out reassembler);
+                        }
+                        if (clearReassembler)
+                        {
+                            var nwk = reassembler.GetNwk(dnm.MCEI);
+                            nwk.Clear();
+                            reassembler.Return(dnm.MCEI, nwk);
+                        }
+                    }
                 }
                 if (_unknown && !message.HasUnknown)
                     return;

@@ -187,12 +187,9 @@ namespace RfpProxy.Log.Messages.Dnm
             {
                 payloadData = base.Raw.Slice(4);
             }
-            var lln = LLN;
-            if (Command)
-                lln |= 0b1000;
             if (MoreData)
             {
-                reassembler.AddFragment(lln, Ns, payloadData);
+                reassembler.AddFragment(LLN, Ns, payloadData);
                 Payload = new NwkFragmentedPayload(payloadData);
             }
             else
@@ -200,7 +197,7 @@ namespace RfpProxy.Log.Messages.Dnm
                 bool retransmit = false;
                 if (CommandType == LcCommandType.I) // ETSI EN 300 175-4 V2.4.0 section 7.7.2
                 {
-                    payloadData = reassembler.Reassemble(lln, Ns, payloadData, out retransmit);
+                    payloadData = reassembler.Reassemble(LLN, Ns, payloadData, out retransmit);
                 }
                 Payload = NwkPayload.Create(payloadData);
                 Payload.WasRetransmitted = retransmit;

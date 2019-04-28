@@ -7,9 +7,27 @@ namespace RfpProxy.Log.Messages.Dnm
 {
     public class NwkReassembler
     {
-        private readonly Dictionary<byte, ReadOnlyMemory<byte>[]> _fragments = new Dictionary<byte, ReadOnlyMemory<byte>[]>();
+        private readonly struct Fragment
+        {
+            public readonly byte Ns;
 
-        private readonly Dictionary<byte, ReadOnlyMemory<byte>[]> _retransmits = new Dictionary<byte, ReadOnlyMemory<byte>[]>();
+            public readonly ReadOnlyMemory<byte> Data;
+
+            public Fragment(byte ns, ReadOnlyMemory<byte> data)
+            {
+                Ns = ns;
+                Data = data;
+            }
+
+            public override string ToString()
+            {
+                return $"Ns={Ns}";
+            }
+        }
+
+        private readonly Dictionary<byte, List<Fragment>> _fragments = new Dictionary<byte, List<Fragment>>();
+
+        private readonly Dictionary<byte, List<Fragment>> _retransmits = new Dictionary<byte, List<Fragment>>();
 
         public bool IsEmpty
         {
@@ -20,25 +38,26 @@ namespace RfpProxy.Log.Messages.Dnm
         {
             if (!_fragments.ContainsKey(lln))
             {
-                _fragments.Add(lln, new ReadOnlyMemory<byte>[8]);
+                _fragments.Add(lln, new List<Fragment>());
                 _retransmits.Remove(lln);
             }
-            _fragments[lln][ns] = fragment;
+            _fragments[lln].Add(new Fragment(ns, fragment));
         }
 
         public ReadOnlyMemory<byte> Reassemble(byte lln, byte ns, in ReadOnlyMemory<byte> fragment, out bool retransmit)
         {
             retransmit = false;
+            List<Fragment> fragments;
             if (!_fragments.ContainsKey(lln))
             {
-                if (_retransmits.TryGetValue(lln, out var fragments))
+                if (_retransmits.TryGetValue(lln, out fragments))
                 {
-                    var previous = fragments[ns];
-                    if (!previous.IsEmpty)
+                    var previous = fragments[fragments.Count-1];//todo handle more than the last
+                    if (previous.Ns == ns)
                     {
-                        if (previous.Length == fragment.Length)
+                        if (previous.Data.Length == fragment.Length)
                         {
-                            if (previous.Span.SequenceEqual(fragment.Span))
+                            if (previous.Data.Span.SequenceEqual(fragment.Span))
                             {
                                 retransmit = true;
                                 _fragments.Add(lln, fragments);
@@ -50,25 +69,32 @@ namespace RfpProxy.Log.Messages.Dnm
             }
             if (!_fragments.ContainsKey(lln))
                 return fragment;
-            //todo validate
-            _fragments[lln][ns] = fragment;
-            var size = _fragments[lln].Sum(x => x.Length);
+            fragments = _fragments[lln];
+            if (!retransmit)
+                fragments.Add(new Fragment(ns, fragment));
+            var modulus = lln == 1 ? 2 : 8;
+            int vr = fragments[0].Ns;
+            for (int i = 1; i < fragments.Count; i++)
+            {
+                vr = (vr + 1) % modulus;
+                var frag = fragments[i];
+                if (frag.Ns != vr)
+                {
+                    //invalid Ns
+                    if (Debugger.IsAttached)
+                        Debugger.Break();
+                }
+            }
+            var size = fragments.Sum(x => x.Data.Length);
             var result = new byte[size].AsMemory();
             var slice = result;
-            for (int i = ns +1; i < 8; i++)
+            foreach (var frag in fragments)
             {
-                var frag = _fragments[lln][i];
-                frag.CopyTo(slice);
-                slice = slice.Slice(frag.Length);
-            }
-            for (int i = 0; i <= ns; i++)
-            {
-                var frag = _fragments[lln][i];
-                frag.CopyTo(slice);
-                slice = slice.Slice(frag.Length);
+                frag.Data.CopyTo(slice);
+                slice = slice.Slice(frag.Data.Length);
             }
 
-            _retransmits.Add(lln, _fragments[lln]);
+            _retransmits.Add(lln, fragments);
             _fragments.Remove(lln);
             return result;
         }
