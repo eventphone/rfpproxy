@@ -196,7 +196,7 @@ namespace RfpProxy.Log
                 }
                 if (message is DnmMessage dnm)
                 {
-                    if (dnm.Payload is MacDisIndPayload)
+                    if (dnm.Payload is MacDisIndPayload || dnm.DnmType == DnmType.MacDisReq)
                     {
                         bool clearReassembler;
                         if (direction == MessageDirection.FromOmm)

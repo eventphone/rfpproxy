@@ -51,6 +51,7 @@ namespace RfpProxy.Log.Messages.Dnm
                     reassembler.Clear();
                     return new MacDisIndPayload(data);
                 case DnmType.MacDisReq:
+                    reassembler.Clear();
                     return new EmptyDnmPayload(data);
                 case DnmType.MacEncKeyReq:
                     return new MacEncKeyReqPayload(data);

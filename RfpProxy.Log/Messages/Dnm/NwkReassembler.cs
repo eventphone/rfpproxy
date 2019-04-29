@@ -36,6 +36,52 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public void AddFragment(byte lln, byte ns, ReadOnlyMemory<byte> fragment)
         {
+            if (_fragments.TryGetValue(lln, out var fragments) || _retransmits.TryGetValue(lln, out fragments))
+            {
+                if (lln == 1)
+                {
+                    //class A
+                    if (fragments[fragments.Count - 1].Ns == ns)
+                    {
+                        if (fragments[fragments.Count - 1].Data.Span.SequenceEqual(fragment.Span))
+                        {
+                            //retransmit
+                            if (Debugger.IsAttached)
+                                Debugger.Break();
+                        }
+                    }
+                }
+                else
+                {
+                    //class B
+                    var last = fragments.Count - 1;
+                    if (fragments[last].Ns == ns)
+                    {
+                        if (fragments[last].Data.Span.SequenceEqual(fragment.Span))
+                        {
+                            //retransmit
+                            return;
+                        }
+                    }
+                    else if (fragments.Count > 1 && fragments[last - 1].Ns == ns)
+                    {
+                        if (fragments[last - 1].Data.Span.SequenceEqual(fragment.Span))
+                        {
+                            //retransmit
+                            return;
+                        }
+                    }
+                    else if (fragments.Count > 2 && fragments[last - 2].Ns == ns)
+                    {
+                        if (fragments[last - 2].Data.Span.SequenceEqual(fragment.Span))
+                        {
+                            //retransmit
+                            if (Debugger.IsAttached)
+                                Debugger.Break();
+                        }
+                    }
+                }
+            }
             if (!_fragments.ContainsKey(lln))
             {
                 _fragments.Add(lln, new List<Fragment>());
@@ -52,17 +98,14 @@ namespace RfpProxy.Log.Messages.Dnm
             {
                 if (_retransmits.TryGetValue(lln, out fragments))
                 {
-                    var previous = fragments[fragments.Count-1];//todo handle more than the last
+                    var previous = fragments[fragments.Count-1];
                     if (previous.Ns == ns)
                     {
-                        if (previous.Data.Length == fragment.Length)
+                        if (previous.Data.Span.SequenceEqual(fragment.Span))
                         {
-                            if (previous.Data.Span.SequenceEqual(fragment.Span))
-                            {
-                                retransmit = true;
-                                _fragments.Add(lln, fragments);
-                                _retransmits.Remove(lln);
-                            }
+                            retransmit = true;
+                            _fragments.Add(lln, fragments);
+                            _retransmits.Remove(lln);
                         }
                     }
                 }
