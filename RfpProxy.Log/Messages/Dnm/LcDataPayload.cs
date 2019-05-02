@@ -189,18 +189,21 @@ namespace RfpProxy.Log.Messages.Dnm
             }
             if (MoreData)
             {
-                reassembler.AddFragment(LLN, Ns, payloadData);
-                Payload = new NwkFragmentedPayload(payloadData);
+                reassembler.AddFragment(LLN, Ns, payloadData, out var retransmit);
+                Payload = new NwkFragmentedPayload(payloadData) {WasRetransmitted = retransmit};
             }
             else
             {
-                bool retransmit = false;
                 if (CommandType == LcCommandType.I) // ETSI EN 300 175-4 V2.4.0 section 7.7.2
                 {
-                    payloadData = reassembler.Reassemble(LLN, Ns, payloadData, out retransmit);
+                    payloadData = reassembler.Reassemble(LLN, Ns, payloadData, out var retransmit);
+                    Payload = NwkPayload.Create(payloadData);
+                    Payload.WasRetransmitted = retransmit;
                 }
-                Payload = NwkPayload.Create(payloadData);
-                Payload.WasRetransmitted = retransmit;
+                else
+                {
+                    Payload = NwkPayload.Create(payloadData);
+                }
             }
         }
 

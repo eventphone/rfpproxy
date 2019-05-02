@@ -18,6 +18,8 @@ namespace RfpProxy.Log.Messages.Nwk
         {
             writer.WriteLine();
             writer.Write("\tFragmented");
+            if (WasRetransmitted)
+                writer.Write(" Retransmit");
         }
     }
 }

@@ -13,9 +13,12 @@ namespace RfpProxy.Log.Messages.Dnm
 
             public readonly ReadOnlyMemory<byte> Data;
 
-            public Fragment(byte ns, ReadOnlyMemory<byte> data)
+            public readonly bool MoreData;
+
+            public Fragment(byte ns, bool moreData, ReadOnlyMemory<byte> data)
             {
                 Ns = ns;
+                MoreData = moreData;
                 Data = data;
             }
 
@@ -27,94 +30,82 @@ namespace RfpProxy.Log.Messages.Dnm
 
         private readonly Dictionary<byte, List<Fragment>> _fragments = new Dictionary<byte, List<Fragment>>();
 
-        private readonly Dictionary<byte, List<Fragment>> _retransmits = new Dictionary<byte, List<Fragment>>();
+        private readonly Dictionary<byte, Queue<Fragment>> _retransmitBuffer = new Dictionary<byte, Queue<Fragment>>();
 
-        public bool IsEmpty
+        public bool IsEmpty => _fragments.Count == 0 && _retransmitBuffer.Count == 0;
+
+        private bool IsRetransmit(byte lln, byte ns, ReadOnlyMemory<byte> fragment, bool moreData)
         {
-            get { return _fragments.Count == 0 && _retransmits.Count == 0; }
+            if (!_retransmitBuffer.ContainsKey(lln))
+            {
+                _retransmitBuffer.Add(lln, new Queue<Fragment>(3));
+            }
+
+            var buffer = _retransmitBuffer[lln];
+            if (buffer.Any(x => x.Ns == ns))
+            {
+                var previous = buffer.First(x => x.Ns == ns);
+                if (previous.Data.Span.SequenceEqual(fragment.Span))
+                {
+                    return true;
+                }
+                var current = buffer.Dequeue();
+                while (current.Ns != ns)
+                {
+                    buffer.Enqueue(current);
+                    current = buffer.Dequeue();
+                }
+                for (int i = ns + 1; true; i++)
+                {
+                    i = lln == 1 ? i % 2 : i % 7;
+                    if(!buffer.TryPeek(out current)) break;
+                    if (current.Ns != i) break;
+                    buffer.Dequeue();
+                }
+                if (_fragments.ContainsKey(lln))
+                {
+                    //todo cleanup _fragments
+                    if (Debugger.IsAttached)
+                        Debugger.Break();
+                }
+
+                current = new Fragment(ns, moreData, fragment);
+                buffer.Enqueue(current);
+                return true;
+            }
+            buffer.Enqueue(new Fragment(ns, moreData, fragment));
+            if ((lln == 1 && buffer.Count > 1) || buffer.Count > 3)
+                buffer.Dequeue();
+            return false;
         }
 
-        public void AddFragment(byte lln, byte ns, ReadOnlyMemory<byte> fragment)
+        public void AddFragment(byte lln, byte ns, ReadOnlyMemory<byte> fragment, out bool retransmit)
         {
-            if (_fragments.TryGetValue(lln, out var fragments) || _retransmits.TryGetValue(lln, out fragments))
+            retransmit = IsRetransmit(lln, ns, fragment, true);
+            if (retransmit)
             {
-                if (lln == 1)
-                {
-                    //class A
-                    if (fragments[fragments.Count - 1].Ns == ns)
-                    {
-                        if (fragments[fragments.Count - 1].Data.Span.SequenceEqual(fragment.Span))
-                        {
-                            //retransmit
-                            if (Debugger.IsAttached)
-                                Debugger.Break();
-                        }
-                    }
-                }
-                else
-                {
-                    //class B
-                    var last = fragments.Count - 1;
-                    if (fragments[last].Ns == ns)
-                    {
-                        if (fragments[last].Data.Span.SequenceEqual(fragment.Span))
-                        {
-                            //retransmit
-                            return;
-                        }
-                    }
-                    else if (fragments.Count > 1 && fragments[last - 1].Ns == ns)
-                    {
-                        if (fragments[last - 1].Data.Span.SequenceEqual(fragment.Span))
-                        {
-                            //retransmit
-                            return;
-                        }
-                    }
-                    else if (fragments.Count > 2 && fragments[last - 2].Ns == ns)
-                    {
-                        if (fragments[last - 2].Data.Span.SequenceEqual(fragment.Span))
-                        {
-                            //retransmit
-                            if (Debugger.IsAttached)
-                                Debugger.Break();
-                        }
-                    }
-                }
+                //todo replace with current
+                return;
             }
             if (!_fragments.ContainsKey(lln))
             {
                 _fragments.Add(lln, new List<Fragment>());
-                _retransmits.Remove(lln);
             }
-            _fragments[lln].Add(new Fragment(ns, fragment));
+            _fragments[lln].Add(new Fragment(ns, true, fragment));
         }
 
         public ReadOnlyMemory<byte> Reassemble(byte lln, byte ns, in ReadOnlyMemory<byte> fragment, out bool retransmit)
         {
-            retransmit = false;
-            List<Fragment> fragments;
-            if (!_fragments.ContainsKey(lln))
+            retransmit = IsRetransmit(lln, ns, fragment, false);
+            if (retransmit)
             {
-                if (_retransmits.TryGetValue(lln, out fragments))
-                {
-                    var previous = fragments[fragments.Count-1];
-                    if (previous.Ns == ns)
-                    {
-                        if (previous.Data.Span.SequenceEqual(fragment.Span))
-                        {
-                            retransmit = true;
-                            _fragments.Add(lln, fragments);
-                            _retransmits.Remove(lln);
-                        }
-                    }
-                }
+                //todo what if content differs?
+                return fragment;
             }
             if (!_fragments.ContainsKey(lln))
                 return fragment;
-            fragments = _fragments[lln];
-            if (!retransmit)
-                fragments.Add(new Fragment(ns, fragment));
+            var fragments = _fragments[lln];
+            fragments.Add(new Fragment(ns, false, fragment));
             var modulus = lln == 1 ? 2 : 8;
             int vr = fragments[0].Ns;
             for (int i = 1; i < fragments.Count; i++)
@@ -136,8 +127,6 @@ namespace RfpProxy.Log.Messages.Dnm
                 frag.Data.CopyTo(slice);
                 slice = slice.Slice(frag.Data.Length);
             }
-
-            _retransmits.Add(lln, fragments);
             _fragments.Remove(lln);
             return result;
         }
@@ -145,7 +134,7 @@ namespace RfpProxy.Log.Messages.Dnm
         public void Clear()
         {
             _fragments.Clear();
-            _retransmits.Clear();
+            _retransmitBuffer.Clear();
         }
     }
 }
