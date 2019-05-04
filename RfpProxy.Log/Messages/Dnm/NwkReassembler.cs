@@ -84,9 +84,36 @@ namespace RfpProxy.Log.Messages.Dnm
                             buffer.Enqueue(previous);
                             if (_retransmitFragments.TryGetValue(lln, out var additional))
                             {
-                                if (additional.Count > 0 && fragments.Count > 0 && fragments.All(x=>x.MoreData))
+                                if (additional.Count > 0)
                                 {
-                                    fragments.InsertRange(0, additional);
+                                    var prevNs = ns;
+                                    bool allFragmented = true;
+                                    for (int i = fragments.Count - 1; i >= 0; i--)
+                                    {
+                                        if (prevNs == 0)
+                                            prevNs = 7;
+                                        else
+                                            prevNs -= 1;
+                                        if (!fragments[i].MoreData)
+                                        {
+                                            allFragmented = false;
+                                            break;
+                                        }
+                                    }
+                                    if (allFragmented)
+                                    {
+                                        for (int i = additional.Count - 1; i >= 0; i--)
+                                        {
+                                            if (prevNs == 0)
+                                                prevNs = 7;
+                                            else
+                                                prevNs -= 1;
+                                            if (additional[i].Ns == prevNs)
+                                                fragments.Insert(0, additional[i]);
+                                            else
+                                                break;
+                                        }
+                                    }
                                 }
                             }
                             _fragments.Add(lln, fragments);
