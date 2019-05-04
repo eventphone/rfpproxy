@@ -30,18 +30,20 @@ namespace RfpProxy.Log.Messages.Dnm
 
         private readonly Dictionary<byte, List<Fragment>> _fragments = new Dictionary<byte, List<Fragment>>();
 
-        private readonly Dictionary<byte, Queue<Fragment>> _retransmitBuffer = new Dictionary<byte, Queue<Fragment>>();
+        private readonly Dictionary<byte, Queue<Fragment>> _retransmits = new Dictionary<byte, Queue<Fragment>>();
 
-        public bool IsEmpty => _fragments.Count == 0 && _retransmitBuffer.Count == 0;
+        private readonly Dictionary<byte, List<Fragment>> _retransmitFragments = new Dictionary<byte, List<Fragment>>();
+
+        public bool IsEmpty => _fragments.Count == 0 && _retransmits.Count == 0 && _retransmitFragments.Count == 0;
 
         private bool IsRetransmit(byte lln, byte ns, ReadOnlyMemory<byte> fragment, bool moreData)
         {
-            if (!_retransmitBuffer.ContainsKey(lln))
+            if (!_retransmits.ContainsKey(lln))
             {
-                _retransmitBuffer.Add(lln, new Queue<Fragment>(3));
+                _retransmits.Add(lln, new Queue<Fragment>(3));
             }
 
-            var buffer = _retransmitBuffer[lln];
+            var buffer = _retransmits[lln];
             if (buffer.Any(x => x.Ns == ns))
             {
                 var previous = buffer.First(x => x.Ns == ns);
@@ -50,7 +52,7 @@ namespace RfpProxy.Log.Messages.Dnm
                     if (_fragments.TryGetValue(lln, out var fragments))
                     {
                         //remove future fragments
-                        while (fragments[fragments.Count - 1].Ns != ns)
+                        while (fragments.Count > 0 && fragments[fragments.Count - 1].Ns != ns)
                         {
                             fragments.RemoveAt(fragments.Count - 1);
                         }
@@ -60,7 +62,7 @@ namespace RfpProxy.Log.Messages.Dnm
                     if (lln != 1)
                     {
                         //remove future retransmits
-                        _retransmitBuffer[lln] = buffer = new Queue<Fragment>(buffer.Reverse().SkipWhile(x => x.Ns != ns).Reverse());
+                        _retransmits[lln] = buffer = new Queue<Fragment>(buffer.Reverse().SkipWhile(x => x.Ns != ns).Reverse());
                         if (!_fragments.ContainsKey(lln))
                         {
                             //readd fragments
@@ -80,8 +82,13 @@ namespace RfpProxy.Log.Messages.Dnm
                             }
                             previous = buffer.Dequeue();
                             buffer.Enqueue(previous);
-                            //if (fragments.Count > 0)
-                            //    fragments.RemoveAt(fragments.Count - 1);
+                            if (_retransmitFragments.TryGetValue(lln, out var additional))
+                            {
+                                if (additional.Count > 0 && fragments.Count > 0 && fragments.All(x=>x.MoreData))
+                                {
+                                    fragments.InsertRange(0, additional);
+                                }
+                            }
                             _fragments.Add(lln, fragments);
                         }
                     }
@@ -113,7 +120,22 @@ namespace RfpProxy.Log.Messages.Dnm
             }
             buffer.Enqueue(new Fragment(ns, moreData, fragment));
             if ((lln == 1 && buffer.Count > 1) || buffer.Count > 3)
-                buffer.Dequeue();
+            {
+                var previous = buffer.Dequeue();
+                if (previous.MoreData)
+                {
+                    if (!_retransmitFragments.TryGetValue(lln, out var fragments))
+                    {
+                        fragments = new List<Fragment>();
+                        _retransmitFragments.Add(lln, fragments);
+                    }
+                    fragments.Add(previous);
+                }
+                else
+                {
+                    _retransmitFragments.Remove(lln);
+                }
+            }
             return false;
         }
 
@@ -162,7 +184,7 @@ namespace RfpProxy.Log.Messages.Dnm
         public void Clear()
         {
             _fragments.Clear();
-            _retransmitBuffer.Clear();
+            _retransmits.Clear();
         }
     }
 }
