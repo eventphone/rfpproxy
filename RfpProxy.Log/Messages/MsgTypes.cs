@@ -43,6 +43,9 @@ namespace RfpProxy.Log.Messages
         MEDIA_RESTART = 0x0208,
         MEDIA_DTMF = 0x0209,
         MEDIA_DSP_CLOSE = 0x020a,
+        /// <summary>
+        /// generate call end tone
+        /// </summary>
         MEDIA_TONE2 = 0x020b,
         MEDIA_BANDWIDTH_SWO = 0x020c,
         MEDIA_MUTE = 0x020d,
