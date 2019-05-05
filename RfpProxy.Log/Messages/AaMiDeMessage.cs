@@ -43,11 +43,12 @@ namespace RfpProxy.Log.Messages
                 case MsgType.MEDIA_REDIRECT_START:
                 case MsgType.MEDIA_REDIRECT_STOP:
                 case MsgType.MEDIA_RESTART:
-                case MsgType.MEDIA_START:
                 case MsgType.MEDIA_TONE2:
                 case MsgType.MEDIA_TRACE_PPN:
                 case MsgType.MEDIA_VIDEO_STATE:
                     return new UnknownMediaMessage(type, data);
+                case MsgType.MEDIA_START:
+                    return new MediaStartMessage(data);
                 case MsgType.MEDIA_STOP:
                     return new MediaStopMessage(data);
                 case MsgType.MEDIA_CLOSE:

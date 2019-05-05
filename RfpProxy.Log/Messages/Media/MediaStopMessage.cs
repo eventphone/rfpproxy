@@ -3,17 +3,17 @@ using System.IO;
 
 namespace RfpProxy.Log.Messages.Media
 {
+    public enum MediaDirection : byte
+    {
+        None = 0,
+        Rx = 1,
+        Tx = 2,
+        TxRx = 3
+    }
+
     public sealed class MediaStopMessage : MediaMessage
     {
-        public enum Direction : byte
-        {
-            None=0,
-            Rx = 1,
-            Tx=2,
-            TxRx = 3
-        }
-
-        public Direction Dir { get; }
+        public MediaDirection Direction { get; }
 
         public byte Padding { get; }
 
@@ -22,14 +22,14 @@ namespace RfpProxy.Log.Messages.Media
         public MediaStopMessage(ReadOnlyMemory<byte> data):base(MsgType.MEDIA_STOP, data)
         {
             var span = base.Raw.Span;
-            Dir = (Direction) span[0];
+            Direction = (MediaDirection) span[0];
             Padding = span[1];
         }
 
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($" Direction({Dir}) Padding({Padding:x2})");
+            writer.Write($" Direction({Direction}) Padding({Padding:x2})");
         }
     }
 }

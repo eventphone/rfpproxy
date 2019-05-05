@@ -8,6 +8,8 @@ namespace RfpProxy.Log.Messages.Media
     {
         public override bool HasUnknown => true;
 
+        protected override ReadOnlyMemory<byte> Raw => ReadOnlyMemory<byte>.Empty;
+
         public UnknownMediaMessage(MsgType type, ReadOnlyMemory<byte> data) : base(type, data)
         {
         }
@@ -15,7 +17,7 @@ namespace RfpProxy.Log.Messages.Media
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Reserved({Raw.ToHex()})");
+            writer.Write($"Reserved({base.Raw.ToHex()})");
         }
     }
 }
