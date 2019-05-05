@@ -2,7 +2,7 @@
 using System.Buffers.Binary;
 using System.IO;
 
-namespace RfpProxy.Log.Messages
+namespace RfpProxy.Log.Messages.Media
 {
     public abstract class MediaMessage : AaMiDeMessage
     {

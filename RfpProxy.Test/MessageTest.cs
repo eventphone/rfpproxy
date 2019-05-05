@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using RfpProxy.Log.Messages;
 using RfpProxy.Log.Messages.Dnm;
+using RfpProxy.Log.Messages.Media;
 using RfpProxy.Log.Messages.Nwk;
 using RfpProxy.Log.Messages.Nwk.InformationElements;
 using RfpProxy.Log.Messages.Rfpc;

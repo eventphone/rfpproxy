@@ -4,7 +4,7 @@ using System.IO;
 using System.Net;
 using RfpProxyLib;
 
-namespace RfpProxy.Log.Messages
+namespace RfpProxy.Log.Messages.Media
 {
     public sealed class MediaConfMessage : MediaMessage
     {

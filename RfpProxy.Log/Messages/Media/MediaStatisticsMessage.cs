@@ -3,7 +3,7 @@ using System.Buffers.Binary;
 using System.IO;
 using System.Net;
 
-namespace RfpProxy.Log.Messages
+namespace RfpProxy.Log.Messages.Media
 {
     public sealed class MediaStatisticsMessage : MediaMessage
     {

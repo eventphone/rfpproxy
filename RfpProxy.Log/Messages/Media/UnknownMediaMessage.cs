@@ -2,7 +2,7 @@
 using System.IO;
 using RfpProxyLib;
 
-namespace RfpProxy.Log.Messages
+namespace RfpProxy.Log.Messages.Media
 {
     public sealed class UnknownMediaMessage : MediaMessage
     {
