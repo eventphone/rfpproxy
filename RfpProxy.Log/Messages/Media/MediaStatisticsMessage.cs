@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers.Binary;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 
@@ -7,7 +8,7 @@ namespace RfpProxy.Log.Messages.Media
 {
     public sealed class MediaStatisticsMessage : MediaMessage
     {
-        public ushort Reserved { get; }
+        public ushort Padding { get; }
 
         public TimeSpan Duration { get; }
 
@@ -25,14 +26,12 @@ namespace RfpProxy.Log.Messages.Media
 
         public IPAddress RtpIp { get; }
 
-        public override bool HasUnknown => true;
-
         protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(34);
 
         public MediaStatisticsMessage(ReadOnlyMemory<byte> data):base(MsgType.MEDIA_STATISTICS, data)
         {
             var span = base.Raw.Span;
-            Reserved = BinaryPrimitives.ReadUInt16LittleEndian(span);
+            Padding = BinaryPrimitives.ReadUInt16LittleEndian(span);
             Duration = TimeSpan.FromSeconds(BinaryPrimitives.ReadUInt32LittleEndian(span.Slice(2)));
             TransmittedPackets = BinaryPrimitives.ReadUInt32LittleEndian(span.Slice(6));
             TransmittedBytes = BinaryPrimitives.ReadUInt32LittleEndian(span.Slice(10));
@@ -46,12 +45,12 @@ namespace RfpProxy.Log.Messages.Media
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
+            writer.Write($"Padding({Padding:x4}) ");
             writer.Write($"Duration({Duration}) ");
             writer.Write($"Tx({TransmittedPackets}p/{TransmittedBytes}b) ");
             writer.Write($"Rx({ReceivedPackets}p/{ReceivedBytes}b) ");
-            writer.Write($"Lost({LostPackets}p) Jitter({MaxJitter}) ");
+            writer.Write($"Lost({LostPackets}p) Jitter({(MaxJitter/1000d):F3}ms) ");
             writer.Write($"RtpIp({RtpIp}) ");
-            writer.Write($"Reserved({Reserved:x4})");
         }
     }
 }
