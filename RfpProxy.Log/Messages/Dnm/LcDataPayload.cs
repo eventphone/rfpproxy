@@ -100,7 +100,7 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public override ReadOnlyMemory<byte> Raw => ReadOnlyMemory<byte>.Empty;
 
-        public override bool HasUnknown => Payload.HasUnknown || (SAPI != 1 && SAPI != 3);
+        public override bool HasUnknown => Payload.HasUnknown || (SAPI != 0 && SAPI != 3);
         
         public LcDataPayload(ReadOnlyMemory<byte> data, NwkReassembler reassembler):base(data)
         {

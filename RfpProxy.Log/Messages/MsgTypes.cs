@@ -44,7 +44,7 @@ namespace RfpProxy.Log.Messages
         MEDIA_DTMF = 0x0209,
         MEDIA_DSP_CLOSE = 0x020a,
         MEDIA_TONE2 = 0x020b,
-        MEDIA_CHANNEL_MOD = 0x020c,
+        MEDIA_BANDWIDTH_SWO = 0x020c,
         MEDIA_MUTE = 0x020d,
         MEDIA_G729_USED = 0x020e,
         MEDIA_TRACE_PPN = 0x020f,

@@ -5,7 +5,7 @@ using System.Net;
 
 namespace RfpProxy.Log.Messages
 {
-    public sealed class StatisticsMediaMessage : MediaMessage
+    public sealed class MediaStatisticsMessage : MediaMessage
     {
         public ushort Reserved { get; }
 
@@ -29,7 +29,7 @@ namespace RfpProxy.Log.Messages
 
         protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(34);
 
-        public StatisticsMediaMessage(ReadOnlyMemory<byte> data):base(MsgType.MEDIA_STATISTICS, data)
+        public MediaStatisticsMessage(ReadOnlyMemory<byte> data):base(MsgType.MEDIA_STATISTICS, data)
         {
             var span = base.Raw.Span;
             Reserved = BinaryPrimitives.ReadUInt16LittleEndian(span);

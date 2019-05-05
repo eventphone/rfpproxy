@@ -780,7 +780,7 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecodeMediaStatisticsMessage()
         {
-            var stats = Decode<StatisticsMediaMessage>(
+            var stats = Decode<MediaStatisticsMessage>(
                 "0205 0024" +
                 "f919 0000" +
                 "0200" +

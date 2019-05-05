@@ -81,10 +81,10 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
             do
             {
                 Codecs.Add(new Codec(span));
+                data = data.Slice(3);
                 if (span[2] >= 128)
                     break;
                 span = span.Slice(3);
-                data = data.Slice(3);
             } while (true);
             Raw = data;
         }

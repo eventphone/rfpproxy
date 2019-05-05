@@ -34,8 +34,7 @@ namespace RfpProxy.Log.Messages
                 case MsgType.SYS_LICENSE_TIMER:
                     return new SysLicenseTimerMessage(data);
                 case MsgType.MEDIA_AUDIO_STATISTICS:
-                case MsgType.MEDIA_CHANNEL_MOD:
-                case MsgType.MEDIA_CLOSE:
+                case MsgType.MEDIA_BANDWIDTH_SWO:
                 case MsgType.MEDIA_DSP_CLOSE:
                 case MsgType.MEDIA_EOS_DETECT:
                 case MsgType.MEDIA_G729_USED:
@@ -49,14 +48,16 @@ namespace RfpProxy.Log.Messages
                 case MsgType.MEDIA_TRACE_PPN:
                 case MsgType.MEDIA_VIDEO_STATE:
                     return new UnknownMediaMessage(type, data);
+                case MsgType.MEDIA_CLOSE:
+                    return new MediaCloseMessage(data);
                 case MsgType.MEDIA_CONF:
                     return new MediaConfMessage(data);
                 case MsgType.MEDIA_OPEN:
-                    return new OpenMediaMessage(data);
+                    return new MediaOpenMessage(data);
                 case MsgType.MEDIA_DTMF:
-                    return new DtmfMediaMessage(data);
+                    return new MediaDtmfMessage(data);
                 case MsgType.MEDIA_STATISTICS:
-                    return new StatisticsMediaMessage(data);
+                    return new MediaStatisticsMessage(data);
                 case MsgType.DNM:
                     return DnmMessage.CreateDnm(data, reassembler);
                 case MsgType.SNMP_RFP_UPDATE:

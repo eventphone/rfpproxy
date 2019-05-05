@@ -4,7 +4,7 @@ using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages
 {
-    public sealed class OpenMediaMessage : MediaMessage
+    public sealed class MediaOpenMessage : MediaMessage
     {
         public byte Codec { get; }
 
@@ -14,7 +14,7 @@ namespace RfpProxy.Log.Messages
 
         public override bool HasUnknown => !Raw.Span.IsEmpty();
 
-        public OpenMediaMessage(ReadOnlyMemory<byte> data) : base(MsgType.MEDIA_OPEN, data)
+        public MediaOpenMessage(ReadOnlyMemory<byte> data) : base(MsgType.MEDIA_OPEN, data)
         {
             var span = base.Raw.Span;
             Codec = span[0];
