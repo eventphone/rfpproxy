@@ -40,11 +40,12 @@ namespace RfpProxy.Log.Messages
                 case MsgType.MEDIA_EOS_DETECT:
                 case MsgType.MEDIA_G729_USED:
                 case MsgType.MEDIA_MUTE:
-                case MsgType.MEDIA_REDIRECT_START:
                 case MsgType.MEDIA_REDIRECT_STOP:
                 case MsgType.MEDIA_TRACE_PPN:
                 case MsgType.MEDIA_VIDEO_STATE:
                     return new UnknownMediaMessage(type, data);
+                case MsgType.MEDIA_REDIRECT_START:
+                    return new MediaRedirectStartMessage(data);
                 case MsgType.MEDIA_RESTART:
                     return new MediaRestartMessage(data);
                 case MsgType.MEDIA_TONE2:
