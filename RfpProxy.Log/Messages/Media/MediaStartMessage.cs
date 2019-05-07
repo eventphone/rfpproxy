@@ -32,7 +32,7 @@ namespace RfpProxy.Log.Messages.Media
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($" Direction({Direction}) Padding1({Padding1:x2}) Time({Time}) MetKeepAlive({MetKeepAlive}) Padding2({Padding2.ToHex()})");
+            writer.Write($"Direction({Direction}) Padding1({Padding1:x2}) Time({Time}) MetKeepAlive({MetKeepAlive}) Padding2({Padding2.ToHex()})");
         }
     }
 }

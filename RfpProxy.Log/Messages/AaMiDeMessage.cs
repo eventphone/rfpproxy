@@ -40,10 +40,11 @@ namespace RfpProxy.Log.Messages
                 case MsgType.MEDIA_EOS_DETECT:
                 case MsgType.MEDIA_G729_USED:
                 case MsgType.MEDIA_MUTE:
-                case MsgType.MEDIA_REDIRECT_STOP:
                 case MsgType.MEDIA_TRACE_PPN:
                 case MsgType.MEDIA_VIDEO_STATE:
                     return new UnknownMediaMessage(type, data);
+                case MsgType.MEDIA_REDIRECT_STOP:
+                    return new MediaRedirectStopMessage(data);
                 case MsgType.MEDIA_REDIRECT_START:
                     return new MediaRedirectStartMessage(data);
                 case MsgType.MEDIA_RESTART:
@@ -112,11 +113,7 @@ namespace RfpProxy.Log.Messages
             writer.Write($"{Type,-22}({Length,4}) ");
             if (!Raw.IsEmpty)
             {
-                if (HasUnknown)
-                    writer.Write("Reserved");
-                else
-                    writer.Write("Padding");
-                writer.Write($"({Raw.ToHex()}) ");
+                writer.Write($"Reserved({Raw.ToHex()}) ");
             }
         }
     }

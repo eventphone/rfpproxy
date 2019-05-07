@@ -18,7 +18,7 @@ namespace RfpProxy.Log.Messages.Media
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($" Padding({Padding:x4})");
+            writer.Write($"Padding({Padding:x4})");
         }
     }
 }

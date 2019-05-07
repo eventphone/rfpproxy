@@ -38,7 +38,7 @@ namespace RfpProxy.Log.Messages.Media
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($" Local({LocalPort1}/{LocalPort2}) Remote({RemoteIpAddress}:{RemotePort1}/{RemotePort2}) Time({Time})");
+            writer.Write($"Padding({Padding:x4}) Local({LocalPort1}/{LocalPort2}) Remote({RemoteIpAddress}:{RemotePort1}/{RemotePort2}) Time({Time})");
         }
     }
 }

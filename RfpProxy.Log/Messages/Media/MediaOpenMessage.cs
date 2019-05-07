@@ -12,7 +12,7 @@ namespace RfpProxy.Log.Messages.Media
 
         public byte Flags { get; }
 
-        public override bool HasUnknown => !Raw.Span.IsEmpty();
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(3);
 
         public MediaOpenMessage(ReadOnlyMemory<byte> data) : base(MsgType.MEDIA_OPEN, data)
         {
@@ -22,16 +22,10 @@ namespace RfpProxy.Log.Messages.Media
             Flags = span[2];
         }
 
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(3);
-
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
             writer.Write($"codec({Codec}) slots({SlotCount}) flags({Flags})");
-            if (!Raw.Span.IsEmpty())
-            {
-                writer.Write($" extra({Raw.ToHex()})");
-            }
         }
     }
 }

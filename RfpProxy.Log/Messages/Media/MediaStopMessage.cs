@@ -29,7 +29,7 @@ namespace RfpProxy.Log.Messages.Media
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($" Direction({Direction}) Padding({Padding:x2})");
+            writer.Write($"Direction({Direction}) Padding({Padding:x2})");
         }
     }
 }
