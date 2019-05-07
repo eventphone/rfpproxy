@@ -36,13 +36,14 @@ namespace RfpProxy.Log.Messages
                     return new SysLicenseTimerMessage(data);
                 case MsgType.MEDIA_AUDIO_STATISTICS:
                 case MsgType.MEDIA_BANDWIDTH_SWO:
-                case MsgType.MEDIA_DSP_CLOSE:
                 case MsgType.MEDIA_EOS_DETECT:
                 case MsgType.MEDIA_G729_USED:
                 case MsgType.MEDIA_MUTE:
                 case MsgType.MEDIA_TRACE_PPN:
                 case MsgType.MEDIA_VIDEO_STATE:
                     return new UnknownMediaMessage(type, data);
+                case MsgType.MEDIA_DSP_CLOSE:
+                    return new MediaDspCloseMessage(data);
                 case MsgType.MEDIA_REDIRECT_STOP:
                     return new MediaRedirectStopMessage(data);
                 case MsgType.MEDIA_REDIRECT_START:
