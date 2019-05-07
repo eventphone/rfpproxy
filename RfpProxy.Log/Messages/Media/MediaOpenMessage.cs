@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.IO;
 using RfpProxyLib;
 
@@ -10,16 +11,16 @@ namespace RfpProxy.Log.Messages.Media
 
         public byte SlotCount { get; }
 
-        public byte Flags { get; }
+        public uint Flags { get; }
 
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(3);
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(6);
 
         public MediaOpenMessage(ReadOnlyMemory<byte> data) : base(MsgType.MEDIA_OPEN, data)
         {
             var span = base.Raw.Span;
             Codec = span[0];
             SlotCount = span[1];
-            Flags = span[2];
+            Flags = BinaryPrimitives.ReadUInt32LittleEndian(span.Slice(2));
         }
 
         public override void Log(TextWriter writer)
