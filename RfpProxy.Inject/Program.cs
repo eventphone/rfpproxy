@@ -15,13 +15,11 @@ namespace RfpProxy.Inject
             string socketname = "client.sock";
             bool showHelp = false;
             string mac = null;
-            string message =null;
             bool toOmm = false;
             var options = new OptionSet
             {
                 {"s|socket=", "socket path", x => socketname = x},
                 {"r|rfp=", "rfp MAC address", x => mac = x},
-                {"m|message=", "message to inject", x => message = x},
                 {"o|omm", "send to omm instead of rfp", x=>toOmm = x != null},
                 {"h|help", "show help", x => showHelp = x != null},
             };
@@ -39,7 +37,7 @@ namespace RfpProxy.Inject
                 Console.Error.WriteLine("Try 'dotnet rfpproxyinject.dll --help' for more information");
                 return;
             }
-            if (String.IsNullOrEmpty(mac) || String.IsNullOrEmpty(message))
+            if (String.IsNullOrEmpty(mac))
             {
                 showHelp = true;
             }
@@ -61,9 +59,16 @@ namespace RfpProxy.Inject
                     };
                     await client.FinishHandshakeAsync(cts.Token);
                     var rfp = HexEncoding.HexToByte(mac);
-                    var data = HexEncoding.HexToByte(message);
                     var direction = toOmm ? MessageDirection.ToOmm : MessageDirection.ToRfp;
-                    await client.WriteAsync(direction, 0, new RfpIdentifier(rfp), data, cts.Token);
+                    Console.WriteLine("RTS. Enter on hex encoded message per line. Empty message to close.");
+                    do
+                    {
+                        var message = Console.ReadLine();
+                        if (String.IsNullOrEmpty(message))
+                            break;
+                        var data = HexEncoding.HexToByte(message);
+                        await client.WriteAsync(direction, 0, new RfpIdentifier(rfp), data, cts.Token);
+                    } while (true);
                     client.Stop();
                 }
             }
