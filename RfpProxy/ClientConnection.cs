@@ -34,9 +34,11 @@ namespace RfpProxy
             var pipe = new Pipe();
             var fillPipe = PipeHelper.FillPipeAsync(Socket, pipe.Writer, cancellationToken);
             var handshake = HandshakeAsync(pipe.Reader, cancellationToken);
-            await Task.WhenAny(fillPipe, handshake).ConfigureAwait(false);
+            var t = await Task.WhenAny(fillPipe, handshake).ConfigureAwait(false);
+            await t;
             var readPipe = ReadPipeAsync(pipe.Reader, cancellationToken);
-            await Task.WhenAny(fillPipe, readPipe).ConfigureAwait(false);
+            t = await Task.WhenAny(fillPipe, readPipe).ConfigureAwait(false);
+            await t;
         }
 
         private async Task HandshakeAsync(PipeReader client, CancellationToken cancellationToken)

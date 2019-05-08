@@ -108,7 +108,8 @@ namespace RfpProxy
                         var fillServerPipe = PipeHelper.FillPipeAsync(server.Client, serverPipe.Writer, cts.Token);
                         var readServerPipe = ReadFromServerAsync(clientData, serverPipe.Reader, cancellationToken);
 
-                        await Task.WhenAny(fillClientPipe, readClientPipe, fillServerPipe, readServerPipe).ConfigureAwait(false);
+                        var t = await Task.WhenAny(fillClientPipe, readClientPipe, fillServerPipe, readServerPipe).ConfigureAwait(false);
+                        await t;
                     }
                     catch (Exception ex)
                     {
