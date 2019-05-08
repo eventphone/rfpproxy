@@ -41,7 +41,7 @@ namespace RfpProxy.Log.Messages
         Lc = 0x79,
         Mac = 0x7a,
         Unknown1 = 0x7B,
-        Unknown2 = 0x7C, //HO???
+        Mt = 0x7C,
         Sync = 0x7d,
     }
 
@@ -80,6 +80,8 @@ namespace RfpProxy.Log.Messages
             {
                 case DnmLayer.Rfpc:
                     return new DnmRfpcMessage(data);
+                case DnmLayer.Mt:
+                    return new DnmMtMessage(data);
                 case DnmLayer.Lc:
                 case DnmLayer.Mac:
                     var type = (DnmType) data.Span[5];
