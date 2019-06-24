@@ -3,14 +3,14 @@ using System.IO;
 
 namespace RfpProxy.Log.Messages.Nwk.InformationElements
 {
-    public sealed class NwkIeMultiKeypad : NwkVariableLengthInformationElement
+    public sealed class NwkIeMultiDisplay : NwkVariableLengthInformationElement
     {
 
         public override bool HasUnknown { get; }
 
         public ReadOnlyMemory<byte> Keys { get; }
 
-        public NwkIeMultiKeypad(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.MultiKeypad, data)
+        public NwkIeMultiDisplay(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.MultiDisplay, data)
         {
             Keys = data;
         }
