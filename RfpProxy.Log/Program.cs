@@ -218,6 +218,7 @@ namespace RfpProxy.Log
                         nwk.Open(macConInd);
                     }
                 }
+                else return;
                 if (_unknown && !message.HasUnknown)
                     return;
                 Console.Write($"{timestamp:yyyy/MM/dd HH:mm:ss.fff} {prefix}{rfp} ");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace RfpProxy.Log.Messages.Nwk.InformationElements
@@ -29,6 +30,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
             UserBusy = 0x14,
             UserRejection = 0x15,
             UserCallModify = 0x16,
+            AaMiDeUnsupportedCallClass = 0x20,
             ExternalHandoverNotSupported = 0x21,
             NetworkParametersMissing = 0x22,
             ExternalHandoverRelease = 0x23,
