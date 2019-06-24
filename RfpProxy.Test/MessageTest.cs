@@ -881,6 +881,32 @@ namespace RfpProxy.Test
             Assert.False(dnm.HasUnknown);
         }
 
+        [Fact]
+        public void Unsupported()
+        {
+            try
+            {
+                Decode<DnmMessage>("03010049 79060200 442114f9 4e474d41 43534541 3230000" +
+                                   "9372e302 e5350313 100007b2 68100310 1024b011 1095a38" +
+                                   "0c050f7c 7d77af16 01015503 80480064 01045201 0253010" +
+                                   "154010ef 0f0f0");
+            }
+            catch (InvalidProtocolDiscriminatorException)
+            {
+
+            }
+            var a = Decode<DnmMessage>("03010049 79060200 442102ff 05540508 80b01000 e02cf8b3" +
+                                       "060781a8 102af12c 2c07015f 63113515 1a012006 64811300" +
+                                       "04000000 90048f78 03003141 7c049002 0084771d c0810094" +
+                                       "01170bf0 f0");
+            Log(a);
+            var b = Decode<DnmMessage>("03010049 79060200 442104f9 4e474d41 43534541 32300009" +
+                                       "372e302e 53503131 00007b26 81003101 024b0111 095a380c" +
+                                       "050f7c7d 77af1601 01550380 48006401 04520102 53010154" +
+                                       "010ef0f0 f0");
+            Log(b);
+        }
+
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex.Replace(" ", String.Empty));

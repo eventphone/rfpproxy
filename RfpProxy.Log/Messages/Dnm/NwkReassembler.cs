@@ -187,19 +187,47 @@ namespace RfpProxy.Log.Messages.Dnm
         public void AddFragment(byte lln, byte ns, ReadOnlyMemory<byte> fragment, out bool retransmit)
         {
             retransmit = IsRetransmit(lln, ns, fragment, true);
-            if (!_fragments.ContainsKey(lln))
+            if (!_fragments.TryGetValue(lln, out var fragments))
             {
-                _fragments.Add(lln, new List<Fragment>());
+                fragments = new List<Fragment>();
+                _fragments.Add(lln, fragments);
             }
-            _fragments[lln].Add(new Fragment(ns, true, fragment));
+            fragments.Add(new Fragment(ns, true, fragment));
+        }
+
+        public void RemoveFragment(byte lln, byte ns)
+        {
+            if (_fragments.TryGetValue(lln, out var fragments))
+            {
+                foreach (var fragment in fragments)
+                {
+                    if (fragment.Ns == ns)
+                    {
+                        fragments.Remove(fragment);
+                        break;
+                    }
+                }
+            }
+            if (_retransmits.TryGetValue(lln, out var retransmits))
+            {
+                for (int i = 0; i < retransmits.Count; i++)
+                {
+                    var retransmit = retransmits.Dequeue();
+                    if (retransmit.Ns == ns)
+                    {
+                        i++;
+                        continue;
+                    }
+                    retransmits.Enqueue(retransmit);
+                }
+            }
         }
 
         public ReadOnlyMemory<byte> Reassemble(byte lln, byte ns, in ReadOnlyMemory<byte> fragment, out bool retransmit)
         {
             retransmit = IsRetransmit(lln, ns, fragment, false);
-            if (!_fragments.ContainsKey(lln))
+            if (!_fragments.TryGetValue(lln, out var fragments))
                 return fragment;
-            var fragments = _fragments[lln];
             fragments.Add(new Fragment(ns, false, fragment));
             var modulus = lln == 1 ? 2 : 8;
             int vr = fragments[0].Ns;

@@ -51,7 +51,7 @@ namespace RfpProxy.Log.Messages.Nwk
                     return new NwkCOMSPayload(ti, f, data);
                 default:
                     if ((byte)pd > 8)
-                        throw new NotImplementedException("Unknown");
+                        throw new InvalidProtocolDiscriminatorException();
                     throw new ArgumentOutOfRangeException();
             }
         }
@@ -63,5 +63,10 @@ namespace RfpProxy.Log.Messages.Nwk
             if (WasRetransmitted)
                 writer.Write(" Retransmit");
         }
+    }
+
+    public class InvalidProtocolDiscriminatorException : Exception
+    {
+
     }
 }

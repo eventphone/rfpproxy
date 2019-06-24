@@ -196,8 +196,19 @@ namespace RfpProxy.Log.Messages.Dnm
             {
                 if (CommandType == LcCommandType.I) // ETSI EN 300 175-4 V2.4.0 section 7.7.2
                 {
-                    payloadData = reassembler.Reassemble(LLN, Ns, payloadData, out var retransmit);
-                    Payload = NwkPayload.Create(payloadData);
+                    bool retransmit = false;
+                    if (reassembler != null)
+                        payloadData = reassembler.Reassemble(LLN, Ns, payloadData, out retransmit);
+                    try
+                    {
+                        Payload = NwkPayload.Create(payloadData);
+                    }
+                    catch (InvalidProtocolDiscriminatorException) when (reassembler != null)
+                    {
+                        //maybe we should honor the REJ message instead of implementing our own
+                        reassembler.RemoveFragment(LLN, Ns);
+                        throw;
+                    }
                     Payload.WasRetransmitted = retransmit;
                 }
                 else

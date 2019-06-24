@@ -10,6 +10,8 @@ namespace RfpProxy.Log.Messages.Dnm
         public uint PMID { get; }
 
         public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(3);
+        
+        public override bool HasUnknown => Raw.Length != 2 || (Raw.Span[0] != 0 && Raw.Span[0] != 2) || Raw.Span[1] != 1;
 
         public MacHoInProgressIndPayload(ReadOnlyMemory<byte> data):base(data)
         {
