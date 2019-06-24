@@ -36,6 +36,24 @@ namespace RfpProxy.Log.Messages.Dnm
 
         public bool IsEmpty => _fragments.Count == 0 && _retransmits.Count == 0 && _retransmitFragments.Count == 0;
 
+        public void CopyFrom(NwkReassembler nwkReassembler)
+        {
+            Clear();
+            _retransmitFragments.Clear();
+            foreach (var item in nwkReassembler._fragments)
+            {
+                _fragments.Add(item.Key, item.Value);
+            }
+            foreach (var item in nwkReassembler._retransmits)
+            {
+                _retransmits.Add(item.Key, item.Value);
+            }
+            foreach (var item in nwkReassembler._retransmitFragments)
+            {
+                _retransmitFragments.Add(item.Key, item.Value);
+            }
+        }
+
         private bool IsRetransmit(byte lln, byte ns, ReadOnlyMemory<byte> fragment, bool moreData)
         {
             if (!_retransmits.ContainsKey(lln))

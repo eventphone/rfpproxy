@@ -144,8 +144,8 @@ namespace RfpProxy.Log
         {
             private readonly bool _logRaw;
             private readonly bool _unknown;
-            private readonly Dictionary<RfpIdentifier, AaMiDeReassembler> _rfpReassemblers = new Dictionary<RfpIdentifier, AaMiDeReassembler>();
-            private readonly Dictionary<RfpIdentifier, AaMiDeReassembler> _ommReassemblers = new Dictionary<RfpIdentifier, AaMiDeReassembler>();
+            private readonly MacConnectionTracker _rfpTracker = new MacConnectionTracker();
+            private readonly MacConnectionTracker _ommTracker = new MacConnectionTracker();
 
             public LogClient(string socket, bool logRaw, bool unknown) : base(socket)
             {
@@ -165,28 +165,20 @@ namespace RfpProxy.Log
                     return;
                 AaMiDeMessage message;
                 string prefix;
-                AaMiDeReassembler reassembler;
+                MacConnectionTracker reassembler;
                 if (direction == MessageDirection.FromOmm)
                 {
-                    if (!_ommReassemblers.TryGetValue(rfp, out reassembler))
-                    {
-                        reassembler = new AaMiDeReassembler();
-                        _ommReassemblers.Add(rfp, reassembler);
-                    }
+                    reassembler = _ommTracker;
                     prefix = "OMM:";
                 }
                 else
                 {
-                    if (!_rfpReassemblers.TryGetValue(rfp, out reassembler))
-                    {
-                        reassembler = new AaMiDeReassembler();
-                        _rfpReassemblers.Add(rfp, reassembler);
-                    }
+                    reassembler = _rfpTracker;
                     prefix = "RFP:";
                 }
                 try
                 {
-                    message = AaMiDeMessage.Create(data, reassembler);
+                    message = AaMiDeMessage.Create(data, reassembler.Get(rfp));
                 }
                 catch (Exception ex)
                 {
@@ -194,25 +186,37 @@ namespace RfpProxy.Log
                     Console.WriteLine(ex);
                     return;
                 }
+                
                 if (message is DnmMessage dnm)
                 {
                     if (dnm.Payload is MacDisIndPayload || dnm.DnmType == DnmType.MacDisReq)
                     {
-                        bool clearReassembler;
+                        RfpConnectionTracker rfpTracker;
                         if (direction == MessageDirection.FromOmm)
                         {
-                            clearReassembler = _rfpReassemblers.TryGetValue(rfp, out reassembler);
+                            rfpTracker = _rfpTracker.Get(rfp);
                         }
                         else
                         {
-                            clearReassembler = _ommReassemblers.TryGetValue(rfp, out reassembler);
+                            rfpTracker = _ommTracker.Get(rfp);
                         }
-                        if (clearReassembler)
+                        var nwk = rfpTracker.Get(dnm.MCEI);
+                        nwk.Close();
+                    }
+                    else if (dnm.Payload is MacConIndPayload macConInd)
+                    {
+                        
+                        RfpConnectionTracker rfpTracker;
+                        if (direction == MessageDirection.FromOmm)
                         {
-                            var nwk = reassembler.GetNwk(dnm.MCEI);
-                            nwk.Clear();
-                            reassembler.Return(dnm.MCEI, nwk);
+                            rfpTracker = _rfpTracker.Get(rfp);
                         }
+                        else
+                        {
+                            rfpTracker = _ommTracker.Get(rfp);
+                        }
+                        var nwk = rfpTracker.Get(dnm.MCEI);
+                        nwk.Open(macConInd);
                     }
                 }
                 if (_unknown && !message.HasUnknown)

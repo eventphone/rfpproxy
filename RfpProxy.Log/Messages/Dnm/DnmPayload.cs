@@ -14,20 +14,20 @@ namespace RfpProxy.Log.Messages.Dnm
             Raw = data;
         }
 
-        public static DnmPayload Create(DnmLayer layer, DnmType type, ReadOnlyMemory<byte> data, NwkReassembler reassembler)
+        public static DnmPayload Create(DnmLayer layer, DnmType type, ReadOnlyMemory<byte> data, MacConnection connection)
         {
             switch (layer)
             {
                 case DnmLayer.Mac:
-                    return CreateMac(type, data, reassembler);
+                    return CreateMac(type, data, connection);
                 case DnmLayer.Lc:
-                    return CreateLc(type, data, reassembler);
+                    return CreateLc(type, data, connection);
                 default:
                     return new UnknownDnmPayload(data);
             }
         }
 
-        private static DnmPayload CreateLc(DnmType type, ReadOnlyMemory<byte> data, NwkReassembler reassembler)
+        private static DnmPayload CreateLc(DnmType type, ReadOnlyMemory<byte> data, MacConnection connection)
         {
             if (data.Length <= 1)
                 return new EmptyLcPayload(data);
@@ -35,23 +35,25 @@ namespace RfpProxy.Log.Messages.Dnm
             {
                 case DnmType.LcDataReq:
                 case DnmType.LcDataInd:
-                    return new LcDataPayload(data, reassembler);
+                    return new LcDataPayload(data, connection.Reassembler);
                 default:
                     return new UnknowLcPayload(data);
             }
         }
 
-        private static DnmPayload CreateMac(DnmType type, ReadOnlyMemory<byte> data, NwkReassembler reassembler)
+        private static DnmPayload CreateMac(DnmType type, ReadOnlyMemory<byte> data, MacConnection connection)
         {
             switch (type)
             {
                 case DnmType.MacConInd:
-                    return new MacConIndPayload(data);
+                    var macConInd = new MacConIndPayload(data);
+                    connection.Open(macConInd);
+                    return macConInd;
                 case DnmType.MacDisInd:
-                    reassembler.Clear();
+                    connection.Close();
                     return new MacDisIndPayload(data);
                 case DnmType.MacDisReq:
-                    reassembler.Clear();
+                    connection.Close();
                     return new EmptyDnmPayload(data);
                 case DnmType.MacEncKeyReq:
                     return new MacEncKeyReqPayload(data);

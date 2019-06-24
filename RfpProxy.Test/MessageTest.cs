@@ -18,12 +18,12 @@ namespace RfpProxy.Test
     {
         private readonly ITestOutputHelper _output;
 
-        private readonly AaMiDeReassembler _reassembler;
+        private readonly MacConnectionTracker _reassembler;
 
         public MessageTest(ITestOutputHelper output)
         {
             _output = output;
-            _reassembler = new AaMiDeReassembler();
+            _reassembler = new MacConnectionTracker();
         }
 
         [Fact]
@@ -884,7 +884,16 @@ namespace RfpProxy.Test
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex.Replace(" ", String.Empty));
-            var message = AaMiDeMessage.Create(data, _reassembler);
+            var rfpConnectionTracker = _reassembler.Get(new RfpIdentifier(new byte[6]));
+            if (data.Length >= 7)
+            {
+                var mac = rfpConnectionTracker.Get(data[6]);
+                if (!mac.IsConnected)
+                {
+                    mac.Open(new MacConIndPayload(new byte[4]));
+                }
+            }
+            var message = AaMiDeMessage.Create(data, rfpConnectionTracker);
             return Assert.IsType<T>(message);
         }
 

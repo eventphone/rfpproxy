@@ -25,7 +25,7 @@ namespace RfpProxy.Log.Messages
             Raw = data.Slice(4);
         }
 
-        public static AaMiDeMessage Create(ReadOnlyMemory<byte> data, AaMiDeReassembler reassembler)
+        public static AaMiDeMessage Create(ReadOnlyMemory<byte> data, RfpConnectionTracker reassembler)
         {
             var type = (MsgType)BinaryPrimitives.ReadUInt16BigEndian(data.Slice(0, 2).Span);
             switch (type)
