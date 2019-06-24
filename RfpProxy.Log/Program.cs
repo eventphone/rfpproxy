@@ -186,7 +186,7 @@ namespace RfpProxy.Log
                     Console.WriteLine(ex);
                     return;
                 }
-                
+
                 if (message is DnmMessage dnm)
                 {
                     if (dnm.Payload is MacDisIndPayload || dnm.DnmType == DnmType.MacDisReq)
@@ -205,7 +205,6 @@ namespace RfpProxy.Log
                     }
                     else if (dnm.Payload is MacConIndPayload macConInd)
                     {
-                        
                         RfpConnectionTracker rfpTracker;
                         if (direction == MessageDirection.FromOmm)
                         {

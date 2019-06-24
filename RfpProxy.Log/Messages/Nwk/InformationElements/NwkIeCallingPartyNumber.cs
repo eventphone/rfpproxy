@@ -72,13 +72,9 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                 Has3a = true;
                 Presentation = (PresentIndicator) ((span[1] & 0x60) >> 5);
                 Screening = (ScreeningIndicator) (span[1] & 0x03);
-                Number = data.Slice(2);
+                data = data.Slice(1);
             }
-            else
-            {
-                Number = data.Slice(1);
-            }
-
+            Number = data.Slice(1);
         }
 
         public override void Log(TextWriter writer)

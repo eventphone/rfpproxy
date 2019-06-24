@@ -66,6 +66,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                     return new NwkIeFeatureActivate(data);
                 case NwkVariableLengthElementType.MultiDisplay:
                     return new NwkIeMultiDisplay(data);
+                case NwkVariableLengthElementType.ProgressIndicator:
+                    return new NwkIeProgressIndicator(data);
                 case NwkVariableLengthElementType.IdentityType:
                 case NwkVariableLengthElementType.NwkAssignedIdentity:
                 case NwkVariableLengthElementType.IWUAttributes:
@@ -74,7 +76,6 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                 case NwkVariableLengthElementType.ConnectionAttributes:
                 case NwkVariableLengthElementType.CallIdentity:
                 case NwkVariableLengthElementType.ConnectionIdentity:
-                case NwkVariableLengthElementType.ProgressIndicator:
                 case NwkVariableLengthElementType.MMSGenericHeader:
                 case NwkVariableLengthElementType.MMSObjectHeader:
                 case NwkVariableLengthElementType.MMSExtendedHeader:
