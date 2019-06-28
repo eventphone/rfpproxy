@@ -6,7 +6,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
     public sealed class NwkIeMultiDisplay : NwkVariableLengthInformationElement
     {
 
-        public override bool HasUnknown { get; }
+        public override bool HasUnknown => false;
 
         public ReadOnlyMemory<byte> Keys { get; }
 

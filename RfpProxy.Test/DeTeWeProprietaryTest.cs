@@ -94,23 +94,6 @@ namespace RfpProxy.Test
         }
 
         [Fact]
-        public void CanDecodeMms()
-        {
-            var mms = Decode<MmsDeTeWeElement>(DeTeWeType.Mms, "8030085c88 1fe7 06 00 0000 0215 00    0c 806e6f7265706c793a696d61 03 494d41" +
-                                                               "c1012001 53 4c65736562657374c3a4746967756e672066c3bc7220646965204e616368726963687420766f6d2031322e30332e323031392032313a30353a303320616e20506f43207a6976696c6c69616e20283435303229");
-            Log(mms);
-            Assert.EndsWith("noreply:ima", mms.SenderUri);
-            Assert.Equal("IMA", mms.SenderName);
-            Assert.StartsWith("Lesebestätigung", mms.Message);
-
-            mms = Decode<MmsDeTeWeElement>(DeTeWeType.Mms, "8030085c88 168d 03 00 0000 021c 00    09 0074656c3a34353032 0d 506f43207a6976696c6c69616e 01022001 04 54657374");
-            Log(mms);
-            Assert.Equal("\x00tel:4502", mms.SenderUri);
-            Assert.Equal("PoC zivillian", mms.SenderName);
-            Assert.Equal("Test", mms.Message);
-        }
-
-        [Fact]
         public void CanDecodeDisplay2()
         {
             var dis = Decode<Display2DeTeWeElement>(DeTeWeType.Display2, "812a310a");
