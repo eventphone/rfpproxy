@@ -20,7 +20,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe.Reser
             base.Log(writer);
             writer.Write('(');
             writer.Write(Text);
-            writer.WriteLine(')');
+            writer.Write(')');
         }
     }
 }

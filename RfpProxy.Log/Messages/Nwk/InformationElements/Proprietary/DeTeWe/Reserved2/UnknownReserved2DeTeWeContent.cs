@@ -13,7 +13,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe.Reser
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.WriteLine($"({Raw.ToHex()})");
+            writer.Write($"({Raw.ToHex()})");
         }
     }
 }

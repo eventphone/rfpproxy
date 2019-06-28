@@ -13,7 +13,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 
         public byte Reserved2 { get; }
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => Reserved1 != 0xc0 || Reserved2 != 0x00;
 
         public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(8);
 
@@ -29,7 +29,9 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($": Reserved1({Reserved1:x2}) DateTime({DateTime}) Reserved2({Reserved2:x2})");
+            writer.Write($"({DateTime})");
+            if (HasUnknown)
+                writer.Write($" Reserved1({Reserved1:x2}) Reserved2({Reserved2:x2})");
         }
     }
 }

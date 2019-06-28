@@ -17,6 +17,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary
                     return new DeTeWeProprietaryContent(data);
                 case 0x0002:
                     return new SiemensProprietaryContent(data);
+                case 0x0094:
+                    return new AastraProprietaryContent(data);
                 default:
                     return new UnknownProprietaryContent(data);
             }

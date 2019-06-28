@@ -8,28 +8,42 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 {
     public class DisplayDeTeWeElement : DeTeWeElement
     {
+        public enum DeTeWeDisplayType : byte
+        {
+            NoScroll = 0xb2,
+            Scrollable = 0xb3,
+            AddBottom = 0xb8,
+            AddTop = 0xb7,
+            Empty = 0xfe
+        }
+
+        public DeTeWeDisplayType DisplayType { get; }
+
         /// <summary>
-        /// byte 2 always seems to be 0xff
-        /// byte 1:
-        /// 0xb2 - can't scroll
-        /// 0xb3 - scrollable
-        /// 0xb8 - add bottom
-        /// 0xb7 - add top
+        /// always seems to be 0xff
         /// </summary>
-        public ushort Reserved { get; }
+        public byte Padding { get; }
 
         /// <summary>
         /// seems to be always 2 entries
         /// </summary>
         public List<string> Values { get; }
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => !Enum.IsDefined(typeof(DeTeWeDisplayType), DisplayType) ||
+                                           !Raw.IsEmpty ||
+                                           Padding != 0xff;
 
         public override ReadOnlyMemory<byte> Raw { get; }
 
         public DisplayDeTeWeElement(ReadOnlyMemory<byte> data) : base(DeTeWeType.Display, data)
         {
-            Reserved = BinaryPrimitives.ReadUInt16BigEndian(data.Span);
+            DisplayType = (DeTeWeDisplayType) data.Span[0];
+            if (DisplayType == DeTeWeDisplayType.Empty && data.Length == 1)
+            {
+                Padding = 0xff;
+                return;
+            }
+            Padding = data.Span[1];
             data = data.Slice(2);
             Values = new List<string>();
             while (data.Length > 0)
@@ -45,7 +59,17 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"({String.Join('|', Values)}) Reserved({Reserved:x4})");
+            if (Enum.IsDefined(typeof(DeTeWeDisplayType), DisplayType))
+                writer.Write($"({DisplayType:G})");
+            else
+                writer.Write($"({DisplayType:x})");
+            if (HasUnknown)
+                writer.Write($" Padding({Padding:x2})");
+            foreach (var value in Values)
+            {
+                writer.WriteLine();
+                writer.Write($"\t\t\t\t{value}");
+            }
         }
     }
 }

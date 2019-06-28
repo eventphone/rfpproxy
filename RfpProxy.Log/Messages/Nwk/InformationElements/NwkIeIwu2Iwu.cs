@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.IO;
+using RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary;
 using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages.Nwk.InformationElements
@@ -53,9 +54,13 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
 
         public ushort EMC { get; }
 
-        public ReadOnlyMemory<byte> Reserved { get; }
+        public NwkIeProprietaryContent Content { get; }
 
-        public override bool HasUnknown => ProtocolDiscriminator != ProtocolDiscriminatorType.UserSpecific || Discriminator != DiscriminatorType.EMC;
+        public override ReadOnlyMemory<byte> Raw { get; }
+
+        public override bool HasUnknown => ProtocolDiscriminator != ProtocolDiscriminatorType.UserSpecific ||
+                                           Discriminator != DiscriminatorType.EMC ||
+                                           Content.HasUnknown;
 
         public NwkIeIwu2Iwu(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.IWU2IWU, data)
         {
@@ -68,16 +73,17 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
                 if (Discriminator == DiscriminatorType.EMC)
                 {
                     EMC = BinaryPrimitives.ReadUInt16BigEndian(data.Span.Slice(2));
-                    Reserved = data.Slice(4);
+                    Raw = ReadOnlyMemory<byte>.Empty;
+                    Content = NwkIeProprietaryContent.Create(EMC, data.Slice(4));
                 }
                 else
                 {
-                    Reserved = data.Slice(2);
+                    Raw = data.Slice(2);
                 }
             }
             else
             {
-                Reserved = data.Slice(1);
+                Raw = data.Slice(1);
             }
         }
 
@@ -89,16 +95,17 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
             {
                 if (Discriminator == DiscriminatorType.EMC)
                 {
-                    writer.Write($" EMC({EMC:x4}) Proprietary({Reserved.ToHex()})");
+                    writer.Write($" EMC({EMC:x4})");
+                    Content.Log(writer);
                 }
                 else
                 {
-                    writer.Write($" Unspecified({Reserved.ToHex()})");
+                    writer.Write($" Unspecified({Raw.ToHex()})");
                 }
             }
             else
             {
-                writer.Write($" Reserved({Reserved.ToHex()})");
+                writer.Write($" Reserved({Raw.ToHex()})");
             }
         }
     }

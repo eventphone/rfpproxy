@@ -34,9 +34,10 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.WriteLine($"({Reserved2Type:x2})");
+            writer.Write($"({Reserved2Type:x2})");
             foreach (var element in Elements)
             {
+                writer.WriteLine();
                 element.Log(writer);
             }
         }

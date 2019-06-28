@@ -11,7 +11,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
         
         public List<string> Values { get; }
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => Reserved != 0x90;
 
         public override ReadOnlyMemory<byte> Raw { get; }
 
@@ -33,7 +33,9 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"({String.Join('|', Values)}) Reserved({Reserved:x2})");
+            writer.Write($"({String.Join('|', Values)})");
+            if (HasUnknown)
+                writer.Write($" Reserved({Reserved:x2})");
         }
     }
 }

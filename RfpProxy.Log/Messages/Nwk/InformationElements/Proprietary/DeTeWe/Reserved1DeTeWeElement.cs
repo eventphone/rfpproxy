@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using RfpProxyLib;
 
@@ -12,10 +13,16 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
 
         public override ReadOnlyMemory<byte> Raw { get; }
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => !Raw.IsEmpty;
 
         public Reserved1DeTeWeElement(ReadOnlyMemory<byte> data):base(DeTeWeType.Reserved1, data)
         {
+            if (data.Span[0] != 6)
+            {
+                Raw = data;
+                return;
+            }
+            data = data.Slice(1);
             Text1 = data.Span.CString();
             var eos = data.Span.IndexOf((byte) 0);
             data = data.Slice(eos + 1);
@@ -28,6 +35,8 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements.Proprietary.DeTeWe
         {
             base.Log(writer);
             writer.Write($"({Text1}|{Text2})");
+            if (HasUnknown)
+                writer.WriteLine($" Reserved({Raw.ToHex()})");
         }
     }
 }
