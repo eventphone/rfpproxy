@@ -37,6 +37,8 @@ namespace RfpProxy.Log.Messages.Rfpc
 
         public override bool HasUnknown => (int)Capabilities > 0xfffff;
 
+        public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(3);
+
         public MacCapabilitiesRfpcValue(ReadOnlyMemory<byte> data):base(RfpcKey.MacCapabilities, data)
         {
             var span = data.Span;
