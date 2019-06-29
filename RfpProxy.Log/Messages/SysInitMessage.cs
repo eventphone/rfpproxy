@@ -20,9 +20,11 @@ namespace RfpProxy.Log.Messages
 
         public string SwVersion { get; }
 
+        public ReadOnlyMemory<byte> Signature { get; }
+
         public override bool HasUnknown => true;
 
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(0xf4);
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(0x104);
 
         public SysInitMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_INIT, data)
         {
@@ -33,6 +35,7 @@ namespace RfpProxy.Log.Messages
             Reserved3 = base.Raw.Slice(0x18, 0x4c);
 
             SwVersion = base.Raw.Slice(0x64, 0x90).Span.CString();
+            Signature = base.Raw.Slice(0xf4, 0x10);
         }
 
         public override void Log(TextWriter writer)
@@ -41,6 +44,7 @@ namespace RfpProxy.Log.Messages
             writer.Write($"Reserved1({Reserved1.ToHex()}) MAC({Mac}) ");
             writer.Write($"Reserved2({Reserved2.ToHex()}) Capabilities({Capabilities:x2}) ");
             writer.Write($"Reserved3({Reserved3.ToHex()}) SW Version({SwVersion}) ");
+            writer.Write($"Signature({Signature.ToHex()}) ");
         }
     }
 }
