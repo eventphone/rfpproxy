@@ -2,12 +2,31 @@
 using System.Buffers.Binary;
 using System.IO;
 using System.Net.NetworkInformation;
+using System.Security.Cryptography;
 using RfpProxyLib;
 
 namespace RfpProxy.Log.Messages
 {
     public sealed class SysInitMessage : AaMiDeMessage
     {
+        private static readonly byte[] AesKey = 
+        {
+            0xe7, 0x05, 0xbc, 0x1a, 0x92, 0x41, 0x2f, 0x32,
+            0x62, 0xc5, 0x47, 0xf8, 0x79, 0x46, 0x93, 0x69,
+            0x97, 0xe6, 0x90, 0xad, 0xa4, 0x6f, 0xad, 0x25,
+            0xbb, 0xc6, 0x26, 0xf6, 0xf5, 0xa5, 0xa6, 0xce
+        };
+
+        public enum RfpBranding:ushort
+        {
+            Avaya = 0x01,
+            FFSIP = 0x02,
+            A5000 = 0x04,
+            Mitel = 0x08,
+            OC01XX = 0x10,
+            OCX = 0x20,
+        }
+
         public ReadOnlyMemory<byte> Reserved1 { get; }
 
         public PhysicalAddress Mac { get; }
@@ -16,7 +35,21 @@ namespace RfpProxy.Log.Messages
 
         public ushort Capabilities { get; }
 
+        public ReadOnlyMemory<byte> Crypted { get; }
+        
+        public byte[] Plain { get; }
+
+        public uint Crc32 { get; }
+
+        public ulong Magic { get; }
+
+        public RfpBranding Branding { get; }
+
+        public PhysicalAddress Mac2 { get; }
+
         public ReadOnlyMemory<byte> Reserved3 { get; }
+        
+        public ReadOnlyMemory<byte> Reserved4 { get; }
 
         public string SwVersion { get; }
 
@@ -32,10 +65,41 @@ namespace RfpProxy.Log.Messages
             Mac = new PhysicalAddress(base.Raw.Slice(0x08, 0x06).ToArray());
             Reserved2 = base.Raw.Slice(0x0e, 0x08);
             Capabilities = BinaryPrimitives.ReadUInt16BigEndian(base.Raw.Slice(0x16).Span);
-            Reserved3 = base.Raw.Slice(0x18, 0x4c);
+            Crypted = base.Raw.Slice(0x18, 0x40);
+            Reserved4 = base.Raw.Slice(0x58, 0x0c);
+
+            Plain = new byte[Crypted.Length];
+            AesDecrypt();
+
+            var plain = Plain.AsSpan();
+            Magic = BinaryPrimitives.ReadUInt64BigEndian(plain);
+            plain = plain.Slice(8);
+            Mac2 = new PhysicalAddress(plain.Slice(0, 6).ToArray());
+            plain = plain.Slice(6);
+            Branding = (RfpBranding) (BinaryPrimitives.ReadUInt16LittleEndian(plain) & 0x3ffu);
+            Reserved3 = Plain.AsMemory().Slice(16, 44);
+            Crc32 = BinaryPrimitives.ReadUInt32BigEndian(Plain.AsSpan().Slice(60));
 
             SwVersion = base.Raw.Slice(0x64, 0x90).Span.CString();
             Signature = base.Raw.Slice(0xf4, 0x10);
+        }
+
+        private void AesDecrypt()
+        {
+            using (var aes = new AesManaged())
+            {
+                aes.KeySize = 256;
+                aes.Padding = PaddingMode.None;
+                aes.Key = AesKey;
+                aes.Mode = CipherMode.ECB;
+                
+                using (var dec = aes.CreateDecryptor())
+                using (var ms = new MemoryStream(Plain))
+                using (var s = new CryptoStream(ms, dec, CryptoStreamMode.Write))
+                {
+                    s.Write(Crypted.Span);
+                }
+            }
         }
 
         public override void Log(TextWriter writer)
@@ -43,8 +107,9 @@ namespace RfpProxy.Log.Messages
             base.Log(writer);
             writer.Write($"Reserved1({Reserved1.ToHex()}) MAC({Mac}) ");
             writer.Write($"Reserved2({Reserved2.ToHex()}) Capabilities({Capabilities:x2}) ");
-            writer.Write($"Reserved3({Reserved3.ToHex()}) SW Version({SwVersion}) ");
-            writer.Write($"Signature({Signature.ToHex()}) ");
+            writer.Write($"Magic({Magic:x16}) Mac2({Mac2}) Branding({Branding}) ");
+            writer.Write($"Reserved3({Reserved3.ToHex()}) Reserved4({Reserved4.ToHex()}) ");
+            writer.Write($"SW Version({SwVersion}) Signature({Signature.ToHex()}) ");
         }
     }
 }

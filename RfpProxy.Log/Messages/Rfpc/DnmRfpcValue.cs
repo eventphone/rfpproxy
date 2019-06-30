@@ -67,6 +67,7 @@ namespace RfpProxy.Log.Messages.Rfpc
                 case RfpcKey.StatisticDataReset:
                     return new StatisticDataResetRfpcValue(data);
                 case RfpcKey.Revision:
+                    return new RevisionRfpcValue(data);
                 case RfpcKey.StatusInfo:
                 case RfpcKey.ErrorCause:
                 case RfpcKey.RfpToRfp:

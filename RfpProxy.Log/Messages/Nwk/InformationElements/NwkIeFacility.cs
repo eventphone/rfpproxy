@@ -11,7 +11,7 @@ namespace RfpProxy.Log.Messages.Nwk.InformationElements
         //see EN 300 196-1
         public ReadOnlyMemory<byte> Components { get; }
 
-        public override bool HasUnknown => true;
+        public override bool HasUnknown => !HasValidServiceDiscriminator;
 
         public override ReadOnlyMemory<byte> Raw => ReadOnlyMemory<byte>.Empty;
 
