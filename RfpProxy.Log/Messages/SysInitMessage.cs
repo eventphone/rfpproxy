@@ -27,6 +27,47 @@ namespace RfpProxy.Log.Messages
             OCX = 0x20,
         }
 
+        public enum RfpType
+        {
+            RFP31 = 0x01,
+            RFP33 = 0x02,
+            RFP41 = 0x03,
+            RFP32 = 0x04,
+            RFP32US = 0x05,
+            RFP34 = 0x06,
+            RFP34US = 0x07,
+            RFP42 = 0x08,
+            RFP42US = 0x09,
+            RFP35 = 0x0b,
+            RFP36 = 0x0c,
+            RFP43 = 0x0d,
+            RFP37 = 0x0e,
+            RFP44 = 0x10,
+            RFP45 = 0x11,
+            RFP47 = 0x12,
+            RFP48 = 0x13,
+            PC_ECM = 0x14,
+            PC = 0x15,
+            RFPL31 = 0x1001,
+            RFPL33 = 0x1002,
+            RFPL41 = 0x1003,
+            RFPL32US = 0x1005,
+            RFPL34 = 0x1006,
+            RFPL34US = 0x1007,
+            RFPL42 = 0x1008,
+            RFPL42US = 0x1009,
+            RFPL35 = 0x100B,
+            RFPL36 = 0x100C,
+            RFPL43 = 0x100D,
+            RFPL37 = 0x100E,
+            RFPSL35 = 0x200B,
+            RFPSL36 = 0x200C,
+            RFPSL43 = 0x200D,
+            RFPSL37 = 0x200E,
+        }
+
+        public RfpType Hardware { get; }
+
         public ReadOnlyMemory<byte> Reserved1 { get; }
 
         public PhysicalAddress Mac { get; }
@@ -61,7 +102,8 @@ namespace RfpProxy.Log.Messages
 
         public SysInitMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_INIT, data)
         {
-            Reserved1 = base.Raw.Slice(0x00, 0x08);
+            Hardware = (RfpType) BinaryPrimitives.ReadInt32BigEndian(base.Raw.Span);
+            Reserved1 = base.Raw.Slice(0x04, 0x04);
             Mac = new PhysicalAddress(base.Raw.Slice(0x08, 0x06).ToArray());
             Reserved2 = base.Raw.Slice(0x0e, 0x08);
             Capabilities = BinaryPrimitives.ReadUInt16BigEndian(base.Raw.Slice(0x16).Span);
@@ -105,10 +147,10 @@ namespace RfpProxy.Log.Messages
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Reserved1({Reserved1.ToHex()}) MAC({Mac}) ");
+            writer.Write($"Hardware({Hardware:G}) Reserved1({Reserved1.ToHex()}) MAC({Mac}) ");
             writer.Write($"Reserved2({Reserved2.ToHex()}) Capabilities({Capabilities:x2}) ");
             writer.Write($"Magic({Magic:x16}) Mac2({Mac2}) Branding({Branding}) ");
-            writer.Write($"Reserved3({Reserved3.ToHex()}) Reserved4({Reserved4.ToHex()}) ");
+            writer.Write($"Reserved3({Reserved3.ToHex()}) Crc({Crc32:x8}) Reserved4({Reserved4.ToHex()}) ");
             writer.Write($"SW Version({SwVersion}) Signature({Signature.ToHex()}) ");
         }
     }
