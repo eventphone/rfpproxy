@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Mono.Options;
 using RfpProxyLib.Messages;
-using RfpProxy.Log.Messages;
+using RfpProxyLib.AaMiDe;
 using RfpProxyLib;
 using System.Buffers.Binary;
-using RfpProxy.Log.Messages.Dnm;
+using RfpProxyLib.AaMiDe.Dnm;
+using RfpProxyLib.AaMiDe.Mac;
 
 namespace RfpProxy.Log
 {
