@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.271
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy", "RfpProxy\RfpProxy.csproj", "{F2CD5A70-C2A2-4267-8DB3-3DC614187745}"
 EndProject
@@ -22,7 +22,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.Pcap", "RfpProxy.P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.Inject", "RfpProxy.Inject\RfpProxy.Inject.csproj", "{97C6D03B-5B18-4518-B596-5E8746E5AF78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfpProxy.Traffic", "RfpProxy.Traffic\RfpProxy.Traffic.csproj", "{D4FFAF39-3DF1-42CC-8592-8E1712479E53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.Traffic", "RfpProxy.Traffic\RfpProxy.Traffic.csproj", "{D4FFAF39-3DF1-42CC-8592-8E1712479E53}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompressIPUI", "CompressIPUI\CompressIPUI.csproj", "{A87DF390-2858-4CEF-AF3A-B79B161C361A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,6 +64,10 @@ Global
 		{D4FFAF39-3DF1-42CC-8592-8E1712479E53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4FFAF39-3DF1-42CC-8592-8E1712479E53}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4FFAF39-3DF1-42CC-8592-8E1712479E53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A87DF390-2858-4CEF-AF3A-B79B161C361A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A87DF390-2858-4CEF-AF3A-B79B161C361A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A87DF390-2858-4CEF-AF3A-B79B161C361A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A87DF390-2858-4CEF-AF3A-B79B161C361A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

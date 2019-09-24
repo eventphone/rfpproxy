@@ -183,13 +183,13 @@ namespace RfpProxyLib
         {
             subscription.Rfp = new SubscriptionFilter
             {
-                Filter = mac,
-                Mask = macMask
+                Filter = mac.Replace(" ", String.Empty),
+                Mask = macMask.Replace(" ", String.Empty)
             };
             subscription.Message = new SubscriptionFilter
             {
-                Filter = filter,
-                Mask = filterMask
+                Filter = filter.Replace(" ", String.Empty),
+                Mask = filterMask.Replace(" ", String.Empty)
             };
             await InitAsync(cancellationToken).ConfigureAwait(false);
             var msg = JsonConvert.SerializeObject(subscription);
