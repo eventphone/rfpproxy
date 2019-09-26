@@ -13,24 +13,35 @@ namespace RfpProxyLib.AaMiDe.Mac
 
         public byte Padding { get; }
 
-        public uint PMID { get; }
+        public FlagsType Flags { get; }
+
+        public ushort PMID { get; }
 
         protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(6);
 
+        [Flags]
+        public enum FlagsType : byte
+        {
+            Three = 4,
+            Four = 8,
+            Five = 16,
+            Eight = 128,
+        }
         public MacPageReqMessage(ReadOnlyMemory<byte> data) : base(MsgType.DNM, data)
         {
             var span = base.Raw.Span;
             Layer = (DnmLayer) span[0];
             DnmType = (DnmType) span[1];
             Padding = span[2];
-            PMID = (uint)(((span[3] & 0xf) << 16) | BinaryPrimitives.ReadUInt16BigEndian(span.Slice(4)));
+            Flags = (FlagsType) span[3];
+            PMID = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(4));
         }
 
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
             writer.Write($"Layer({Layer,-3:G}) Type({DnmType,-20:G})");
-            writer.Write($" Padding({Padding:x2}) PMID({PMID:x5})");
+            writer.Write($" Padding({Padding:x2}) Flags({Flags:F}) PMID({PMID:x5})");
         }
     }
 }

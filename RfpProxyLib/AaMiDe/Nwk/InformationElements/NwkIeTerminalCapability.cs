@@ -318,7 +318,7 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
                 goto OctetGroup4;
             span = span.Slice(1);
 
-            DisplayCharCount = (ushort)((DisplayCharCount << 7) | (span[1] & 0x7f));
+            DisplayCharCount = (ushort)((DisplayCharCount << 7) | (span[0] & 0x7f));
             if (span[0] >= 128)
                 goto OctetGroup4;
             span = span.Slice(1);
@@ -402,6 +402,7 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
                 span = span.Slice(1);
             }
             OctetGroup5:
+            span = span.Slice(1);
             Dsaa2 = (span[0] & 0x40) != 0;
             Dsc2 = (span[0] & 0x20) != 0;
             ControlCode = (ControlCodes) (span[0] & 0b0111);
@@ -410,7 +411,7 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
             span = span.Slice(1);
             Charsets = (CharacterSets) (span[0] & 0x7f);
             if (span[0] >= 128)
-                goto OctetGroup5;
+                goto OctetGroup6;
             span = span.Slice(1);
 
             HasUnknown = true;
@@ -419,6 +420,9 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
                 span = span.Slice(1);
             }
             OctetGroup6:
+            span = span.Slice(1);
+            if (span.IsEmpty)
+                return;
             BlindSlot = (BlindSlotIndication) ((span[0] >> 5) & 0x3);
             Sp0 = (span[0] & 0x10) != 0;
             Sp1 = (span[0] & 0x08) != 0;
@@ -445,8 +449,10 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($" Tone({Tone:G}) Display({Display:G}) Echo({Echo:G}) N-REJ({NRej == AmbientNoiseRejectionCapabilities.NoiseRejectionProvided})");
+            writer.Write($" Tone({Tone:G}) Display({Display:G}) Echo({Echo:G}) N-REJ({NRej == AmbientNoiseRejectionCapabilities.NoiseRejectionProvided}) A-Vol({AVol})");
             writer.Write($" Slot({SlotTypes}) DisplayChars({DisplayCharCount}) DisplayLines({DisplayLines}) CharsPerLine({CharsPerLine})");
+            if (ScrollBehaviour != 0)
+                writer.Write($" Scroll({ScrollBehaviour})");
             if (Profile1 != 0)
                 writer.Write($" Profile1({Profile1})");
             if (Profile2 != 0)

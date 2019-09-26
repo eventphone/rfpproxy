@@ -31,14 +31,14 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecodeRfpInitReq()
         {
-            var rfpc = Decode<DnmRfpcMessage>(("03010023" +
-                                             "7802" +
-                                             "04 05 102af12c26" +
-                                             "06 02 ca42" +
-                                             "07 05 0010000000" +
-                                             "26 02 0000" +
-                                             "0d 03 1003ff" +
-                                             "27 01 1f  28 01 00").Replace(" ", String.Empty));
+            var rfpc = Decode<DnmRfpcMessage>("03010023" +
+                                              "7802" +
+                                              "04 05 102af12c26" +
+                                              "06 02 ca42" +
+                                              "07 05 0010000000" +
+                                              "26 02 0000" +
+                                              "0d 03 1003ff" +
+                                              "27 01 1f  28 01 00");
 
             Assert.Equal(DnmRfpcType.InitReq, rfpc.DnmType);
 
@@ -150,8 +150,7 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecodeHeartBeatIntervalMessage()
         {
-            var interval = Decode<SysHeartbeatIntervalMessage>("01050004" +
-                                             "0f000000");
+            var interval = Decode<SysHeartbeatIntervalMessage>("01050004 0f000000");
             Assert.Equal(TimeSpan.FromSeconds(15), interval.Interval);
 
             Log(interval);
@@ -236,10 +235,7 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecodeSysRPingMessage()
         {
-            var rping = Decode<SysRPingMessage>("010e000c" +
-                                             "ac141701" +
-                                             "00000023" +
-                                             "00000000");
+            var rping = Decode<SysRPingMessage>("010e000c ac141701 00000023 00000000");
             Assert.Equal("172.20.23.1", rping.Ip.ToString());
             Assert.Equal(TimeSpan.FromMilliseconds(0x23), rping.Rtt);
 
@@ -279,8 +275,8 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecodeHeartbeatMessage()
         {
-            var heartbeat = Decode<HeartbeatMessage>("00030008" + 
-                                                     "0c6b560004a60000");
+            var heartbeat = Decode<HeartbeatMessage>("000300080c6b560004a60000");
+
             Assert.Equal(0, heartbeat.Uptime.Days);
             Assert.Equal(1, heartbeat.Uptime.Hours);
             Assert.Equal(34, heartbeat.Uptime.Minutes);
@@ -314,9 +310,45 @@ namespace RfpProxy.Test
         }
 
         [Fact]
+        public void CanDecodeRejectCommandMessage()
+        {
+            var lc = Decode<DnmMessage>("0301000879060d000323b901");
+
+            Log(lc);
+            Assert.False(lc.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeEmptyLcMessage()
+        {
+            var lc = Decode<DnmMessage>("0301000479070b00");
+
+            Log(lc);
+            Assert.False(lc.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeDisconnectCommandMessage()
+        {
+            var lc = Decode<DnmMessage>("0301000879060b0003a15301");
+
+            Log(lc);
+            Assert.False(lc.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeUACommandMessage()
+        {
+            var lc = Decode<DnmMessage>("0301000879050b0003217301");
+
+            Log(lc);
+            Assert.False(lc.HasUnknown);
+        }
+
+        [Fact]
         public void CanDecodeNwkCCSetupMessage()
         {
-            var dnm = Decode<DnmMessage>("0301002679060c00212102790305050880b01002869965170606a0a0102af12ce0807b06810031160101");
+            var dnm = Decode<DnmMessage>("0301002679060c002121027903050508 80b0100286996517 0606a0a0102af12ce0807b06810031160101");
             var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
             var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
             Log(dnm);
@@ -332,7 +364,7 @@ namespace RfpProxy.Test
             var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
             Log(dnm);
             Assert.Equal(NwkCCMessageType.Setup, nwk.Type);
-            //todo Assert.False(dnm.HasUnknown);
+            Assert.False(dnm.HasUnknown);
         }
 
         [Fact]
@@ -376,7 +408,11 @@ namespace RfpProxy.Test
             var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
             Log(dnm);
             Assert.Equal(NwkCCMessageType.Info, nwk.Type);
-            //todo Assert.False(dnm.HasUnknown);
+            Assert.False(dnm.HasUnknown);
+
+            dnm = Decode<DnmMessage>("0301001a79050e0015132049837b280e0c4c6f67696e206661696c656402");
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
         }
 
         [Fact]
@@ -433,6 +469,34 @@ namespace RfpProxy.Test
         }
 
         [Fact]
+        public void CanDecodeNwkMMAccessRightsRequestMessage()
+        {
+            var dnm = Decode<DnmMessage>("03010030790606002b1102950544050780a800e02ae5c30a03014800630e35151a0120061081330114b004877803003141f0f0f0");
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+
+            dnm = Decode<DnmMessage>("0301003a79060000351102b90544050780a802869965170a03014800631135151a012006108113000400000090048f78030031417c0490020084f0f0f0f0");
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeNwkMMAccessRightsAcceptMessage()
+        {
+            var hex = "0301001c 79050100 17132051 85450508 80b01003 01400fdf 0606a0a0 102f00d2";
+            var dnm = Decode<DnmMessage>(hex);
+            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
+            Log(dnm);
+            Assert.Equal(NwkMMMessageType.AccessRightsAccept, nwk.Type);
+            Assert.False(dnm.HasUnknown);
+            var identity = nwk.InformationElements.OfType<NwkIePortableIdentity>().Single();
+            Assert.Equal(NwkIePortableIdentity.PortableIdentityType.IPUI, identity.IdentityType);
+            Assert.Equal(NwkIePortableIdentity.IPUITypeCoding.O, identity.Ipui.Put);
+            Assert.Equal("301400fdf", identity.Ipui.Number.ToString("x"));
+        }
+
+        [Fact]
         public void CanDecodeNwkCCReleaseMessage()
         {
             var dnm = Decode<DnmMessage>("0301000d7906090008210011034de200f0");
@@ -451,17 +515,7 @@ namespace RfpProxy.Test
             var nwk = Assert.IsType<NwkCCPayload>(lc.Payload);
             Log(dnm);
             Assert.Equal(NwkCCMessageType.ReleaseCom, nwk.Type);
-            //TODO Assert.False(dnm.HasUnknown);
-        }
-        
-        [Fact]
-        public void CanDecodeNwkCLMSMessage()
-        {
-            var dnm = Decode<DnmMessage>("0301001279060a000d21061d060030421fa992f0f0f0");
-            var lc = Assert.IsType<LcDataPayload>(dnm.Payload);
-            var nwk = Assert.IsType<NwkCLMSFixedPayload>(lc.Payload);
-            Log(dnm);
-            //TODO Assert.False(dnm.HasUnknown);
+            Assert.False(dnm.HasUnknown);
         }
 
         [Fact]
@@ -495,7 +549,14 @@ namespace RfpProxy.Test
             var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
             Log(dnm);
             Assert.Equal(NwkMMMessageType.LocateRequest, nwk.Type);
-            //todo Assert.False(dnm.HasUnknown);
+            Assert.False(dnm.HasUnknown);
+            
+            dnm = Decode<DnmMessage>("0301002b79060e002621028d0554050880b0100286996517060781a8902af12c2507015f7b09810031520102530101");
+            lc = Assert.IsType<LcDataPayload>(dnm.Payload);
+            nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
+            Log(dnm);
+            Assert.Equal(NwkMMMessageType.LocateRequest, nwk.Type);
+            Assert.False(dnm.HasUnknown);
         }
 
         [Fact]
@@ -662,12 +723,12 @@ namespace RfpProxy.Test
         {
             var sync = Decode<OffsetIndSyncMessage>("0302000b7d2c0801004cfffd430701");
             Log(sync);
-            Assert.Equal(1, sync.Count);
+            Assert.Equal(1, sync.RFPs.Length);
             var rfp = Assert.Single(sync.RFPs);
             Assert.Equal(-3, rfp.Offset);
             Assert.Equal(67, rfp.Rssi);
             Assert.Equal(0x07, rfp.QtSyncCheck);
-            //TODO Assert.False(sync.HasUnknown);
+            Assert.False(sync.HasUnknown);
         }
 
         [Fact]
@@ -749,7 +810,7 @@ namespace RfpProxy.Test
             var nwk = Assert.IsType<NwkMMPayload>(lc.Payload);
             Log(dnm);
             Assert.Equal(NwkMMMessageType.AccessRightsRequest, nwk.Type);
-            //TODO Assert.False(dnm.HasUnknown);
+            Assert.False(dnm.HasUnknown);
         }
 
         [Fact]
@@ -760,14 +821,16 @@ namespace RfpProxy.Test
             var nwk = Assert.IsType<NwkCISSPayload>(lc.Payload);
             Log(dnm);
             Assert.Equal(NwkCISSMessageType.CISSFacility, nwk.Type);
-            //TODO Assert.False(dnm.HasUnknown);
+            Assert.False(dnm.HasUnknown);
         }
 
         [Fact]
         public void CanDecodeCCReleaseComMessageWithoutIe()
         {
-            var dnm = Decode<DnmMessage>("0301 000d 79060d0008210a11035a0000f0");
+            var hex = "0301 000d 79060d0008210a11035a0000f0";
+            var dnm = Decode<DnmMessage>(hex);
             Log(dnm);
+            Assert.False(dnm.HasUnknown);
         }
 
         [Fact]
@@ -775,6 +838,26 @@ namespace RfpProxy.Test
         {
             var dnm = Decode<DnmMessage>("03010034 7a1c010002c9004672616d65734f4b3d323839204672616d65734d555445443d302042484f3d302042484f4661696c65643d3000");
             var info = Assert.IsType<MacInfoIndPayload>(dnm.Payload);
+
+            Log(dnm);
+            Assert.False(info.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeMacDisIndMessage()
+        {
+            var dnm = Decode<DnmMessage>("030100047a030b01");
+            var info = Assert.IsType<MacDisIndPayload>(dnm.Payload);
+
+            Log(dnm);
+            Assert.False(info.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeMacConIndMessage()
+        {
+            var dnm = Decode<DnmMessage>("030100087a010b00027b0001");
+            var info = Assert.IsType<MacConIndPayload>(dnm.Payload);
 
             Log(dnm);
             Assert.False(info.HasUnknown);
@@ -795,16 +878,70 @@ namespace RfpProxy.Test
         }
 
         [Fact]
+        public void CanDecodeMacClearDefKeyReqMessage()
+        {
+            var req = Decode<MacClearDefCkeyReqPayload>("030100057a1f00027b");
+            Log(req);
+            Assert.False(req.HasUnknown);
+        }
+
+        [Fact]
         public void CanDecodeMacHoInProgressMessage()
         {
             var ind = Decode<DnmMessage>("03010008 7a0b0400 027b0201");
             Log(ind);
+            Assert.False(ind.HasUnknown);
+
+            ind = Decode<DnmMessage>("030100087a0b0c0eb3370201");
+            Log(ind);
+            Assert.False(ind.HasUnknown);
 
             var res = Decode<DnmMessage>("0301000e 7a0c0400 00000000 00000000 00ff");
             Log(res);
+            Assert.False(res.HasUnknown);
 
-            //todo Assert.False(ind.HasUnknown);
-            //todo Assert.False(res.HasUnknown);
+            res = Decode<DnmMessage>("0301000e7a0c0c00000000000000000000ff");
+            Log(res);
+            Assert.False(res.HasUnknown);
+
+            res = Decode<DnmMessage>("0301000e7a0c05006948547d6b1611590101");
+            Log(res);
+            Assert.False(res.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeMacPageReqMessage()
+        {
+            var req = Decode<MacPageReqMessage>("030100067a0803080e9e");
+            Log(req);
+            Assert.False(req.HasUnknown);
+
+            req = Decode<MacPageReqMessage>("030100067a08 03 0c027b");
+            Log(req);
+            Assert.False(req.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeMacEncKeyReqMessage()
+        {
+            var dnm = Decode<DnmMessage>("0301000c7a09036623c872e3ef825701");
+            Log(dnm);
+
+            Assert.False(dnm.HasUnknown);
+        }
+
+        [Fact]
+        public void CanDecodeMacEncEksIndMessage()
+        {
+            var dnm = Decode<DnmMessage>("030100077a0a0302010000");
+            Log(dnm);
+
+            Assert.False(dnm.HasUnknown);
+
+            dnm = Decode<DnmMessage>("030100047a0a0301");
+            Log(dnm);
+
+            Assert.False(dnm.HasUnknown);
         }
 
         [Fact]
@@ -822,7 +959,6 @@ namespace RfpProxy.Test
         public void CanDecodeSyncPhaseOfsWithRssiIndMessage()
         {
             var sync = Decode<OffsetIndSyncMessage>("03020011 7d2c0e02 004c0000 46000044 ffff4607 00");
-            Assert.Equal(2, sync.Count);
             Assert.Equal(2, sync.RFPs.Length);
             var rfp = sync.RFPs[0];
             Assert.Equal(0x4c, rfp.Rpn);
@@ -837,7 +973,7 @@ namespace RfpProxy.Test
             Assert.Equal(7, rfp.QtSyncCheck);
 
             Log(sync);
-            //TODO Assert.False(sync.HasUnknown);
+            Assert.False(sync.HasUnknown);
         }
 
         [Fact]

@@ -52,7 +52,7 @@ namespace RfpProxyLib.AaMiDe.Nwk
                 default:
                     if ((byte)pd > 8)
                         throw new InvalidProtocolDiscriminatorException();
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException("Protocol Discriminator (ETSI EN 300 175-5 section 7.2)");
             }
         }
 
@@ -65,6 +65,9 @@ namespace RfpProxyLib.AaMiDe.Nwk
         }
     }
 
+    /// <summary>
+    /// catch and ignore frame ETSI EN 300 175-4 section 6.1.5
+    /// </summary>
     public class InvalidProtocolDiscriminatorException : Exception
     {
 

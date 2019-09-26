@@ -4,18 +4,17 @@ using System.IO;
 using RfpProxyLib.AaMiDe.Media;
 using RfpProxyLib.AaMiDe.Sys;
 using RfpProxyLib.AaMiDe.Sync;
-using RfpProxyLib;
 using RfpProxyLib.AaMiDe.Dnm;
 
 namespace RfpProxyLib.AaMiDe
 {
     public abstract class AaMiDeMessage
     {
+        private readonly ushort _length;
+
         public virtual bool HasUnknown => !Raw.IsEmpty;
 
         public MsgType Type { get; }
-
-        public ushort Length { get; }
 
         protected virtual ReadOnlyMemory<byte> Raw { get; }
 
@@ -23,8 +22,8 @@ namespace RfpProxyLib.AaMiDe
         {
             Type = type;
             var span = data.Span;
-            Length = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(2));
-            Raw = data.Slice(4);
+            _length = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(2));
+            Raw = data.Slice(4, _length);
         }
 
         public static AaMiDeMessage Create(ReadOnlyMemory<byte> data, RfpConnectionTracker reassembler)
@@ -114,7 +113,7 @@ namespace RfpProxyLib.AaMiDe
 
         public virtual void Log(TextWriter writer)
         {
-            writer.Write($"{Type,-22}({Length,4}) ");
+            writer.Write($"{Type,-22}({_length,4}) ");
             if (!Raw.IsEmpty)
             {
                 writer.Write($"Reserved({Raw.ToHex()}) ");

@@ -89,6 +89,8 @@ namespace RfpProxyLib.AaMiDe.Dnm
                     {
                         case DnmType.MacPageReq:
                             return new MacPageReqMessage(data);
+                        case DnmType.MacClearDefCkeyReq:
+                            return new MacClearDefCkeyReqPayload(data);
                         default:
                             return new DnmMessage(data, reassembler);
                     }

@@ -54,6 +54,8 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
 
         public FeatureType Feature { get; }
 
+        public byte Parameter { get; }
+
         public NwkIeFeatureActivate(ReadOnlyMemory<byte> data):base(NwkVariableLengthElementType.FeatureActivate, data)
         {
             var span = data.Span;
@@ -73,8 +75,9 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
                 case FeatureType.ControlOfEchoControlFunctions:
                 case FeatureType.CostInformation:
                 default:
-                    Raw = data.Slice(1);
-                    HasUnknown = true;
+                    Parameter = span[1];
+                    Raw = data.Slice(2);
+                    HasUnknown = !Raw.IsEmpty;
                     break;
             }
         }
@@ -86,16 +89,15 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
             switch (Feature)
             {
                 case FeatureType.FeatureKey:
-                    break;
                 case FeatureType.SpecificLineSelection:
-                    break;
                 case FeatureType.SpecificTrunkCarrierSelection:
-                    break;
                 case FeatureType.ControlOfEchoControlFunctions:
-                    break;
                 case FeatureType.CostInformation:
+                    writer.Write($" Parameter({Parameter})");
                     break;
             }
+            if (HasUnknown)
+                writer.Write($" Reserved({Raw.ToHex()})");
         }
     }
 }

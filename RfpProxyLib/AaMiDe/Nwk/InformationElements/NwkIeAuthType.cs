@@ -36,11 +36,6 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
         public bool Inc { get; }
 
         /// <summary>
-        /// generated derived cipher key shall be used as default cipher key for early encryption
-        /// </summary>
-        public bool Def { get; }
-
-        /// <summary>
         /// Include the derived cipher key in the AUTHENTICATION-REPLY message
         /// </summary>
         public bool Txc { get; }
@@ -56,9 +51,9 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
         /// </summary>
         public byte CipherKeyNumber { get; }
 
-        public ushort DefaultCipherKey { get; }
+        public ushort? DefaultCipherKey { get; }
 
-        public override ReadOnlyMemory<byte> Raw => Def ? base.Raw.Slice(5) : base.Raw.Slice(3);
+        public override ReadOnlyMemory<byte> Raw => DefaultCipherKey.HasValue ? base.Raw.Slice(5) : base.Raw.Slice(3);
 
         public NwkIeAuthType(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.AuthType, data)
         {
@@ -73,11 +68,11 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
             KeyType = (AuthenticationKeyType) (span[0] >> 4);
             KeyNumber = (byte) (span[0] & 0xf);
             Inc = (span[1] & 0x80) != 0;
-            Def = (span[1] & 0x40) != 0;
+            var def = (span[1] & 0x40) != 0;
             Txc = (span[1] & 0x20) != 0;
             Upc = (span[1] & 0x10) != 0;
             CipherKeyNumber = (byte) (span[1] & 0xf);
-            if (Def)
+            if (def)
             {
                 DefaultCipherKey = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(2));
             }
@@ -91,10 +86,10 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
             {
                 writer.Write($"{Proprietary}, ");
             }
-            writer.Write($"{KeyType}, {KeyNumber}) INC({Inc}) DEF({Def}) TXC({Txc}) UPC({Upc})");
+            writer.Write($"{KeyType}, {KeyNumber}) INC({Inc}) DEF({DefaultCipherKey.HasValue}) TXC({Txc}) UPC({Upc})");
             if (Upc)
                 writer.Write($" CipherKeyNumber({CipherKeyNumber})");
-            if (Def)
+            if (DefaultCipherKey.HasValue)
                 writer.Write($" DefaultCipherKeyIndex({DefaultCipherKey})");
         }
     }

@@ -10,15 +10,15 @@ namespace RfpProxyLib.AaMiDe.Sync
 
         public OffsetInd[] RFPs { get; }
 
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(1 + Count * 6);
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(1 + RFPs.Length * 6);
 
         public override bool HasUnknown => false;
 
         public OffsetIndSyncMessage(ReadOnlyMemory<byte> data):base(SyncMessageType.PhaseOfsWithRssiInd, data)
         {
             var span = base.Raw.Span;
-            Count = span[0];
-            RFPs = new OffsetInd[Count];
+            var count = span[0];
+            RFPs = new OffsetInd[count];
             span = span.Slice(1);
             for (int i = 0; i < RFPs.Length; i++)
             {
@@ -44,7 +44,7 @@ namespace RfpProxyLib.AaMiDe.Sync
 
         public class OffsetInd
         {
-            public OffsetInd(ushort rpn, int offset, byte rssi, byte qtSyncCheck)
+            public OffsetInd(ushort rpn, short offset, byte rssi, byte qtSyncCheck)
             {
                 Rpn = rpn;
                 Offset = offset;
@@ -57,7 +57,7 @@ namespace RfpProxyLib.AaMiDe.Sync
             /// </summary>
             public ushort Rpn { get; }
 
-            public int Offset { get; }
+            public short Offset { get; }
 
             public byte Rssi { get; }
 

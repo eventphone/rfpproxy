@@ -13,7 +13,7 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements.Proprietary.DeTeWe
 
         public override bool HasUnknown => Reserved != 0x90;
 
-        public override ReadOnlyMemory<byte> Raw { get; }
+        public override ReadOnlyMemory<byte> Raw => Memory<byte>.Empty;
 
         public HomeScreenTextDeTeWeElement(ReadOnlyMemory<byte> data) : base(DeTeWeType.HomeScreenText, data)
         {
@@ -27,7 +27,6 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements.Proprietary.DeTeWe
                 Values.Add(Encoding.UTF8.GetString(value.Span));
                 data = data.Slice(1).Slice(length);
             }
-            Raw = data;
         }
 
         public override void Log(TextWriter writer)

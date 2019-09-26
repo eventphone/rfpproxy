@@ -60,7 +60,7 @@ namespace RfpProxy.Inject
                     await client.FinishHandshakeAsync(cts.Token);
                     var rfp = HexEncoding.HexToByte(mac);
                     var direction = toOmm ? MessageDirection.ToOmm : MessageDirection.ToRfp;
-                    Console.WriteLine("RTS. Enter on hex encoded message per line. Empty message to close.");
+                    Console.WriteLine("RTS. Enter one hex encoded message per line. Empty message to close.");
                     do
                     {
                         var message = Console.ReadLine();

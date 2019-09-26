@@ -33,7 +33,7 @@ namespace RfpProxyLib.AaMiDe.Sys
         protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(2);
 
         public override bool HasUnknown => false;
-        
+
         public SysLedMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LED, data)
         {
             var led = base.Raw.Span[0];

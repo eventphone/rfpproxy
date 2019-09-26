@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.IO;
 using RfpProxyLib.AaMiDe.Dnm;
 
@@ -6,7 +7,7 @@ namespace RfpProxyLib.AaMiDe.Mac
 {
     public sealed class MacEncKeyReqPayload : DnmPayload
     {
-        public ReadOnlyMemory<byte> Key { get; }
+        public ulong Key { get; }
 
         public byte Id { get; }
 
@@ -16,13 +17,13 @@ namespace RfpProxyLib.AaMiDe.Mac
         {
             if (data.Length != 9)
                 throw new ArgumentException("invalid length");
-            Key = data.Slice(0, 8);
+            Key = BinaryPrimitives.ReadUInt64BigEndian(data.Span);
             Id = data.Span[8];
         }
 
         public override void Log(TextWriter writer)
         {
-            writer.Write($" Key({Key.ToHex()}) Id({Id,3})");
+            writer.Write($" Key({Key:x16}) Id({Id,3})");
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Buffers.Binary;
 using System.IO;
 using System.Net;
-using RfpProxyLib;
 
 namespace RfpProxyLib.AaMiDe.Media
 {

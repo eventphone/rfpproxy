@@ -14,7 +14,7 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
         public enum Relation : byte
         {
             IPUI = 0b0,
-            PARK = 0b1,
+            IPUI_PARK = 0b1,
         }
 
         public AlgorithmIdentifierCode AlgorithmIdentifier { get; }

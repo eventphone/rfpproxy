@@ -28,11 +28,9 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements.Proprietary.DeTeWe
         /// </summary>
         public List<string> Values { get; }
 
-        public override bool HasUnknown => !Enum.IsDefined(typeof(DeTeWeDisplayType), DisplayType) ||
-                                           !Raw.IsEmpty ||
-                                           Padding != 0xff;
+        public override bool HasUnknown => !Enum.IsDefined(typeof(DeTeWeDisplayType), DisplayType) || Padding != 0xff;
 
-        public override ReadOnlyMemory<byte> Raw { get; }
+        public override ReadOnlyMemory<byte> Raw => Memory<byte>.Empty;
 
         public DisplayDeTeWeElement(ReadOnlyMemory<byte> data) : base(DeTeWeType.Display, data)
         {
@@ -52,7 +50,6 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements.Proprietary.DeTeWe
                 Values.Add(Encoding.UTF8.GetString(value.Span));
                 data = data.Slice(1).Slice(length);
             }
-            Raw = data;
         }
 
         public override void Log(TextWriter writer)

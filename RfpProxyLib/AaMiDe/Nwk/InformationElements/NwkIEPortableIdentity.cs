@@ -44,8 +44,6 @@ namespace RfpProxyLib.AaMiDe.Nwk.InformationElements
                     case IPUITypeCoding.N:
                         if (length != 40)
                             throw new ArgumentOutOfRangeException(nameof(length));
-                        Number = BinaryPrimitives.ReadUInt32BigEndian(span.Slice(1));
-                        Number |= (span[0] & 0xfUL) << 32;
                         EMC = (ushort) ((span[0] & 0xf) << 12 | (span[1] << 4) | (span[2] >> 4));
                         PSN = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(3)) | ((span[2] & 0xfu)<<16);
                         int checksum = 0;

@@ -53,7 +53,7 @@ namespace RfpProxyLib.AaMiDe.Media
 
             public void Log(TextWriter writer)
             {
-                writer.Write($"Tone1({Frequency1,5}Hz/{CB1/10d}dB) ");
+                writer.Write($"Tone1({Frequency1,5}Hz/{CB1 / 10d}dB) ");
                 writer.Write($"Tone2({Frequency2,5}Hz/{CB2 / 10d}dB) ");
                 writer.Write($"Tone3({Frequency3,5}Hz/{CB3 / 10d}dB) ");
                 writer.Write($"Tone4({Frequency4,5}Hz/{CB4 / 10d}dB) ");

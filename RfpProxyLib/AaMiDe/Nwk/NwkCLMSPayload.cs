@@ -17,7 +17,15 @@ namespace RfpProxyLib.AaMiDe.Nwk
             else
             {
                 //B-Format
-                return new NwkCLMSFixedPayload(ti, f, data.Slice(1));
+                if ((data.Span[1] & 0x08) != 0)
+                {
+                    //address
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    return new NwkCLMSFixedDataPlayload(ti, f, data.Slice(1));
+                }
             }
         }
     }

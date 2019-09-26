@@ -16,7 +16,7 @@ namespace RfpProxyLib.AaMiDe.Mac
         public override bool HasUnknown => base.HasUnknown || !Enum.IsDefined(typeof(HoFailedReason), Reason);
 
         public override ReadOnlyMemory<byte> Raw => base.Raw.Slice(1);
-        
+
         public MacHoFailedIndPayload(ReadOnlyMemory<byte> data):base(data)
         {
             Reason = (HoFailedReason) data.Span[0];

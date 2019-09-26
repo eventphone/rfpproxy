@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RfpProxy.Log\RfpProxy.Log.csproj" />
     <ProjectReference Include="..\RfpProxy\RfpProxy.csproj" />
   </ItemGroup>
 

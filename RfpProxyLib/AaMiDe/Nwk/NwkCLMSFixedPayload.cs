@@ -1,24 +1,9 @@
-﻿using System;
-using System.IO;
-using RfpProxyLib;
-
-namespace RfpProxyLib.AaMiDe.Nwk
+﻿namespace RfpProxyLib.AaMiDe.Nwk
 {
-    public sealed class NwkCLMSFixedPayload : NwkCLMSPayload
+    public abstract class NwkCLMSFixedPayload : NwkCLMSPayload
     {
-        public ReadOnlyMemory<byte> Reserved { get; }
-
-        public override bool HasUnknown => true;
-
-        public NwkCLMSFixedPayload(byte ti, bool f, ReadOnlyMemory<byte> data):base(NwkProtocolDiscriminator.CLMS, ti, f)
+        protected NwkCLMSFixedPayload(byte ti, bool f) : base(NwkProtocolDiscriminator.CLMS, ti, f)
         {
-            Reserved = data;
-        }
-
-        public override void Log(TextWriter writer)
-        {
-            base.Log(writer);
-            writer.Write($" Reserved({Reserved.ToHex()})");
         }
     }
 }

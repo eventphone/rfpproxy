@@ -93,20 +93,24 @@ namespace RfpProxyLib.AaMiDe.Dnm
 
         public bool MoreData { get; }
 
-        public byte PayloadLength { get; }
+        private byte _payloadLength;
 
         public NwkPayload Payload { get; }
 
         public override ReadOnlyMemory<byte> Raw => ReadOnlyMemory<byte>.Empty;
 
         public override bool HasUnknown => Payload.HasUnknown || (SAPI != 0 && SAPI != 3);
-        
+
+        public override byte DataLength { get; }
         public LcDataPayload(ReadOnlyMemory<byte> data, NwkReassembler reassembler):base(data)
         {
             var span = base.Raw.Span;
+            DataLength = span[0];
+            span = span.Slice(1);
             Command = (span[0] & 0x2) == 0x2;
             SAPI = (byte) ((span[0] & 0xc) >> 2);
             LLN = (byte) ((span[0] & 0x70) >> 4);
+            NLF = (span[0] & 0x80) == 0x80;
 
             var control = span[1];
             //ETSI EN 300 175-4 7.11
@@ -179,12 +183,13 @@ namespace RfpProxyLib.AaMiDe.Dnm
             ReadOnlyMemory<byte> payloadData;
             if (!ExtendedLength)
             {
-                PayloadLength = (byte) (span[2] >> 2);
-                payloadData = base.Raw.Slice(3, PayloadLength);
+                _payloadLength = (byte) (span[2] >> 2);
+                payloadData = base.Raw.Slice(4, _payloadLength);
             }
             else
             {
-                payloadData = base.Raw.Slice(4);
+                //TODO parse length until N=1 ETSI EN 300 175-4 V2.4.0 section 7.6
+                payloadData = base.Raw.Slice(5);
             }
             if (MoreData)
             {
@@ -220,8 +225,7 @@ namespace RfpProxyLib.AaMiDe.Dnm
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($" Command({(Command?0:1)}) SAPI({SAPI}) LLN({LLN}) NLF({NLF})");
-            writer.Write($" Type({CommandType})");
+            writer.Write($" Command({(Command?0:1)}) SAPI({SAPI}) LLN({LLN}) NLF({NLF}) Type({CommandType})");
             switch (CommandType)
             {
                 case LcCommandType.Unknown:
@@ -243,7 +247,7 @@ namespace RfpProxyLib.AaMiDe.Dnm
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            writer.Write($" N({(ExtendedLength?0:1)}) M({(MoreData?1:0)}) L({PayloadLength})");
+            writer.Write($" N({(ExtendedLength?0:1)}) M({(MoreData?1:0)}) L({_payloadLength})");
             if (!Raw.IsEmpty)
             {
                 if (HasUnknown)

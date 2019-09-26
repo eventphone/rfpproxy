@@ -55,6 +55,10 @@ namespace RfpProxyLib.AaMiDe.Nwk
                             HasUnknown = true;
                         InformationElements.Add(ie);
                     }
+                    else
+                    {
+                        InformationElements.Add(new NwkIeEmpty());
+                    }
                     i += length + 1;
                 }
             }
