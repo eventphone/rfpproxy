@@ -9,32 +9,44 @@ namespace RfpProxyLib.AaMiDe.Media
         public class Tone
         {
             //tenth dB = cB
-            public ushort CB1 { get; set; }
+            public ushort CB1 { get; }
             //tenth dB = cB
-            public ushort CB2 { get; set; }
+            public ushort CB2 { get; }
             //tenth dB = cB
-            public ushort CB3 { get; set; }
+            public ushort CB3 { get; }
             //tenth dB = cB
-            public ushort CB4 { get; set; }
+            public ushort CB4 { get; }
 
-            public ushort Frequency1 { get; set; }
+            public ushort Frequency1 { get; }
 
-            public ushort Frequency2 { get; set; }
+            public ushort Frequency2 { get; }
 
-            public ushort Frequency3 { get; set; }
+            public ushort Frequency3 { get; }
 
-            public ushort Frequency4 { get; set; }
+            public ushort Frequency4 { get; }
 
-            public ushort Duration { get; set; }
+            public ushort Duration { get; }
 
-            public ushort CycleCount { get; set; }
+            public ushort CycleCount { get; }
 
-            public ushort CycleTo { get; set; }
+            public ushort CycleTo { get; }
 
             public ushort Next { get; set; }
 
-            public Tone()
+            public Tone(ushort cb1, ushort cb2, ushort cb3, ushort cb4, ushort freq1, ushort freq2, ushort freq3, ushort freq4, ushort duration, ushort cyclecount, ushort cycleTo, ushort next)
             {
+                CB1 = cb1;
+                CB2 = cb2;
+                CB3 = cb3;
+                CB4 = cb4;
+                Frequency1 = freq1;
+                Frequency2 = freq2;
+                Frequency3 = freq3;
+                Frequency4 = freq4;
+                Duration = duration;
+                CycleCount = cyclecount;
+                CycleTo = cycleTo;
+                Next = next;
             }
 
             public Tone(ReadOnlySpan<byte> data)

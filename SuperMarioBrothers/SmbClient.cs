@@ -12,7 +12,7 @@ using RfpProxyLib.Messages;
 
 namespace SuperMarioBrothers
 {
-    class SmbClient : ProxyClient
+    public class SmbClient : ProxyClient
     {
         private readonly MidiFile _midi;
 
@@ -118,7 +118,7 @@ namespace SuperMarioBrothers
             ushort i = 0;
             foreach (var chord in chords)
             {
-                var result = new MediaToneMessage.Tone();
+                var result = new RelativeTone();
                 if (chord[0] is Rest rest)
                 {
                     if (i == 0) continue;
@@ -153,9 +153,9 @@ namespace SuperMarioBrothers
                 if (result.Duration == 0)
                     continue;
                 if (previous != null) previous.Next = i;
-                yield return result;
+                previous = result.Tone();
+                yield return previous;
                 i++;
-                previous = result;
             }
             previous.Next = 0;
         }
