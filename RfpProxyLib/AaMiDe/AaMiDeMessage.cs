@@ -12,15 +12,22 @@ namespace RfpProxyLib.AaMiDe
     {
         private readonly ushort _length;
 
+        public virtual ushort Length => 4;
+
         public virtual bool HasUnknown => !Raw.IsEmpty;
 
         public MsgType Type { get; }
 
         protected virtual ReadOnlyMemory<byte> Raw { get; }
 
-        protected AaMiDeMessage(MsgType type, ReadOnlyMemory<byte> data)
+        protected AaMiDeMessage(MsgType type)
         {
             Type = type;
+            Raw = ReadOnlyMemory<byte>.Empty;
+        }
+
+        protected AaMiDeMessage(MsgType type, ReadOnlyMemory<byte> data):this(type)
+        {
             var span = data.Span;
             _length = BinaryPrimitives.ReadUInt16BigEndian(span.Slice(2));
             Raw = data.Slice(4, _length);
@@ -118,6 +125,13 @@ namespace RfpProxyLib.AaMiDe
             {
                 writer.Write($"Reserved({Raw.ToHex()}) ");
             }
+        }
+
+        public virtual Span<byte> Serialize(Span<byte> data)
+        {
+            BinaryPrimitives.WriteUInt16BigEndian(data, (ushort) Type);
+            BinaryPrimitives.WriteUInt16BigEndian(data.Slice(2), Length);
+            return data.Slice(4);
         }
     }
 }

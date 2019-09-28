@@ -1007,6 +1007,19 @@ namespace RfpProxy.Test
         }
 
         [Fact]
+        public void CanDecodeMediaToneMessage()
+        {
+            var media = Decode<MediaToneMessage>(
+                "020b0038 78c00102 00000000 a9010000 00000000 00000000 00000000f4010000" +
+                "00000100 00000000 00000000 00000000 00000000 f4010000 00000000");
+
+            Assert.Equal(0xC078, media.Handle);
+
+            Log(media);
+            Assert.False(media.HasUnknown);
+        }
+
+        [Fact]
         public void CanDecodeNwkIEFeatureAvtivate()
         {
             var dnm = Decode<DnmMessage>("0301000d 79060600 08112215 64623801 b0");
