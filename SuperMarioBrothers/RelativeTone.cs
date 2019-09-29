@@ -4,13 +4,13 @@ namespace SuperMarioBrothers
 {
     public class RelativeTone
     {
-        public ushort CB1 { get; set; }
+        public short CB1 { get; set; }
         
-        public ushort CB2 { get; set; }
+        public short CB2 { get; set; }
         
-        public ushort CB3 { get; set; }
+        public short CB3 { get; set; }
         
-        public ushort CB4 { get; set; }
+        public short CB4 { get; set; }
 
         public ushort Frequency1 { get; set; }
 

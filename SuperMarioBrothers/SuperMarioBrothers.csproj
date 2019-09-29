@@ -6,13 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="86046.mid" />
     <None Remove="amelie.mid" />
+    <None Remove="portal.mid" />
     <None Remove="smb.mid" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="86046.mid" />
+    <EmbeddedResource Include="portal.mid" />
     <EmbeddedResource Include="amelie.mid" />
     <EmbeddedResource Include="smb.mid" />
   </ItemGroup>

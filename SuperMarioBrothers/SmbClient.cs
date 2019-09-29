@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
 using RfpProxyLib;
@@ -16,10 +18,10 @@ namespace SuperMarioBrothers
     {
         private readonly MidiFile _midi;
 
-        public SmbClient(string socket):base(socket)
+        public SmbClient(string name, string socket):base(socket)
         {
             var assembly = typeof(SmbClient).Assembly;
-            var stream = assembly.GetManifestResourceStream("SuperMarioBrothers.amelie.mid");
+            var stream = assembly.GetManifestResourceStream("SuperMarioBrothers." + name + ".mid");
             _midi = MidiFile.Read(stream);
         }
 
@@ -114,8 +116,7 @@ namespace SuperMarioBrothers
 
         private IEnumerable<MediaToneMessage.Tone> GetTones(IEnumerable<ILengthedObject[]> chords, TempoMap tempoMap)
         {
-            MediaToneMessage.Tone previous = null;
-            ushort i = 0;
+            ushort i = 1;
             foreach (var chord in chords)
             {
                 var result = new RelativeTone();
@@ -126,38 +127,40 @@ namespace SuperMarioBrothers
                 }
                 else
                 {
-                    if (chord.Length > 4)
-                        throw new ArgumentOutOfRangeException();
+                    //todo if (chord.Length > 4)
+                    //    throw new ArgumentOutOfRangeException();
                     if (chord[0] is Note note1)
                     {
                         result.Frequency1 = GetFrequency(note1);
-                        result.CB1 = note1.Velocity;
+                        result.CB1 = GetVolume(note1.Velocity);
                         result.Duration = GetDuration(note1.Length, tempoMap);
                     }
                     if (chord.Length > 1 && chord[1] is Note note2)
                     {
                         result.Frequency2 = GetFrequency(note2);
-                        result.CB2 = note2.Velocity;
+                        result.CB2 = GetVolume(note2.Velocity);
                     }
                     if (chord.Length > 2 && chord[2] is Note note3)
                     {
                         result.Frequency3 = GetFrequency(note3);
-                        result.CB3 = note3.Velocity;
+                        result.CB3 = GetVolume(note3.Velocity);
                     }
                     if (chord.Length > 3 && chord[3] is Note note4)
                     {
                         result.Frequency4 = GetFrequency(note4);
-                        result.CB4 = note4.Velocity;
+                        result.CB4 = GetVolume(note4.Velocity);
                     }
                 }
                 if (result.Duration == 0)
                     continue;
-                if (previous != null) previous.Next = i;
-                previous = result.Tone();
-                yield return previous;
-                i++;
+                result.Next = i++;
+                yield return result.Tone();
             }
-            previous.Next = 0;
+        }
+
+        private static short GetVolume(SevenBitNumber velocity)
+        {
+            return (short) (-800 + (830 / 127d) * velocity);
         }
 
         private static ushort GetDuration(long length, TempoMap tempoMap)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using Mono.Options;
 using RfpProxyLib;
 using RfpProxyLib.AaMiDe.Media;
@@ -14,9 +15,11 @@ namespace SuperMarioBrothers
     {
         static async Task Main(string[] args)
         {
-            using (var c = new SmbClient(string.Empty))
+            using (var c = new SmbClient("amelie", string.Empty))
             {
                 var tones = c.GetTones().Take(255).ToArray();
+                var compressor = new ToneCompressor(tones);
+                tones = compressor.Compress();
                 var total = 0;
                 foreach (var tone in tones)
                 {
@@ -71,7 +74,7 @@ namespace SuperMarioBrothers
             try
             {
                 using (var cts = new CancellationTokenSource())
-                using (var client = new SmbClient(socketname))
+                using (var client = new SmbClient("smb", socketname))
                 {
                     Console.CancelKeyPress += (s, e) =>
                     {

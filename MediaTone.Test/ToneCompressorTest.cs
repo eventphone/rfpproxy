@@ -17,13 +17,19 @@ namespace MediaTone.Test
             _testOutputHelper = testOutputHelper;
         }
 
-        [Fact]
-        public void CanCompress()
+        [Theory]
+        [InlineData("amelie")]
+        [InlineData("portal")]
+        [InlineData("smb")]
+        public void CanCompress(string name)
         {
-            using (var c = new SmbClient(string.Empty))
+            using (var c = new SmbClient(name, string.Empty))
             {
                 var tones = c.GetTones().ToArray();
                 
+                var compressor = new ToneCompressor(tones);
+                var compressed = compressor.Compress();
+                _testOutputHelper.WriteLine(compressed.Length.ToString());
                 for (var i = 0; i < tones.Length; i++)
                 {
                     var tone = tones[i];
@@ -33,9 +39,6 @@ namespace MediaTone.Test
                         _testOutputHelper.WriteLine(i + " " + writer);
                     }
                 }
-                var compressor = new ToneCompressor(tones);
-                var compressed = compressor.Compress();
-                
                 for (var i = 0; i < compressed.Length; i++)
                 {
                     var tone = compressed[i];

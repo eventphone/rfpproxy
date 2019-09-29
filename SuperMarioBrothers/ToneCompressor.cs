@@ -20,11 +20,10 @@ namespace SuperMarioBrothers
             var relativeTones = tones.Select(x=>new RelativeTone(x)).ToArray();
             int index = 0;
             ushort next = 1;
-            MediaToneMessage.Tone last;
             do
             {
                 var tone = relativeTones[index];
-                last = tone.Tone(0, 0, next++);
+                var last = tone.Tone(0, 0, next++);
                 yield return last;
                 if (tone.CycleCount != 0)
                 {
@@ -35,15 +34,14 @@ namespace SuperMarioBrothers
                 {
                     index = tone.Next;
                 }
-            } while (index != 0);
-            last.Next = 0;
+            } while (index < tones.Length);
         }
 
         public MediaToneMessage.Tone[] Compress()
         {
             var relative = Relative(_tones);
             int i = 0;
-            while (i < 2)
+            while (i < 5)
             {
                 var indexed = CountDuplicates(relative);
                 var sequences = FindSequences(indexed);
@@ -52,7 +50,12 @@ namespace SuperMarioBrothers
                 {
                     break;
                 }
-                relative = ReplaceMatch(match, indexed);
+                var result = ReplaceMatch(match, indexed);
+                if (result == null)
+                {
+                    break;
+                }
+                relative = result;
                 i++;
             }
             return Absolute(relative);
@@ -75,8 +78,6 @@ namespace SuperMarioBrothers
                         rightStart = right.Span[0];
                     }
                     var rightEnd = right.Span[right.Length - 1];
-                    var beforeMatch = indexed.Where(x => x.Index < leftEnd.Index).OrderBy(x => x.Index).Select(x => x.Tone);
-                    var afterMatch = indexed.Where(x => x.Index > rightEnd.Index).OrderBy(x => x.Index).Select(x => x.Tone);
                     if (leftEnd.Index + 1 == rightStart.Index)
                     {
                         if (leftEnd.Tone.CycleCount != 0)
@@ -84,47 +85,77 @@ namespace SuperMarioBrothers
 
                         leftEnd.Tone.CycleCount++;
                         leftEnd.Tone.CycleTo = 1 - right.Length;
+                        var leftStart = left.Span[0];
                         var result = new RelativeTone[indexed.Length - right.Length];
-                        for (int i = 0; i < result.Length; i++)
+                        int i = 0;
+                        for (; i < leftEnd.Index; i++)
                         {
-                            if (i < leftEnd.Index)
+                            var tone = indexed[i].Tone;
+                            if (tone.CycleTo != 0)
                             {
-                                var tone = indexed[i].Tone;
-                                if (tone.CycleTo != 0)
+                                if (tone.CycleTo + i > leftEnd.Index)
                                 {
                                     throw new NotImplementedException();
                                 }
-                                if (tone.Next != 1)
-                                {
-                                    throw new NotImplementedException();
-                                }
-                                result[i] = tone;
                             }
-                            else if (i == leftEnd.Index)
+                            if (tone.Next != 1)
                             {
-                                result[i] = leftEnd.Tone;
-                            }
-                            else if (i > leftEnd.Index)
-                            {
-                                var tone = indexed[i + right.Length].Tone;
-                                if (tone.CycleTo != 0)
+                                if (tone.Next + i > rightEnd.Index)
+                                {
+                                    tone.Next -= right.Length;
+                                }
+                                else if (tone.Next + i > leftStart.Index)
                                 {
                                     throw new NotImplementedException();
                                 }
-                                if (tone.Next != 1)
+                                else
                                 {
-                                    var absolute = tone.Next + indexed.Length - 1;
-                                    if (absolute > leftEnd.Index && absolute <= rightEnd.Index)
+                                }
+                            }
+                            result[i] = tone;
+                        }
+                        result[i++] = leftEnd.Tone;
+                        for (; i < result.Length; i++)
+                        {
+                            var tone = indexed[i + right.Length].Tone;
+                            if (tone.CycleTo != 0)
+                            {
+                                if (tone.CycleTo + i < rightEnd.Index)
+                                {
+                                    if (tone.CycleTo + i < leftStart.Index)
                                     {
-                                        throw new NotImplementedException();
+                                        tone.CycleTo += right.Length;
+                                    }
+                                    else if (tone.CycleTo + i > leftEnd.Index)
+                                    {
+                                        tone.CycleTo += right.Length;
                                     }
                                     else
                                     {
-                                        tone.Next = absolute - i;
+                                        throw new NotImplementedException();
                                     }
                                 }
-                                result[i] = tone;
                             }
+                            if (tone.Next < 1)
+                            {
+                                if (tone.Next + i < rightStart.Index)
+                                {
+                                    if (tone.Next + i < leftStart.Index)
+                                    {
+                                        tone.Next += right.Length;
+                                    }
+                                    else
+                                    {
+                                        throw new NotImplementedException();
+                                    }
+
+                                }
+                            }
+                            else if (tone.Next > result.Length - i)
+                            {
+                                throw new NotImplementedException();
+                            }
+                            result[i] = tone;
                         }
                         return result;
                     }
@@ -140,37 +171,104 @@ namespace SuperMarioBrothers
                         {
                             var leftStart = left.Span[0];
 
-                            var next = betweenMatch.Length + 1;
-                            leftEnd.Tone.CycleCount = 1;
-                            leftEnd.Tone.CycleTo = 1;
-                            leftEnd.Tone.Next = next;
 
-                            next = leftStart.Index - rightStart.Index + 1;
-
-                            last.CycleCount = 1;
-                            last.CycleTo = next;
-                            var after = afterMatch.ToArray();
-                            foreach (var tone in after)
+                            var result = new RelativeTone[indexed.Length - right.Length];
+                            int i = 0;
+                            for (; i < leftEnd.Index; i++)
                             {
-                                if (tone.CycleTo + leftEnd.Index < 0)
+                                var tone = indexed[i].Tone;
+                                if (tone.CycleTo != 0)
                                 {
-                                    tone.CycleTo += right.Length;
+                                    if (tone.CycleTo + i > leftEnd.Index)
+                                    {
+                                        throw new NotImplementedException();
+                                    }
                                 }
-                                if (tone.Next + leftEnd.Index < 0)
+                                if (tone.Next != 1)
                                 {
-                                    tone.Next += right.Length;
+                                    if (tone.Next + i > rightEnd.Index)
+                                    {
+                                        tone.Next -= right.Length;
+                                    }
+                                    else if (tone.Next + i > leftStart.Index)
+                                    {
+                                        throw new NotImplementedException();
+                                    }
                                 }
+                                result[i] = tone;
                             }
-                            return beforeMatch
-                                .Concat(new[] { leftEnd.Tone })
-                                .Concat(betweenMatch)
-                                .Concat(after)
-                                .ToArray();
+                            result[i++] = leftEnd.Tone;
+                            for (; i < rightStart.Index; i++)
+                            {
+                                var tone = indexed[i].Tone;
+                                if (tone.CycleTo > 0)
+                                {
+                                    if (tone.CycleTo + i > rightStart.Index)
+                                    {
+                                        throw new NotImplementedException();
+                                    }
+                                }
+                                if (tone.Next > 1)
+                                {
+                                    if (tone.Next + i > rightStart.Index)
+                                    {
+                                        throw new NotImplementedException();
+                                    }
+                                }
+                                result[i] = tone;
+                            }
+                            for (; i < result.Length; i++)
+                            {
+                                var tone = indexed[i + right.Length].Tone;
+                                if (tone.CycleTo < 0)
+                                {
+                                    if (tone.CycleTo + i < rightStart.Index)
+                                    {
+                                        //we inserted a cycle in between, so we can't cycle over this again
+                                        break;
+                                    }
+                                    else if (tone.CycleTo + i < rightEnd.Index)
+                                    {
+                                        throw new NotImplementedException();
+                                    }
+                                }
+                                if (tone.Next < 0)
+                                {
+                                    if (tone.Next + i < rightStart.Index)
+                                    {
+                                        //we inserted a cycle in between, so we can't cycle over this again
+                                        break;
+                                    }
+                                    else if (tone.Next + i < rightEnd.Index)
+                                    {
+                                        throw new NotImplementedException();
+                                    }
+                                }
+                                result[i] = tone;
+                            }
+                            if (i == result.Length)
+                            {
+                                var next = betweenMatch.Length + 1;
+                                leftEnd.Tone.CycleCount = 1;
+                                leftEnd.Tone.CycleTo = 1;
+                                leftEnd.Tone.Next = next;
+
+                                next = leftStart.Index - rightStart.Index + 1;
+
+                                last.Next = next;
+                                last.CycleTo = next;
+                                last.CycleCount = 1;
+                                return result;
+                            }
                         }
                     }
                 }
+                else
+                {
+                    throw new NotImplementedException();
+                }
             }
-            throw new NotImplementedException();
+            return null;
         }
 
         private List<SequenceMatch> FindMatch(List<Memory<IndexedTone>> sequences)
@@ -203,7 +301,10 @@ namespace SuperMarioBrothers
                                 if (left.Span[0].Index > right.Span[0].Index)
                                     continue;
                                 if (left.Span[0].Index == right.Span[0].Index) continue;
-
+                                if (right.Span[0].Index < left.Span[0].Index + length)
+                                {
+                                    smallerOffset += (left.Span[0].Index + length) - right.Span[0].Index - 1;
+                                }
                                 if (Matches(left, right))
                                 {
                                     max = length;
@@ -308,10 +409,7 @@ namespace SuperMarioBrothers
                    left.Frequency2 == right.Frequency2 &&
                    left.Frequency3 == right.Frequency3 &&
                    left.Frequency4 == right.Frequency4 &&
-                   left.Duration == right.Duration &&
-                   left.CycleCount == right.CycleCount &&
-                   left.CycleTo == right.CycleTo &&
-                   left.Next == right.Next;
+                   left.Duration == right.Duration;
         }
     }
 }
