@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using RfpProxyLib.AaMiDe.Media;
 
@@ -41,8 +40,7 @@ namespace SuperMarioBrothers
         {
             var relative = Relative(_tones);
             int maxMatchSize = Int32.MaxValue;
-            int i = 0;
-            while (maxMatchSize > 0 && i < 135)
+            while (maxMatchSize > 0)
             {
                 var indexed = CountDuplicates(relative);
                 var sequences = FindSequences(indexed);
@@ -60,7 +58,6 @@ namespace SuperMarioBrothers
                 {
                     relative = result;
                 }
-                i++;
             }
             return Absolute(relative);
         }
@@ -149,24 +146,24 @@ namespace SuperMarioBrothers
                         var next = tone.Tone.Next + tone.Index;
                         if (next < before.Length + match.Length + between.Length)
                         {
-                            //pointed to left
+                            //pointed to between
                             tone.Tone.Next += match.Length;
                         }
-                        else if (next < before.Length + match.Length)
+                        else if (next < before.Length + 2 * match.Length + between.Length)
                         {
-                            //pointed to between
-                            tone.Tone.Next += match.Length - between.Length;
+                            //pointed to right
+                            tone.Tone.Next -= between.Length;
                         }
                         var cycle = tone.Tone.CycleTo + tone.Index;
                         if (cycle < before.Length + match.Length + between.Length)
                         {
-                            //pointed to left
+                            //pointed to between
                             tone.Tone.CycleTo += match.Length;
                         }
-                        else if (cycle < before.Length + match.Length)
+                        else if (cycle < before.Length + 2 * match.Length + between.Length)
                         {
-                            //pointed to between
-                            tone.Tone.CycleTo += match.Length - between.Length;
+                            //pointed to right
+                            tone.Tone.CycleTo -= between.Length;
                         }
                     }
                     result.Add(tone.Tone);
@@ -191,12 +188,6 @@ namespace SuperMarioBrothers
                 var boundary = match.Start + match.Length;
                 if (HasCycleIntoBoundary(after, 0, boundary))
                     return false;
-                {
-                    //todo remove
-                    boundary = match.Start + match.Length + 1;
-                    if (HasCycleIntoBoundary(after, 0, boundary))
-                        return false;
-                }
                 adjustAfter = true;
             }
             var before = indexed.AsMemory(0, match.Start);
