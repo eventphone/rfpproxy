@@ -42,7 +42,7 @@ namespace SuperMarioBrothers
             var relative = Relative(_tones);
             int maxMatchSize = Int32.MaxValue;
             int i = 0;
-            while (maxMatchSize > 0 && i < 50000008)
+            while (maxMatchSize > 0 && i < 135)
             {
                 var indexed = CountDuplicates(relative);
                 var sequences = FindSequences(indexed);
@@ -69,7 +69,7 @@ namespace SuperMarioBrothers
         {
             foreach (var match in matches)
             {
-                if (!CanBeReplaced(match, indexed, out var adjustBeforeCycles))
+                if (!CanBeReplaced(match, indexed, out var adjustBeforeCycles, out var adjustAfterCycles))
                 {
                     continue;
                 }
@@ -113,8 +113,8 @@ namespace SuperMarioBrothers
                     leftEnd.Tone.CycleCount = 1;
                     leftEnd.Tone.Next = between.Length + 1;
                     var lastBetween = between.Span[between.Length - 1];
-                    lastBetween.Tone.CycleTo = 1 - between.Length - match.Length;
-                    lastBetween.Tone.CycleCount = 1;
+                    lastBetween.Tone.CycleTo = 1; //marker
+                    lastBetween.Tone.Next = 1 - between.Length - match.Length;
                 }
                 var result = new List<RelativeTone>();
                 foreach (var tone in before.Span)
@@ -144,6 +144,31 @@ namespace SuperMarioBrothers
                 }
                 foreach (var tone in after.Span)
                 {
+                    if (adjustAfterCycles)
+                    {
+                        var next = tone.Tone.Next + tone.Index;
+                        if (next < before.Length + match.Length + between.Length)
+                        {
+                            //pointed to left
+                            tone.Tone.Next += match.Length;
+                        }
+                        else if (next < before.Length + match.Length)
+                        {
+                            //pointed to between
+                            tone.Tone.Next += match.Length - between.Length;
+                        }
+                        var cycle = tone.Tone.CycleTo + tone.Index;
+                        if (cycle < before.Length + match.Length + between.Length)
+                        {
+                            //pointed to left
+                            tone.Tone.CycleTo += match.Length;
+                        }
+                        else if (cycle < before.Length + match.Length)
+                        {
+                            //pointed to between
+                            tone.Tone.CycleTo += match.Length - between.Length;
+                        }
+                    }
                     result.Add(tone.Tone);
                 }
                 return result.ToArray();
@@ -151,9 +176,10 @@ namespace SuperMarioBrothers
             return null;
         }
 
-        private static bool CanBeReplaced(SequenceMatch match, IndexedTone[] indexed, out bool adjustBefore)
+        private static bool CanBeReplaced(SequenceMatch match, IndexedTone[] indexed, out bool adjustBefore,  out bool adjustAfter)
         {
             adjustBefore = false;
+            adjustAfter = false;
             if (HasCycle(match.Left.Span))
                 return false;
             if (HasCycle(match.Right.Span))
@@ -161,10 +187,17 @@ namespace SuperMarioBrothers
             var after = indexed.AsMemory(match.End+1);
             if (!IsContained(after.Span))
             {
-                //todo //can not point to before match or in left part of match
-                //var boundary = match.End - match.Length - match.Between;
-                //if (HasCycleIntoBoundary(after, 0, boundary))
+                //can not point to before match or in left part of match
+                var boundary = match.Start + match.Length;
+                if (HasCycleIntoBoundary(after, 0, boundary))
                     return false;
+                {
+                    //todo remove
+                    boundary = match.Start + match.Length + 1;
+                    if (HasCycleIntoBoundary(after, 0, boundary))
+                        return false;
+                }
+                adjustAfter = true;
             }
             var before = indexed.AsMemory(0, match.Start);
             if (!IsContained(before.Span))
@@ -262,16 +295,12 @@ namespace SuperMarioBrothers
                             {
                                 var left = larger.Slice(largerOffset, length);
                                 var right = smaller.Slice(smallerOffset, length);
-                                if (left.IsEmpty)
-                                    Debugger.Break();
-                                if (right.IsEmpty)
-                                    Debugger.Break();
                                 if (left.Span[0].Index > right.Span[0].Index)
                                     continue;
-                                if (left.Span[0].Index == right.Span[0].Index) continue;
                                 if (right.Span[0].Index < left.Span[0].Index + length)
                                 {
                                     smallerOffset += (left.Span[0].Index + length) - right.Span[0].Index - 1;
+                                    continue;
                                 }
                                 if (Matches(left, right))
                                 {

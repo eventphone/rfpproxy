@@ -60,7 +60,7 @@ namespace SuperMarioBrothers
 
         public MediaToneMessage.Tone Tone(int index)
         {
-            return new MediaToneMessage.Tone(CB1, CB2, CB3, CB4, Frequency1, Frequency2, Frequency3, Frequency4, Duration, CycleCount, CycleCount==0?(ushort)0:(ushort) (index + CycleTo), (ushort) (index + Next));
+            return new MediaToneMessage.Tone(CB1, CB2, CB3, CB4, Frequency1, Frequency2, Frequency3, Frequency4, Duration, CycleCount, CycleCount==0?(ushort)CycleTo:(ushort) (index + CycleTo), (ushort) (index + Next));
         }
 
         public MediaToneMessage.Tone Tone(ushort cycleCount, ushort cycleTo, ushort next)
