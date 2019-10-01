@@ -45,7 +45,7 @@ namespace SuperMarioBrothers
                 var indexed = CountDuplicates(relative);
                 var sequences = FindSequences(indexed);
                 var match = FindMatch(sequences, maxMatchSize);
-                if (match == null)
+                if (match.Count == 0)
                 {
                     break;
                 }
@@ -71,9 +71,16 @@ namespace SuperMarioBrothers
                     continue;
                 }
                 var leftEnd = match.Left.Span[match.Length - 1];
-                if (leftEnd.Tone.Next != 1 || leftEnd.Tone.CycleCount != 0)
+                if (leftEnd.Tone.Next != 1)
                 {
                     throw new NotImplementedException();
+                }
+                if (leftEnd.Tone.CycleCount != 0)
+                {
+                    if (!match.IsGapless)
+                    {
+                        throw new NotImplementedException();
+                    }
                 }
 
                 var rightEnd = match.Right.Span[match.Length - 1];
@@ -101,7 +108,7 @@ namespace SuperMarioBrothers
                 {
                     between = Memory<IndexedTone>.Empty;
                     leftEnd.Tone.CycleTo = 1-match.Length;
-                    leftEnd.Tone.CycleCount = 1;
+                    leftEnd.Tone.CycleCount++;
                 }
                 else
                 {
@@ -178,7 +185,29 @@ namespace SuperMarioBrothers
             adjustBefore = false;
             adjustAfter = false;
             if (HasCycle(match.Left.Span))
-                return false;
+            {
+                if (!match.IsGapless)
+                {
+                    return false;
+                }
+                if (match.Length < 2)
+                {
+                    return false;
+                }
+                if (HasCycle(match.Left.Span.Slice(0, match.Length - 2)))
+                {
+                    return false;
+                }
+                var last = match.Left.Span[match.Length - 1];
+                if (last.Tone.CycleTo != 1 - match.Length)
+                {
+                    return false;
+                }
+                if (last.Tone.Next != 1)
+                {
+                    return false;
+                }
+            }
             if (HasCycle(match.Right.Span))
                 return false;
             var after = indexed.AsMemory(match.End+1);
@@ -282,7 +311,7 @@ namespace SuperMarioBrothers
                     {
                         for (int largerOffset = 0; largerOffset <= larger.Length-length; largerOffset++)
                         {
-                            for (int smallerOffset = 0; smallerOffset < smaller.Length-length; smallerOffset++)
+                            for (int smallerOffset = 0; smallerOffset <= smaller.Length-length; smallerOffset++)
                             {
                                 var left = larger.Slice(largerOffset, length);
                                 var right = smaller.Slice(smallerOffset, length);

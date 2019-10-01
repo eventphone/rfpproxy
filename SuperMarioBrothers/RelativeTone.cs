@@ -28,6 +28,12 @@ namespace SuperMarioBrothers
 
         public int Next { get; set; }
 
+        public RelativeTone(ushort frequency1)
+        {
+            Frequency1 = frequency1;
+            Next = 1;
+        }
+
         public RelativeTone()
         {
         }

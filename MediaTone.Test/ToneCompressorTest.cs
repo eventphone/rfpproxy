@@ -26,10 +26,65 @@ namespace MediaTone.Test
             using (var c = new SmbClient(name, string.Empty))
             {
                 var tones = c.GetTones().ToArray();
-                
-                var compressor = new ToneCompressor(tones);
-                var compressed = compressor.Compress();
-                _testOutputHelper.WriteLine(compressed.Length.ToString());
+                Compress(tones, false, true, false);
+            }
+        }
+
+        [Fact]
+        public void CanCompress3Cycles()
+        {
+            var tones = new []
+            {
+                new RelativeTone(1),
+                new RelativeTone(2),
+                new RelativeTone(3),
+                new RelativeTone(1),
+                new RelativeTone(2),
+                new RelativeTone(3),
+                new RelativeTone(1),
+                new RelativeTone(2),
+                new RelativeTone(3),
+            };
+            var count = Compress(tones.Select((x,i)=>x.Tone(i)).ToArray(), false, true, false);
+            Assert.Equal(3, count);
+        }
+
+        [Fact]
+        public void CanCompressInsideCycle()
+        {
+            var tones = new []
+            {
+                new RelativeTone(0),
+                new RelativeTone(7),
+                new RelativeTone(1),
+                new RelativeTone(2),
+                new RelativeTone(3),
+                new RelativeTone(1),
+                new RelativeTone(2),
+                new RelativeTone(3),
+                new RelativeTone(8),
+                new RelativeTone(4),
+                new RelativeTone(7),
+                new RelativeTone(1),
+                new RelativeTone(2),
+                new RelativeTone(3),
+                new RelativeTone(1),
+                new RelativeTone(2),
+                new RelativeTone(3),
+                new RelativeTone(8),
+                new RelativeTone(5),
+            };
+            var count = Compress(tones.Select((x,i)=>x.Tone(i)).ToArray(), false, true, false);
+            Assert.Equal(9, count);
+        }
+
+        private int Compress(MediaToneMessage.Tone[] tones, bool showBefore, bool showcompressed, bool showAfter)
+        {
+            var compressor = new ToneCompressor(tones);
+            var compressed = compressor.Compress();
+            _testOutputHelper.WriteLine($"{tones.Length} > {compressed.Length}");
+            if (showBefore)
+            {
                 for (var i = 0; i < tones.Length; i++)
                 {
                     var tone = tones[i];
@@ -39,6 +94,10 @@ namespace MediaTone.Test
                         _testOutputHelper.WriteLine(i + " " + writer);
                     }
                 }
+                _testOutputHelper.WriteLine(String.Empty);
+            }
+            if (showcompressed)
+            {
                 for (var i = 0; i < compressed.Length; i++)
                 {
                     var tone = compressed[i];
@@ -48,9 +107,12 @@ namespace MediaTone.Test
                         _testOutputHelper.WriteLine(i + " " + writer);
                     }
                 }
-                Assert.True(compressed.Length < tones.Length);
-                var uncompressed = ToneCompressor.Decompress(compressed).ToArray();
-                
+                _testOutputHelper.WriteLine(String.Empty);
+            }
+            Assert.True(compressed.Length < tones.Length);
+            var uncompressed = ToneCompressor.Decompress(compressed).ToArray();
+            if (showAfter)
+            {
                 for (var i = 0; i < uncompressed.Length; i++)
                 {
                     var tone = uncompressed[i];
@@ -60,8 +122,10 @@ namespace MediaTone.Test
                         _testOutputHelper.WriteLine(i + " " + writer);
                     }
                 }
-                Equal(tones, uncompressed);
+                _testOutputHelper.WriteLine(String.Empty);
             }
+            Equal(tones, uncompressed);
+            return compressed.Length;
         }
 
         private void Equal(MediaToneMessage.Tone[] lefts, MediaToneMessage.Tone[] rights)
