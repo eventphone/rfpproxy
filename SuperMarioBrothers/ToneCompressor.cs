@@ -40,32 +40,39 @@ namespace SuperMarioBrothers
 
         public MediaToneMessage.Tone[] Compress()
         {
-            var relative = Relative(_tones);
-            int maxMatchSize = Int32.MaxValue;
-            while (maxMatchSize > 0)
-            {
-                var indexed = CountDuplicates(relative);
-                var sequences = FindSequences(indexed);
-                var match = FindMatch(sequences, maxMatchSize);
-                if (match.Count == 0)
+            var tones = _tones.AsSpan();
+            RelativeTone[] relative;
+            //do
+            //{
+                int maxMatchSize = Int32.MaxValue;
+                relative = Relative(tones);
+                while (maxMatchSize > 0)
                 {
-                    break;
+                    var indexed = CountDuplicates(relative);
+                    var sequences = FindSequences(indexed);
+                    var match = FindMatch(sequences, maxMatchSize);
+                    if (match.Count == 0)
+                    {
+                        break;
+                    }
+                    var result = ReplaceMatch(match, indexed);
+                    if (result == null)
+                    {
+                        maxMatchSize = match.Max(x => x.Length) - 1;
+                    }
+                    else
+                    {
+                        relative = result;
+                    }
                 }
-                var result = ReplaceMatch(match, indexed);
-                if (result == null)
-                {
-                    maxMatchSize = match.Max(x => x.Length) - 1;
-                }
-                else
-                {
-                    relative = result;
-                }
-            }
+                tones = tones.Slice(0, tones.Length - 1);
+            //} while (relative.Length > _limit);
             if (relative.Length > _limit)
             {
                 var indexed = CountDuplicates(relative);
                 relative = Limit(indexed);
             }
+            //todo second loop, increasing while inside limit
             return Absolute(relative);
         }
 
@@ -490,7 +497,7 @@ namespace SuperMarioBrothers
             return result;
         }
 
-        private static RelativeTone[] Relative(MediaToneMessage.Tone[] tones)
+        private static RelativeTone[] Relative(Span<MediaToneMessage.Tone> tones)
         {
             var result = new RelativeTone[tones.Length];
             for (int i = 0; i < tones.Length; i++)

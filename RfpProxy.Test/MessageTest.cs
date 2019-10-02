@@ -723,7 +723,7 @@ namespace RfpProxy.Test
         {
             var sync = Decode<OffsetIndSyncMessage>("0302000b7d2c0801004cfffd430701");
             Log(sync);
-            Assert.Equal(1, sync.RFPs.Length);
+            Assert.Single(sync.RFPs);
             var rfp = Assert.Single(sync.RFPs);
             Assert.Equal(-3, rfp.Offset);
             Assert.Equal(67, rfp.Rssi);
