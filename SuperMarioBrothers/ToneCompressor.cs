@@ -66,7 +66,7 @@ namespace SuperMarioBrothers
         {
             foreach (var match in matches)
             {
-                if (!CanBeReplaced(match, indexed, out var adjustBeforeCycles, out var adjustAfterCycles))
+                if (!CanBeReplaced(match, indexed, out var adjustBeforeCycles, out var adjustAfterCycles, out var cycleIntoBefore))
                 {
                     continue;
                 }
@@ -142,6 +142,24 @@ namespace SuperMarioBrothers
                 {
                     result.Add(tone.Tone);
                 }
+                if (cycleIntoBefore)
+                {
+                    var injected = new RelativeTone(leftEnd.Tone.Tone(), 1, -match.Length, 1 + between.Length);
+                    leftEnd.Tone.Next++;
+                    var beforeLeftEnd = match.Left.Span[match.Length - 2];
+                    beforeLeftEnd.Tone.CycleCount = 2;
+                    beforeLeftEnd.Tone.CycleTo = 2;
+                    if (!match.IsGapless)
+                    {
+                        injected.CycleTo = 1; //between
+                        injected.CycleCount = 1;
+                        injected.Next = 1 + between.Length; //after between
+                        var lastBetween = between.Span[between.Length - 1];
+                        lastBetween.Tone.Next--;
+                        leftEnd.Tone.CycleTo++;
+                    }
+                    result.Add(injected);
+                }
                 foreach (var tone in between.Span)
                 {
                     result.Add(tone.Tone);
@@ -151,7 +169,19 @@ namespace SuperMarioBrothers
                     if (adjustAfterCycles)
                     {
                         var next = tone.Tone.Next + tone.Index;
-                        if (next < before.Length + match.Length + between.Length)
+                        if (next < before.Length)
+                        {
+                            //pointed to before
+                            if (cycleIntoBefore)
+                            {
+                                tone.Tone.Next += match.Length - 1;
+                            }
+                            else
+                            {
+                                throw new NotImplementedException();
+                            }
+                        }
+                        else if (next < before.Length + match.Length + between.Length)
                         {
                             //pointed to between
                             tone.Tone.Next += match.Length;
@@ -162,7 +192,19 @@ namespace SuperMarioBrothers
                             tone.Tone.Next -= between.Length;
                         }
                         var cycle = tone.Tone.CycleTo + tone.Index;
-                        if (cycle < before.Length + match.Length + between.Length)
+                        if (cycle < before.Length)
+                        {
+                            //pointed to before
+                            if (cycleIntoBefore)
+                            {
+                                tone.Tone.CycleTo += match.Length - 1;
+                            }
+                            else
+                            {
+                                throw new NotImplementedException();
+                            }
+                        }
+                        else if (cycle < before.Length + match.Length + between.Length)
                         {
                             //pointed to between
                             tone.Tone.CycleTo += match.Length;
@@ -180,10 +222,11 @@ namespace SuperMarioBrothers
             return null;
         }
 
-        private static bool CanBeReplaced(SequenceMatch match, IndexedTone[] indexed, out bool adjustBefore,  out bool adjustAfter)
+        private static bool CanBeReplaced(SequenceMatch match, IndexedTone[] indexed, out bool adjustBefore,  out bool adjustAfter, out bool cycleIntoBefore)
         {
             adjustBefore = false;
             adjustAfter = false;
+            cycleIntoBefore = false;
             if (HasCycle(match.Left.Span))
             {
                 if (!match.IsGapless)
@@ -213,16 +256,36 @@ namespace SuperMarioBrothers
             var after = indexed.AsMemory(match.End+1);
             if (!IsContained(after.Span))
             {
-                //can not point to before match or in left part of match
+                //cannot point to before match or in left part of match
                 var boundary = match.Start + match.Length;
-                if (HasCycleIntoBoundary(after, 0, boundary))
-                    return false;
-                adjustAfter = true;
+                if (!HasCycleIntoBoundary(after, 0, boundary))
+                {
+                    adjustAfter = true;
+                }
+                else
+                {
+                    //cannot point into match
+                    if (HasCycleIntoBoundary(after, match.Start, match.End))
+                    {
+                        return false;
+                    }
+                    if (match.Length < 2)
+                    {
+                        return false;
+                    }
+                    var cycleCountIntoBefore = CountCycleIntoBoundary(after, 0, match.Start);
+                    if (cycleCountIntoBefore > 1)
+                    {
+                        return false;
+                    }
+                    cycleIntoBefore = true;
+                    adjustAfter = true;
+                }
             }
             var before = indexed.AsMemory(0, match.Start);
             if (!IsContained(before.Span))
             {
-                //can not point inside match
+                //cannot point inside match
                 var upper = match.End;
                 var lower = match.Start;
                 if (HasCycleIntoBoundary(before, lower, upper))
@@ -239,6 +302,26 @@ namespace SuperMarioBrothers
             }
 
             return true;
+        }
+
+        private static int CountCycleIntoBoundary(Memory<IndexedTone> tones, int lower, int upper)
+        {
+            var result = 0;
+            for (int i = 0; i < tones.Length; i++)
+            {
+                var tone = tones.Span[i];
+                var cycle = tone.Tone.CycleTo + tone.Index;
+                if (cycle >= lower && cycle <= upper)
+                {
+                    result += tone.Tone.CycleCount;
+                }
+                var next = tone.Tone.Next + tone.Index;
+                if (next >= lower && next <= upper)
+                {
+                    result++;
+                }
+            }
+            return result;
         }
 
         private static bool HasCycleIntoBoundary(Memory<IndexedTone> tones, int lower, int upper)

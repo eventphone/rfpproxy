@@ -78,6 +78,37 @@ namespace MediaTone.Test
             Assert.Equal(9, count);
         }
 
+        [Fact]
+        public void CanCompressInsideCycleWithGap()
+        {
+            var tones = new []
+            {
+                new RelativeTone(0),
+                new RelativeTone(7),
+                new RelativeTone(1),
+                new RelativeTone(2),
+                new RelativeTone(3),
+                new RelativeTone(14),
+                new RelativeTone(1),
+                new RelativeTone(2),
+                new RelativeTone(3),
+                new RelativeTone(8),
+                new RelativeTone(4),
+                new RelativeTone(7),
+                new RelativeTone(1),
+                new RelativeTone(2),
+                new RelativeTone(3),
+                new RelativeTone(14),
+                new RelativeTone(1),
+                new RelativeTone(2),
+                new RelativeTone(3),
+                new RelativeTone(8),
+                new RelativeTone(5),
+            };
+            var count = Compress(tones.Select((x,i)=>x.Tone(i)).ToArray(), false, true, false);
+            Assert.Equal(10, count);
+        }
+
         private int Compress(MediaToneMessage.Tone[] tones, bool showBefore, bool showcompressed, bool showAfter)
         {
             var compressor = new ToneCompressor(tones);
