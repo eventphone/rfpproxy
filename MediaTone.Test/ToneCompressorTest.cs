@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using RfpProxyLib.AaMiDe.Media;
@@ -27,6 +28,19 @@ namespace MediaTone.Test
             {
                 var tones = c.GetTones().ToArray();
                 Compress(tones, false, true, false);
+            }
+        }
+
+        [Theory]
+        [InlineData("amelie")]
+        [InlineData("portal")]
+        [InlineData("smb")]
+        public void CanCompressWithLimit(string name)
+        {
+            using (var c = new SmbClient(name, String.Empty))
+            {
+                var tones = c.GetTones().ToArray();
+                Compress(tones, false, false, true, 256);
             }
         }
 
@@ -109,9 +123,9 @@ namespace MediaTone.Test
             Assert.Equal(10, count);
         }
 
-        private int Compress(MediaToneMessage.Tone[] tones, bool showBefore, bool showcompressed, bool showAfter)
+        private int Compress(MediaToneMessage.Tone[] tones, bool showBefore, bool showcompressed, bool showAfter, int limit = Int32.MaxValue)
         {
-            var compressor = new ToneCompressor(tones);
+            var compressor = new ToneCompressor(tones, limit);
             var compressed = compressor.Compress();
             _testOutputHelper.WriteLine($"{tones.Length} > {compressed.Length}");
             if (showBefore)
@@ -141,6 +155,7 @@ namespace MediaTone.Test
                 _testOutputHelper.WriteLine(String.Empty);
             }
             Assert.True(compressed.Length < tones.Length);
+            Assert.True(compressed.Length <= limit);
             var uncompressed = ToneCompressor.Decompress(compressed).ToArray();
             if (showAfter)
             {
@@ -155,6 +170,8 @@ namespace MediaTone.Test
                 }
                 _testOutputHelper.WriteLine(String.Empty);
             }
+            if (limit < Int32.MaxValue && tones.Length > uncompressed.Length)
+                tones = tones.AsMemory(0, uncompressed.Length).ToArray();
             Equal(tones, uncompressed);
             return compressed.Length;
         }

@@ -8,10 +8,12 @@ namespace SuperMarioBrothers
     public class ToneCompressor
     {
         private readonly MediaToneMessage.Tone[] _tones;
+        private readonly int _limit;
 
-        public ToneCompressor(MediaToneMessage.Tone[] tones)
+        public ToneCompressor(MediaToneMessage.Tone[] tones, int limit)
         {
             _tones = tones;
+            _limit = limit;
         }
 
         public static IEnumerable<MediaToneMessage.Tone> Decompress(MediaToneMessage.Tone[] tones)
@@ -59,10 +61,30 @@ namespace SuperMarioBrothers
                     relative = result;
                 }
             }
+            if (relative.Length > _limit)
+            {
+                var indexed = CountDuplicates(relative);
+                relative = Limit(indexed);
+            }
             return Absolute(relative);
         }
 
-        private RelativeTone[] ReplaceMatch(List<SequenceMatch> matches, IndexedTone[] indexed)
+        private RelativeTone[] Limit(IndexedTone[] tones)
+        {
+            var indexed = tones.AsMemory(0, _limit);
+            while (HasCycleIntoBoundary(indexed, indexed.Length+1, indexed.Length+1))
+            {
+                indexed = indexed.Slice(0, indexed.Length - 2);
+            }
+            var result = new RelativeTone[indexed.Length];
+            for (int i = 0; i < indexed.Length; i++)
+            {
+                result[i] = indexed.Span[i].Tone;
+            }
+            return result;
+        }
+
+        private static RelativeTone[] ReplaceMatch(List<SequenceMatch> matches, IndexedTone[] indexed)
         {
             foreach (var match in matches)
             {
@@ -424,7 +446,7 @@ namespace SuperMarioBrothers
                 .ToList();
         }
 
-        private bool Matches(Memory<IndexedTone> left, Memory<IndexedTone> right)
+        private static bool Matches(Memory<IndexedTone> left, Memory<IndexedTone> right)
         {
             if (left.Length != right.Length) return false;
             if (!ToneEqual(left.Span[0].Tone, right.Span[0].Tone)) return false;
@@ -436,7 +458,7 @@ namespace SuperMarioBrothers
             return true;
         }
         
-        private List<Memory<IndexedTone>> FindSequences(IndexedTone[] indexed)
+        private static List<Memory<IndexedTone>> FindSequences(IndexedTone[] indexed)
         {
             var result = new List<Memory<IndexedTone>>();
             var start = 0;
@@ -458,7 +480,7 @@ namespace SuperMarioBrothers
             return result;
         }
 
-        private MediaToneMessage.Tone[] Absolute(RelativeTone[] tones)
+        private static MediaToneMessage.Tone[] Absolute(RelativeTone[] tones)
         {
             var result = new MediaToneMessage.Tone[tones.Length];
             for (int i = 0; i < tones.Length; i++)

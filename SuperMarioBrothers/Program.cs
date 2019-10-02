@@ -17,8 +17,8 @@ namespace SuperMarioBrothers
         {
             using (var c = new SmbClient("amelie", string.Empty))
             {
-                var tones = c.GetTones().Take(255).ToArray();
-                var compressor = new ToneCompressor(tones);
+                var tones = c.GetTones().ToArray();
+                var compressor = new ToneCompressor(tones, 256);
                 tones = compressor.Compress();
                 var total = 0;
                 foreach (var tone in tones)
