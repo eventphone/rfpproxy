@@ -1,6 +1,6 @@
 ﻿using RfpProxyLib.AaMiDe.Media;
 
-namespace SuperMarioBrothers
+namespace MediaTone
 {
     public class RelativeTone
     {

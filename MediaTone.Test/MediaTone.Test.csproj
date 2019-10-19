@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SuperMarioBrothers\SuperMarioBrothers.csproj" />
+    <ProjectReference Include="..\MediaTone\MediaTone.csproj" />
   </ItemGroup>
 
 </Project>

@@ -9,7 +9,7 @@ using RfpProxyLib;
 using RfpProxyLib.AaMiDe.Media;
 using RfpProxyLib.Messages;
 
-namespace SuperMarioBrothers
+namespace MediaTone
 {
     public class SmbClient : ProxyClient
     {

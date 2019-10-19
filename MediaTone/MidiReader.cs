@@ -6,7 +6,7 @@ using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
 using RfpProxyLib.AaMiDe.Media;
 
-namespace SuperMarioBrothers
+namespace MediaTone
 {
     public class MidiReader
     {

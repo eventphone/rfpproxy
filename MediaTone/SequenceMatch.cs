@@ -1,7 +1,6 @@
 ﻿using System;
-using System.IO.MemoryMappedFiles;
 
-namespace SuperMarioBrothers
+namespace MediaTone
 {
     public class SequenceMatch
     {

@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Mono.Options;
-using RfpProxyLib;
-using RfpProxyLib.AaMiDe.Media;
 
-namespace SuperMarioBrothers
+namespace MediaTone
 {
     class Program
     {
