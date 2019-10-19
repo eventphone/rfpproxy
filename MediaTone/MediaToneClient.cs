@@ -11,12 +11,12 @@ using RfpProxyLib.Messages;
 
 namespace MediaTone
 {
-    public class SmbClient : ProxyClient
+    public class MediaToneClient : ProxyClient
     {
         private readonly List<ValueTuple<string, MediaToneMessage.Tone[]>> _audio;
         private readonly ConcurrentDictionary<ushort, string> _mediaHandles;
 
-        public SmbClient(string socket):base(socket)
+        public MediaToneClient(string socket):base(socket)
         {
             _audio = new List<ValueTuple<string, MediaToneMessage.Tone[]>>();
             _mediaHandles = new ConcurrentDictionary<ushort, string>();

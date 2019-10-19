@@ -39,7 +39,7 @@ namespace MediaTone
             try
             {
                 using (var cts = new CancellationTokenSource())
-                using (var client = new SmbClient(socketname))
+                using (var client = new MediaToneClient(socketname))
                 {
                     Console.CancelKeyPress += (s, e) =>
                     {
