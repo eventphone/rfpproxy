@@ -10,7 +10,7 @@ namespace SuperMarioBrothers
         private readonly MediaToneMessage.Tone[] _tones;
         private readonly int _limit;
 
-        public ToneCompressor(MediaToneMessage.Tone[] tones, int limit)
+        public ToneCompressor(MediaToneMessage.Tone[] tones, int limit = Int32.MaxValue)
         {
             _tones = tones;
             _limit = limit;
@@ -41,39 +41,66 @@ namespace SuperMarioBrothers
         public MediaToneMessage.Tone[] Compress()
         {
             var tones = _tones.AsSpan();
-            RelativeTone[] relative;
-            //do
-            //{
-                int maxMatchSize = Int32.MaxValue;
-                relative = Relative(tones);
-                while (maxMatchSize > 0)
+            var relative = Relative(tones);
+            relative = Merge(relative);
+            int maxMatchSize = Int32.MaxValue;
+            while (maxMatchSize > 0)
+            {
+                var indexed = CountDuplicates(relative);
+                var sequences = FindSequences(indexed);
+                var match = FindMatch(sequences, maxMatchSize);
+                if (match.Count == 0)
                 {
-                    var indexed = CountDuplicates(relative);
-                    var sequences = FindSequences(indexed);
-                    var match = FindMatch(sequences, maxMatchSize);
-                    if (match.Count == 0)
-                    {
-                        break;
-                    }
-                    var result = ReplaceMatch(match, indexed);
-                    if (result == null)
-                    {
-                        maxMatchSize = match.Max(x => x.Length) - 1;
-                    }
-                    else
-                    {
-                        relative = result;
-                    }
+                    break;
                 }
-                tones = tones.Slice(0, tones.Length - 1);
-            //} while (relative.Length > _limit);
+                var result = ReplaceMatch(match, indexed);
+                if (result == null)
+                {
+                    maxMatchSize = match.Max(x => x.Length) - 1;
+                }
+                else
+                {
+                    relative = result;
+                }
+            }
             if (relative.Length > _limit)
             {
                 var indexed = CountDuplicates(relative);
                 relative = Limit(indexed);
             }
-            //todo second loop, increasing while inside limit
-            return Absolute(relative);
+            var maximum = relative;
+            if (_limit < Int32.MaxValue)
+            {
+                var length = Decompress(Absolute(relative)).Count();
+                do
+                {
+                    maximum = relative;
+                    relative = Relative(tones.Slice(0, length));
+                    relative = Merge(relative);
+                    maxMatchSize = Int32.MaxValue;
+                    while (maxMatchSize > 0)
+                    {
+                        var indexed = CountDuplicates(relative);
+                        var sequences = FindSequences(indexed);
+                        var match = FindMatch(sequences, maxMatchSize);
+                        if (match.Count == 0)
+                        {
+                            break;
+                        }
+                        var result = ReplaceMatch(match, indexed);
+                        if (result == null)
+                        {
+                            maxMatchSize = match.Max(x => x.Length) - 1;
+                        }
+                        else
+                        {
+                            relative = result;
+                        }
+                    }
+                    length++;
+                } while (relative.Length <= _limit);
+            }
+            return Absolute(maximum);
         }
 
         private RelativeTone[] Limit(IndexedTone[] tones)
@@ -508,6 +535,31 @@ namespace SuperMarioBrothers
                     (tones[i].Next - i));
             }
             return result;
+        }
+
+        public static MediaToneMessage.Tone[] Merge(MediaToneMessage.Tone[] tones)
+        {
+            return Absolute(Merge(Relative(tones)));
+        }
+
+        private static RelativeTone[] Merge(RelativeTone[] tones)
+        {
+            RelativeTone last = tones[0];
+            var result = new List<RelativeTone> {last};
+            for (int i = 1; i < tones.Length; i++)
+            {
+                if (Equal(last, tones[i]))
+                {
+                    //merge
+                    last.Duration += tones[i].Duration;
+                }
+                else
+                {
+                    last = tones[i];
+                    result.Add(last);
+                }
+            }
+            return result.ToArray();
         }
 
         private static IndexedTone[] CountDuplicates(RelativeTone[] tones)

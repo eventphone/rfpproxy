@@ -21,26 +21,24 @@ namespace MediaTone.Test
         [InlineData("amelie")]
         [InlineData("portal")]
         [InlineData("smb")]
+        [InlineData("elise")]
         public void CanCompress(string name)
         {
-            using (var c = new SmbClient(name, string.Empty))
-            {
-                var tones = c.GetTones().ToArray();
-                Compress(tones, false, true, false);
-            }
+            var c = new MidiReader(name);
+            var tones = c.GetTones().ToArray();
+            Compress(tones, false, true, false);
         }
 
         [Theory]
         [InlineData("amelie")]
         [InlineData("portal")]
         [InlineData("smb")]
+        [InlineData("elise")]
         public void CanCompressWithLimit(string name)
         {
-            using (var c = new SmbClient(name, String.Empty))
-            {
-                var tones = c.GetTones().ToArray();
-                Compress(tones, false, true, false, 256);
-            }
+            var c = new MidiReader(name);
+            var tones = c.GetTones().ToArray();
+            Compress(tones, false, true, false, 256);
         }
 
         [Fact]
@@ -60,6 +58,24 @@ namespace MediaTone.Test
             };
             var count = Compress(tones.Select((x,i)=>x.Tone(i)).ToArray(), false, true, false);
             Assert.Equal(3, count);
+        }
+
+        [Fact]
+        public void CanMergeTones()
+        {
+            var tones = new []
+            {
+                new RelativeTone(1),
+                new RelativeTone(1),
+                new RelativeTone(1),
+                new RelativeTone(3),
+                new RelativeTone(4),
+                new RelativeTone(4),
+                new RelativeTone(4),
+                new RelativeTone(2),
+            };
+            var count = Compress(tones.Select((x,i)=>x.Tone(i)).ToArray(), false, true, false);
+            Assert.Equal(4, count);
         }
 
         [Fact]
@@ -131,7 +147,7 @@ namespace MediaTone.Test
             var uncompressed = ToneCompressor.Decompress(compressed).ToArray();
             _testOutputHelper.WriteLine($"{tones.Length} > {compressed.Length} < {uncompressed.Length}");
             if (limit < Int32.MaxValue && tones.Length > uncompressed.Length)
-                tones = tones.AsMemory(0, uncompressed.Length).ToArray();
+                tones = ToneCompressor.Merge(tones).AsMemory(0, uncompressed.Length).ToArray();
             if (showBefore)
             {
                 for (var i = 0; i < tones.Length; i++)
@@ -171,6 +187,7 @@ namespace MediaTone.Test
                 }
                 _testOutputHelper.WriteLine(String.Empty);
             }
+            tones = ToneCompressor.Merge(tones);
             Equal(tones, uncompressed);
             return compressed.Length;
         }

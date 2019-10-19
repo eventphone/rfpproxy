@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections;
+using System.Buffers.Binary;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Melanchall.DryWetMidi.Common;
-using Melanchall.DryWetMidi.Smf;
-using Melanchall.DryWetMidi.Smf.Interaction;
 using RfpProxyLib;
 using RfpProxyLib.AaMiDe.Media;
 using RfpProxyLib.Messages;
@@ -16,163 +13,108 @@ namespace SuperMarioBrothers
 {
     public class SmbClient : ProxyClient
     {
-        private readonly MidiFile _midi;
+        private readonly List<ValueTuple<string, MediaToneMessage.Tone[]>> _audio;
+        private readonly ConcurrentDictionary<ushort, string> _mediaHandles;
 
-        public SmbClient(string name, string socket):base(socket)
+        public SmbClient(string socket):base(socket)
         {
-            var assembly = typeof(SmbClient).Assembly;
-            var stream = assembly.GetManifestResourceStream("SuperMarioBrothers." + name + ".mid");
-            _midi = MidiFile.Read(stream);
+            _audio = new List<ValueTuple<string, MediaToneMessage.Tone[]>>();
+            _mediaHandles = new ConcurrentDictionary<ushort, string>();
+        }
+
+        public async Task SubscribeAsync(CancellationToken cancellationToken)
+        {
+            ReadMidiFiles(cancellationToken);
+            await AddListenAsync("000000000000", "000000000000", "0202", "ffff", cancellationToken);//MEDIA_CLOSE
+            await AddListenAsync("000000000000", "000000000000", "020900000000000000030000", "ffff00000000000000ff0000", cancellationToken);//MEDIA_DTMF
+            Console.WriteLine("up & running");
         }
 
         protected override Task OnMessageAsync(MessageDirection direction, uint messageId, RfpIdentifier rfp, Memory<byte> data, CancellationToken cancellationToken)
         {
+            if (data.Length < 6) return Task.CompletedTask;
+            var hdl = BinaryPrimitives.ReadUInt16LittleEndian(data.Span.Slice(4));
+            if (data.Span[1] == 2)
+            {
+                //MEDIA_CLOSE
+                OnClose(hdl);
+            }
+            else if (data.Span[1] == 9)
+            {
+                //MEDIA_DTMF
+                return OnDtmfAsync(rfp, hdl, data, cancellationToken);
+            }
             return Task.CompletedTask;
         }
 
-        public async Task InjectAudioAsync(ushort hdl)
+        private Task OnDtmfAsync(RfpIdentifier rfp, ushort handle, Memory<byte> data, CancellationToken cancellationToken)
         {
-
+            if (data.Length < 7) return Task.CompletedTask;
+            var key = (char) data.Span[6 + 2];
+            Console.WriteLine($"{handle:X4}: key {key} pressed");
+            var state = _mediaHandles.AddOrUpdate(handle, x => key.ToString(), (k, v) => v + key);
+            return InjectAsync(rfp, handle, state, cancellationToken);
         }
 
-        public IEnumerable<MediaToneMessage.Tone> GetTones()
+        private Task InjectAsync(RfpIdentifier rfp, ushort handle, string state, CancellationToken cancellationToken)
         {
-            return GetTones(ExtractChords(), _midi.GetTempoMap());
-        }
-
-        private IEnumerable<ILengthedObject[]> ExtractChords()
-        {
-            var result = new List<Note>();
-            var position = 0L;
-            foreach (var entry in _midi.GetNotesAndRests(RestSeparationPolicy.NoSeparation))
+            foreach (var (number, tones) in _audio)
             {
-                if (entry is Rest rest)
+                if (state.EndsWith(number))
                 {
-                    if (position == 0)
-                    {
-                        position = rest.Length;
-                        continue;
-                    }
-                    foreach (var chords in ExtractUntil(result, rest.Time))
-                    {
-                        yield return chords;   
-                    }
-                    yield return new ILengthedObject[]{rest};
-                    position = rest.Time + rest.Length;
-                    continue;
+                    Console.WriteLine($"{handle:X4}: injecting {number}");
+                    return InjectAsync(rfp, handle, tones, cancellationToken);
                 }
-                if (entry is Chord)
-                    throw new NotSupportedException();
-
-                var note = (Note) entry;
-                if (note.Time != position)
-                {
-                    foreach (var chords in ExtractUntil(result, note.Time))
-                    {
-                        yield return chords;   
-                    }
-                    position = note.Time;
-                }
-                var existing = result.FirstOrDefault(x => x.NoteNumber == note.NoteNumber);
-                if (existing != null)
-                {
-                    if (existing.Velocity == note.Velocity && existing.Time + existing.Length == note.Time)
-                    {
-                        existing.Length += note.Length;
-                        continue;
-                    }
-                    foreach (var chords in ExtractUntil(result, note.Time))
-                    {
-                        yield return chords;   
-                    }
-                    position = note.Time;
-                }
-                result.Add(note);
+                cancellationToken.ThrowIfCancellationRequested();
             }
+            Console.WriteLine($"{handle:X4}: state {state} not found");
+            return Task.CompletedTask;
         }
-        
-        private IEnumerable<Note[]> ExtractUntil(List<Note> notes, long end)
+
+        private Task InjectAsync(RfpIdentifier rfp, ushort handle, MediaToneMessage.Tone[] tones, CancellationToken cancellationToken)
         {
-            while (notes.Any(x=>x.Time < end))
-            {
-                var grouped = notes.GroupBy(x => x.Time).OrderBy(x => x.Key).First().ToArray();
-                var length = grouped.Min(x => x.Length);
-                if (grouped[0].Time + length > end)
-                    length = end - grouped[0].Time;
-                for (int i = 0; i < grouped.Length; i++)
+            var message = new MediaToneMessage(handle, MediaDirection.TxRx, 0, tones);
+            var data = new byte[message.Length];
+            message.Serialize(data);
+            cancellationToken.ThrowIfCancellationRequested();
+            return WriteAsync(MessageDirection.ToRfp, 0, rfp, data, cancellationToken);
+        }
+
+        private void OnClose(ushort handle)
+        {
+            _mediaHandles.TryRemove(handle, out _);
+            Console.WriteLine($"{handle:X4}: closed");
+        }
+
+        private void ReadMidiFiles(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            ReadMidiFile("amelie", "263543");
+            cancellationToken.ThrowIfCancellationRequested();
+            ReadMidiFile("bach", "2224");
+            cancellationToken.ThrowIfCancellationRequested();
+            ReadMidiFile("elise", "35473");
+            cancellationToken.ThrowIfCancellationRequested();
+            ReadMidiFile("portal", "767825");
+            cancellationToken.ThrowIfCancellationRequested();
+            ReadMidiFile("smb", "762");
+        }
+
+        private void ReadMidiFile(string name, string number)
+        {
+            Console.WriteLine($"preparing {name}");
+            var reader = new MidiReader(name);
+            var tones = reader.GetTones().ToArray();
+            var compressor = new ToneCompressor(tones, 253);
+            tones = compressor.Compress();
+            tones = tones
+                .Concat(new[]
                 {
-                    var note = grouped[i];
-                    if (note.Length != length)
-                    {
-                        var split = note.Split(note.Time + length);
-                        grouped[i] = split.LeftPart;
-                        notes.Add(split.RightPart);
-                    }
-                    notes.Remove(note);
-                }
-                yield return grouped;
-            }
-        }
-
-        private IEnumerable<MediaToneMessage.Tone> GetTones(IEnumerable<ILengthedObject[]> chords, TempoMap tempoMap)
-        {
-            ushort i = 1;
-            foreach (var chord in chords)
-            {
-                var result = new RelativeTone();
-                if (chord[0] is Rest rest)
-                {
-                    if (i == 0) continue;
-                    result.Duration = GetDuration(rest.Length, tempoMap);
-                }
-                else
-                {
-                    //todo if (chord.Length > 4)
-                    //    throw new ArgumentOutOfRangeException();
-                    if (chord[0] is Note note1)
-                    {
-                        result.Frequency1 = GetFrequency(note1);
-                        result.CB1 = GetVolume(note1.Velocity);
-                        result.Duration = GetDuration(note1.Length, tempoMap);
-                    }
-                    if (chord.Length > 1 && chord[1] is Note note2)
-                    {
-                        result.Frequency2 = GetFrequency(note2);
-                        result.CB2 = GetVolume(note2.Velocity);
-                    }
-                    if (chord.Length > 2 && chord[2] is Note note3)
-                    {
-                        result.Frequency3 = GetFrequency(note3);
-                        result.CB3 = GetVolume(note3.Velocity);
-                    }
-                    if (chord.Length > 3 && chord[3] is Note note4)
-                    {
-                        result.Frequency4 = GetFrequency(note4);
-                        result.CB4 = GetVolume(note4.Velocity);
-                    }
-                }
-                if (result.Duration == 0)
-                    continue;
-                result.Next = i++;
-                yield return result.Tone();
-            }
-        }
-
-        private static short GetVolume(SevenBitNumber velocity)
-        {
-            return (short) (-800 + (830 / 127d) * velocity);
-        }
-
-        private static ushort GetDuration(long length, TempoMap tempoMap)
-        {
-            return (ushort) (LengthConverter.ConvertTo<MetricTimeSpan>(length, 0, tempoMap).TotalMicroseconds / 1000);
-        }
-
-        private static ushort GetFrequency(Note note)
-        {
-            //https://en.wikipedia.org/wiki/MIDI_tuning_standard#Frequency_values
-            var f = 440 * Math.Pow(2, (note.NoteNumber - 57) / 12d);
-            return (ushort) f;
+                    new MediaToneMessage.Tone(34, 34, 34, 34, 0, 0, 0, 0, UInt16.MaxValue, 0, 0,
+                        (ushort) (tones.Length + 1)),
+                    new MediaToneMessage.Tone(34, 34, 34, 34, 0, 0, 0, 0, UInt16.MaxValue, 0, 0, (ushort) tones.Length)
+                })
+                .ToArray();
+            _audio.Add((number, tones));
         }
     }
 }

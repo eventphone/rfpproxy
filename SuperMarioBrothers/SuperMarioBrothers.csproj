@@ -7,11 +7,15 @@
 
   <ItemGroup>
     <None Remove="amelie.mid" />
+    <None Remove="bach.mid" />
+    <None Remove="elise.mid" />
     <None Remove="portal.mid" />
     <None Remove="smb.mid" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="bach.mid" />
+    <EmbeddedResource Include="elise.mid" />
     <EmbeddedResource Include="portal.mid" />
     <EmbeddedResource Include="amelie.mid" />
     <EmbeddedResource Include="smb.mid" />
