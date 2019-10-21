@@ -97,6 +97,11 @@ namespace MediaTone
             ReadMidiFile("portal", "767825");
             cancellationToken.ThrowIfCancellationRequested();
             ReadMidiFile("smb", "762");
+            _audio.Add(("**##",
+                new[]
+                {
+                    new MediaToneMessage.Tone(34, 34, 34, 34, 19000, 17000, 20000, 18000, UInt16.MaxValue, 0, 0, 0)
+                }));
         }
 
         private void ReadMidiFile(string name, string number)

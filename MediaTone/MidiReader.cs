@@ -14,7 +14,7 @@ namespace MediaTone
         public MidiReader(string name)
         {
             var assembly = typeof(MidiReader).Assembly;
-            var stream = assembly.GetManifestResourceStream("SuperMarioBrothers." + name + ".mid");
+            var stream = assembly.GetManifestResourceStream($"MediaTone.{name}.mid");
             _midi = MidiFile.Read(stream);
         }
 
