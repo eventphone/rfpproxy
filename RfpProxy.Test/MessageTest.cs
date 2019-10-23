@@ -478,6 +478,14 @@ namespace RfpProxy.Test
             dnm = Decode<DnmMessage>("0301003a79060000351102b90544050780a802869965170a03014800631135151a012006108113000400000090048f78030031417c0490020084f0f0f0f0");
             Log(dnm);
             Assert.False(dnm.HasUnknown);
+
+            dnm = Decode<DnmMessage>("0301003a79060400351102c10544050780a802d51243680a0301480063092535080030039082827b13810002060110290b6f7df87d00ff9e803b0214f0f0");
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
+
+            dnm = Decode<DnmMessage>("0301004779060400421102fd0544050780a802d51243680a03014800630f25350a0030039002000040004096827b13810002060110290b6f7df87d00ff9e803b02147c0790030001020084");
+            Log(dnm);
+            Assert.False(dnm.HasUnknown);
         }
 
         [Fact]
