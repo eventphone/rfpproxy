@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RfpProxyLib.AaMiDe.Media;
 
-namespace MediaTone
+namespace RfpProxy.MediaTone
 {
     public class ToneCompressor
     {

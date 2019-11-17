@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mono.Options;
 
-namespace MediaTone
+namespace RfpProxy.MediaTone
 {
     class Program
     {

@@ -7,7 +7,7 @@ using Mono.Options;
 using RfpProxyLib;
 using RfpProxyLib.Messages;
 
-namespace BusyLed
+namespace RfpProxy.BusyLed
 {
     class Program
     {

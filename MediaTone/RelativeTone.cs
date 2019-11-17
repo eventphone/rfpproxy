@@ -1,6 +1,6 @@
 ﻿using RfpProxyLib.AaMiDe.Media;
 
-namespace MediaTone
+namespace RfpProxy.MediaTone
 {
     public class RelativeTone
     {

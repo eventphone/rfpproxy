@@ -9,7 +9,7 @@ using RfpProxyLib;
 using RfpProxyLib.AaMiDe.Media;
 using RfpProxyLib.Messages;
 
-namespace MediaTone
+namespace RfpProxy.MediaTone
 {
     public class MediaToneClient : ProxyClient
     {

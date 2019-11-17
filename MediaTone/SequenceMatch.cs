@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MediaTone
+namespace RfpProxy.MediaTone
 {
     public class SequenceMatch
     {
