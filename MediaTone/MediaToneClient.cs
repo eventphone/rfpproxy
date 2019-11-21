@@ -71,13 +71,18 @@ namespace RfpProxy.MediaTone
             return Task.CompletedTask;
         }
 
-        private Task InjectAsync(RfpIdentifier rfp, ushort handle, MediaToneMessage.Tone[] tones, CancellationToken cancellationToken)
+        private async Task InjectAsync(RfpIdentifier rfp, ushort handle, MediaToneMessage.Tone[] tones, CancellationToken cancellationToken)
         {
-            var message = new MediaToneMessage(handle, MediaDirection.TxRx, 0, tones);
+            var message = new MediaToneMessage(handle, MediaDirection.TxRx, 0, Array.Empty<MediaToneMessage.Tone>());
             var data = new byte[message.Length];
             message.Serialize(data);
             cancellationToken.ThrowIfCancellationRequested();
-            return WriteAsync(MessageDirection.ToRfp, 0, rfp, data, cancellationToken);
+            await WriteAsync(MessageDirection.ToRfp, 0, rfp, data, cancellationToken);
+            message = new MediaToneMessage(handle, MediaDirection.TxRx, 0, tones);
+            data = new byte[message.Length];
+            message.Serialize(data);
+            cancellationToken.ThrowIfCancellationRequested();
+            await WriteAsync(MessageDirection.ToRfp, 0, rfp, data, cancellationToken);
         }
 
         private void OnClose(ushort handle)
