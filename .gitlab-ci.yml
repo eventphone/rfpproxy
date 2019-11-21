@@ -11,15 +11,15 @@ build:
   - dotnet
  script:
   - 'dotnet restore'
-  - 'dotnet publish -o ../publish/rfpproxy -c Release RfpProxy/RfpProxy.csproj'
-  - 'dotnet publish -o ../publish/rfpproxy.log -c Release RfpProxy.Log/RfpProxy.Log.csproj'
-  - 'dotnet publish -o ../publish/rfpproxy.pcap -c Release RfpProxy.Pcap/RfpProxy.Pcap.csproj'
-  - 'dotnet publish -o ../publish/rfpproxy.inject -c Release RfpProxy.Inject/RfpProxy.Inject.csproj'
-  - 'dotnet publish -o ../publish/rfpproxy.led -c Release RfpProxy.ChangeLed/RfpProxy.ChangeLed.csproj'
-  - 'dotnet publish -o ../publish/rfpproxy.traffic -c Release RfpProxy.Traffic/RfpProxy.Traffic.csproj'
-  - 'dotnet publish -o ../publish/compressipui -c Release CompressIPUI/CompressIPUI.csproj'
-  - 'dotnet publish -o ../publish/avm -c Release AVM/AVM.csproj'
-  - 'dotnet publish -o ../publish/busyled -c Release BusyLed/BusyLed.csproj'
+  - 'dotnet publish -o publish/rfpproxy -c Release RfpProxy/RfpProxy.csproj'
+  - 'dotnet publish -o publish/rfpproxy.log -c Release RfpProxy.Log/RfpProxy.Log.csproj'
+  - 'dotnet publish -o publish/rfpproxy.pcap -c Release RfpProxy.Pcap/RfpProxy.Pcap.csproj'
+  - 'dotnet publish -o publish/rfpproxy.inject -c Release RfpProxy.Inject/RfpProxy.Inject.csproj'
+  - 'dotnet publish -o publish/rfpproxy.led -c Release RfpProxy.ChangeLed/RfpProxy.ChangeLed.csproj'
+  - 'dotnet publish -o publish/rfpproxy.traffic -c Release RfpProxy.Traffic/RfpProxy.Traffic.csproj'
+  - 'dotnet publish -o publish/compressipui -c Release CompressIPUI/CompressIPUI.csproj'
+  - 'dotnet publish -o publish/avm -c Release AVM/AVM.csproj'
+  - 'dotnet publish -o publish/busyled -c Release BusyLed/BusyLed.csproj'
  only:
   - master
  artifacts:
