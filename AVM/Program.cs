@@ -111,6 +111,7 @@ namespace RfpProxy.AVM
                             if (current == SignalType)
                             {
                                 ies.Span[1] = 0x41;
+                                Console.WriteLine("patched alerting pattern");
                             }
                             ies = ies.Slice(2);
                         }
