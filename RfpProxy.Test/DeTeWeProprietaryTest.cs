@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using RfpProxyLib.AaMiDe.Nwk.InformationElements.Proprietary.DeTeWe;
+using RfpProxy.AaMiDe.Nwk.InformationElements.Proprietary.DeTeWe;
 using RfpProxyLib;
 using Xunit;
 using Xunit.Abstractions;

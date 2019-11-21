@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\lib\drywetmidi\DryWetMidi\Melanchall.DryWetMidi.csproj" />
+    <ProjectReference Include="..\RfpProxy.AaMiDe\RfpProxy.AaMiDe.csproj" />
     <ProjectReference Include="..\RfpProxyLib\RfpProxyLib.csproj" />
   </ItemGroup>
 

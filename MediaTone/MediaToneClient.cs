@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using RfpProxy.AaMiDe.Media;
 using RfpProxyLib;
-using RfpProxyLib.AaMiDe.Media;
 using RfpProxyLib.Messages;
 
 namespace RfpProxy.MediaTone

@@ -5,8 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mono.Options;
 using RfpProxyLib;
-using RfpProxyLib.AaMiDe.Nwk;
-using RfpProxyLib.AaMiDe.Nwk.InformationElements;
+using RfpProxy.AaMiDe.Nwk;
+using RfpProxy.AaMiDe.Nwk.InformationElements;
 using RfpProxyLib.Messages;
 
 namespace RfpProxy.AVM

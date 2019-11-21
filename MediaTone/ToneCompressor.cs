@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using RfpProxyLib.AaMiDe.Media;
+using RfpProxy.AaMiDe.Media;
 
 namespace RfpProxy.MediaTone
 {

@@ -1,4 +1,4 @@
-﻿using RfpProxyLib.AaMiDe.Media;
+﻿using RfpProxy.AaMiDe.Media;
 
 namespace RfpProxy.MediaTone
 {

@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RfpProxy.AaMiDe\RfpProxy.AaMiDe.csproj" />
     <ProjectReference Include="..\RfpProxyLib\RfpProxyLib.csproj" />
   </ItemGroup>
 

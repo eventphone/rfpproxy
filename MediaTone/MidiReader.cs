@@ -4,7 +4,7 @@ using System.Linq;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
-using RfpProxyLib.AaMiDe.Media;
+using RfpProxy.AaMiDe.Media;
 
 namespace RfpProxy.MediaTone
 {

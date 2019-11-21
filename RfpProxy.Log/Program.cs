@@ -5,11 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mono.Options;
 using RfpProxyLib.Messages;
-using RfpProxyLib.AaMiDe;
+using RfpProxy.AaMiDe;
 using RfpProxyLib;
 using System.Buffers.Binary;
-using RfpProxyLib.AaMiDe.Dnm;
-using RfpProxyLib.AaMiDe.Mac;
+using RfpProxy.AaMiDe.Dnm;
+using RfpProxy.AaMiDe.Mac;
 
 namespace RfpProxy.Log
 {

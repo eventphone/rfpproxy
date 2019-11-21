@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RfpProxy.AaMiDe\RfpProxy.AaMiDe.csproj" />
     <ProjectReference Include="..\RfpProxy\RfpProxy.csproj" />
   </ItemGroup>
 

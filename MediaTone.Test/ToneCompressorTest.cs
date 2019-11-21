@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using RfpProxy.MediaTone;
-using RfpProxyLib.AaMiDe.Media;
+using RfpProxy.AaMiDe.Media;
 using Xunit;
 using Xunit.Abstractions;
 

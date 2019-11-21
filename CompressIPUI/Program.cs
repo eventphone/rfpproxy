@@ -4,8 +4,8 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Mono.Options;
+using RfpProxy.AaMiDe.Nwk.InformationElements;
 using RfpProxyLib;
-using RfpProxyLib.AaMiDe.Nwk.InformationElements;
 using RfpProxyLib.Messages;
 
 namespace RfpProxy.CompressIPUI
