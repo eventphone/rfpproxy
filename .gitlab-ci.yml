@@ -34,7 +34,6 @@ deploy:
   - build
  script:
   - 'rsync -av --delete --exclude rfpproxy publish/ /opt/rfpproxy/'
-  - 'chmod +x /opt/rfpproxy/*/*.exe'
  only:
   - master
 deploy-proxy:
@@ -47,8 +46,7 @@ deploy-proxy:
   - build
  script:
   - 'rsync -av --delete publish/rfpproxy/ /opt/rfpproxy/rfpproxy/'
-  - 'chmod +x /opt/rfpproxy/rfpproxy/rfpproxy.exe'
-  - 'sudo /sbin/setcap CAP_NET_ADMIN=+eip /opt/rfpproxy/rfpproxy/rfpproxy.exe'
+  - 'sudo /sbin/setcap CAP_NET_ADMIN=+eip /opt/rfpproxy/rfpproxy/rfpproxy'
   - 'sudo /usr/bin/systemctl restart rfpproxy'
  only:
   - master
