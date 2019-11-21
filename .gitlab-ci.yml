@@ -8,17 +8,16 @@ build:
   - build
   - dotnet
  script:
-  - 'dotnet add RfpProxy/RfpProxy.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
-  - 'dotnet add RfpProxy.Log/RfpProxy.Log.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
-  - 'dotnet add RfpProxy.Pcap/RfpProxy.Pcap.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
-  - 'dotnet add RfpProxy.Inject/RfpProxy.Inject.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
-#  - 'dotnet add RfpProxy.Traffic/RfpProxy.Traffic.csproj package Microsoft.Packaging.Tools.Trimming -v 1.1.0-preview1-26619-01'
   - 'dotnet restore'
-  - 'dotnet publish -o ../publish/rfpproxy -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy/RfpProxy.csproj'
-  - 'dotnet publish -o ../publish/rfpproxy.log -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy.Log/RfpProxy.Log.csproj'
-  - 'dotnet publish -o ../publish/rfpproxy.pcap -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy.Pcap/RfpProxy.Pcap.csproj'
-  - 'dotnet publish -o ../publish/rfpproxy.inject -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy.Inject/RfpProxy.Inject.csproj'
-#  - 'dotnet publish -o ../publish/rfpproxy.traffic -c Release --self-contained -r linux-x64 /p:TrimUnusedDependencies=true RfpProxy.Traffic/RfpProxy.Traffic.csproj'
+  - 'dotnet publish -o ../publish/rfpproxy -c Release RfpProxy/RfpProxy.csproj'
+  - 'dotnet publish -o ../publish/rfpproxy.log -c Release RfpProxy.Log/RfpProxy.Log.csproj'
+  - 'dotnet publish -o ../publish/rfpproxy.pcap -c Release RfpProxy.Pcap/RfpProxy.Pcap.csproj'
+  - 'dotnet publish -o ../publish/rfpproxy.inject -c Release RfpProxy.Inject/RfpProxy.Inject.csproj'
+  - 'dotnet publish -o ../publish/rfpproxy.led -c Release RfpProxy.ChangeLed/RfpProxy.ChangeLed.csproj'
+  - 'dotnet publish -o ../publish/rfpproxy.traffic -c Release RfpProxy.Traffic/RfpProxy.Traffic.csproj'
+  - 'dotnet publish -o ../publish/compressipui -c Release CompressIPUI/CompressIPUI.csproj'
+  - 'dotnet publish -o ../publish/avm -c Release AVM/AVM.csproj'
+  - 'dotnet publish -o ../publish/busyled -c Release BusyLed/BusyLed.csproj'
  only:
   - master
  artifacts:
@@ -33,10 +32,7 @@ deploy:
   - build
  script:
   - 'rsync -av --delete --exclude rfpproxy publish/ /opt/rfpproxy/'
-  - 'chmod +x /opt/rfpproxy/rfpproxy.log/rfpproxylog'
-  - 'chmod +x /opt/rfpproxy/rfpproxy.pcap/rfpproxydump'
-  - 'chmod +x /opt/rfpproxy/rfpproxy.inject/rfpproxyinject'
-#  - 'chmod +x /opt/rfpproxy/rfpproxy.traffic/rfpproxytraffic'
+  - 'chmod +x /opt/rfpproxy/*/*.exe'
  only:
   - master
 deploy-proxy:
@@ -49,8 +45,8 @@ deploy-proxy:
   - build
  script:
   - 'rsync -av --delete publish/rfpproxy/ /opt/rfpproxy/rfpproxy/'
-  - 'chmod +x /opt/rfpproxy/rfpproxy/rfpproxy'
-  - 'sudo /sbin/setcap CAP_NET_ADMIN=+eip /opt/rfpproxy/rfpproxy/rfpproxy'
+  - 'chmod +x /opt/rfpproxy/rfpproxy/rfpproxy.exe'
+  - 'sudo /sbin/setcap CAP_NET_ADMIN=+eip /opt/rfpproxy/rfpproxy/rfpproxy.exe'
   - 'sudo /usr/bin/systemctl restart rfpproxy'
  only:
   - master
