@@ -20,6 +20,7 @@ build:
   - 'dotnet publish -o publish/compressipui -c Release CompressIPUI/CompressIPUI.csproj'
   - 'dotnet publish -o publish/avm -c Release AVM/AVM.csproj'
   - 'dotnet publish -o publish/busyled -c Release BusyLed/BusyLed.csproj'
+  - 'dotnet publish -o publish/midi -c Release MediaTone/MediaTone.csproj'
  only:
   - master
  artifacts:
