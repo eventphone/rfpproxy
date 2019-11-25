@@ -7,11 +7,6 @@ namespace RfpProxy.AaMiDe.Sys
 {
     public sealed class SysLicenseTimerMessage : AaMiDeMessage
     {
-        /// <summary>
-        /// Padding
-        /// </summary>
-        public ReadOnlyMemory<byte> Reserved { get; }
-
         public TimeSpan GracePeriod { get; }
 
         /// <summary>
@@ -23,8 +18,7 @@ namespace RfpProxy.AaMiDe.Sys
 
         public SysLicenseTimerMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LICENSE_TIMER, data)
         {
-            Reserved = base.Raw.Slice(0, 2);
-            var grace = BinaryPrimitives.ReadUInt16BigEndian(base.Raw.Slice(2).Span);
+            var grace = BinaryPrimitives.ReadUInt32BigEndian(base.Raw.Span);
             GracePeriod = TimeSpan.FromMinutes(grace);
             Md5 = base.Raw.Slice(4,16);
         }
@@ -32,7 +26,11 @@ namespace RfpProxy.AaMiDe.Sys
         public override void Log(TextWriter writer)
         {
             base.Log(writer);
-            writer.Write($"Padding({Reserved.ToHex()}) Grace Period({GracePeriod}) Md5({Md5.ToHex()})");
+            if (GracePeriod.TotalMinutes > Int32.MaxValue)
+                writer.Write($"Query ");
+            else
+                writer.Write($"Grace Period({GracePeriod}) ");
+            writer.Write($"Md5({Md5.ToHex()})");
         }
     }
 }
