@@ -41,7 +41,7 @@ namespace RfpProxy.AaMiDe.Nwk.InformationElements
         public NwkIeCipherInfo(ReadOnlyMemory<byte> data) : base(NwkVariableLengthElementType.CipherInfo, data)
         {
             var span = data.Span;
-            Enable = (span[0] & 0x80) == 0;
+            Enable = (span[0] & 0x80) != 0;
             Algorithm = (CipherAlgorithm) (span[0] & 0x7f);
             span = span.Slice(1);
             if (Algorithm == CipherAlgorithm.Proprietary)
