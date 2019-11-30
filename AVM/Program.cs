@@ -65,7 +65,7 @@ namespace RfpProxy.AVM
         }
     }
 
-    class ReplaceSignalClient : ProxyClient
+    public class ReplaceSignalClient : ProxyClient
     {
         private static readonly HashSet<ushort> EMCs = new HashSet<ushort>
         {
@@ -105,7 +105,7 @@ namespace RfpProxy.AVM
                     if (current >= 128)
                     {
                         //fixed length
-                        if (current >= 240)
+                        if (current >= 224)
                         {
                             if (ies.Length < 2)
                                 break;
@@ -133,9 +133,11 @@ namespace RfpProxy.AVM
                             var ie = new NwkIePortableIdentity(ies);
                             if (ie.IdentityType == NwkIePortableIdentity.PortableIdentityType.IPUI)
                             {
-                                if (ie.Ipui.Put == NwkIePortableIdentity.IPUITypeCoding.O)
+                                if (ie.Ipui.Put == NwkIePortableIdentity.IPUITypeCoding.O && ies.Length >= 5)
                                 {
-                                    if (!EMCs.Contains(ie.Ipui.EMC))
+                                    var span = ies.Slice(3).Span;
+                                    var emc = (ushort)((span[0] & 0xf) << 12 | (span[1] << 4) | (span[2] >> 4));
+                                    if (!EMCs.Contains(emc))
                                         break;
                                 }
                             }

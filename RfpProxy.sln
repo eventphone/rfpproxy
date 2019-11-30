@@ -36,6 +36,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusyLed", "BusyLed\BusyLed.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.AaMiDe", "RfpProxy.AaMiDe\RfpProxy.AaMiDe.csproj", "{5B58EAEF-EE68-4E37-B943-A57057D939FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVM.Test", "AVM.Test\AVM.Test.csproj", "{F1EBE9EC-C1F5-4365-8FED-E8B11622622D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,10 @@ Global
 		{5B58EAEF-EE68-4E37-B943-A57057D939FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B58EAEF-EE68-4E37-B943-A57057D939FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B58EAEF-EE68-4E37-B943-A57057D939FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1EBE9EC-C1F5-4365-8FED-E8B11622622D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1EBE9EC-C1F5-4365-8FED-E8B11622622D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1EBE9EC-C1F5-4365-8FED-E8B11622622D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1EBE9EC-C1F5-4365-8FED-E8B11622622D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

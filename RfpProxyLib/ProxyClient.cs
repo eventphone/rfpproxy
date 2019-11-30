@@ -104,7 +104,7 @@ namespace RfpProxyLib
             }
         }
 
-        public async Task WriteAsync(MessageDirection direction, uint messageId, RfpIdentifier rfp, ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
+        public virtual async Task WriteAsync(MessageDirection direction, uint messageId, RfpIdentifier rfp, ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
         {
             var header = new byte[4 + 1 + 4 + RfpIdentifier.Length];
             BinaryPrimitives.WriteUInt32BigEndian(header, (uint) (1+4+RfpIdentifier.Length + data.Length));
