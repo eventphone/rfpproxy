@@ -71,6 +71,7 @@ namespace RfpProxy.AVM
         {
             04563,
             09615,
+            10596,
             11640,
             11942 //TODO from our blog post, but also flagged as gigaset in GURU3
         };
