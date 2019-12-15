@@ -21,6 +21,7 @@ build:
   - 'dotnet publish -o publish/avm -c Release AVM/AVM.csproj'
   - 'dotnet publish -o publish/busyled -c Release BusyLed/BusyLed.csproj'
   - 'dotnet publish -o publish/midi -c Release MediaTone/MediaTone.csproj'
+  - 'dotnet publish -o publish/morseled -c Release MorseLed/MorseLed.csproj'
  only:
   - master
  artifacts:

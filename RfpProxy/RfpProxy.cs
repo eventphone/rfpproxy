@@ -147,7 +147,7 @@ namespace RfpProxy
         {
             if (!_connections.TryGetValue(message.Rfp, out var connection))
             {
-                throw new InvalidDataException("rfp not found");
+                return Task.CompletedTask;
             }
             switch (message.Direction)
             {

@@ -300,11 +300,8 @@ namespace RfpProxy.Test
         public void CanDecodeSysLedMessage()
         {
             var led = Decode<SysLedMessage>("01020004" +
-                                            "08010000");
-            Assert.False(led.Led1);
-            Assert.False(led.Led2);
-            Assert.False(led.Led3);
-            Assert.True(led.Led4);
+                                            "03010000");
+            Assert.Equal(3, led.Led);
             Assert.Equal(SysLedMessage.ColorScheme.Green, led.Color);
 
             Log(led);
