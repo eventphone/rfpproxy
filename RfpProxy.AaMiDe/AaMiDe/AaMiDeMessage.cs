@@ -86,6 +86,8 @@ namespace RfpProxy.AaMiDe
                     return new SysInitMessage(data);
                 case MsgType.ACK:
                     return new AckMessage(data);
+                case MsgType.NACK:
+                    return new NackMessage(data);
                 case MsgType.SYS_HEARTBEAT_INTERVAL:
                     return new SysHeartbeatIntervalMessage(data);
                 case MsgType.SYS_IP_OPTIONS:

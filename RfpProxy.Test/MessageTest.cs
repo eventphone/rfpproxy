@@ -148,6 +148,17 @@ namespace RfpProxy.Test
         }
 
         [Fact]
+        public void CanDecodeNackMessage()
+        {
+            var nack = Decode<NackMessage>("00020008 020b7ac6 04000004");
+            Assert.Equal(MsgType.MEDIA_TONE2, nack.Message);
+            Assert.Equal(NackReason.InvalidParameters, nack.Reason);
+
+            Log(nack);
+            Assert.False(nack.HasUnknown);
+        }
+
+        [Fact]
         public void CanDecodeHeartBeatIntervalMessage()
         {
             var interval = Decode<SysHeartbeatIntervalMessage>("01050004 0f000000");
