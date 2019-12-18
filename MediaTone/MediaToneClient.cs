@@ -27,6 +27,7 @@ namespace RfpProxy.MediaTone
             ReadMidiFiles(cancellationToken);
             await AddListenAsync("000000000000", "000000000000", "0202", "ffff", cancellationToken);//MEDIA_CLOSE
             await AddListenAsync("000000000000", "000000000000", "020900000000000000030000", "ffff00000000000000ff0000", cancellationToken);//MEDIA_DTMF
+            await AddHandlerAsync(0, "000000000000", "000000000000", "00020008020b000004000004", "ffffffffffff0000ffffffff", cancellationToken); //NACK on Gen3 RFPs
             Console.WriteLine("up & running");
         }
 
@@ -36,8 +37,20 @@ namespace RfpProxy.MediaTone
             var hdl = BinaryPrimitives.ReadUInt16LittleEndian(data.Span.Slice(4));
             if (data.Span[1] == 2)
             {
-                //MEDIA_CLOSE
-                OnClose(hdl);
+                if (data.Span[0] == 0)
+                {
+                    //NACK
+                    if (direction == MessageDirection.ToOmm)
+                    {
+                        //suppress
+                        return WriteAsync(direction, messageId, rfp, Memory<byte>.Empty, cancellationToken);
+                    }
+                }
+                else
+                {
+                    //MEDIA_CLOSE
+                    OnClose(hdl);
+                }
             }
             else if (data.Span[1] == 9)
             {

@@ -31,6 +31,7 @@ namespace RfpProxyLib
             return AddSubscriptionAsync(subscription, mac, macMask, filter, filterMask, cancellationToken);
         }
 
+        /// <param name="priority">subscriptions are processed in ascending priority</param>
         public Task AddHandlerAsync(byte priority, string mac, string macMask, string filter, string filterMask, CancellationToken cancellationToken)
         {
             var subscription = new Subscribe
