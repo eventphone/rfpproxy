@@ -120,7 +120,7 @@ namespace RfpProxy.AaMiDe.Media
 
         public MediaDirection Direction { get; }
 
-        public ushort Offset { get; }
+        public uint Offset { get; }
 
         public Tone[] Tones { get; }
 
@@ -128,10 +128,10 @@ namespace RfpProxy.AaMiDe.Media
 
         public override ushort Length => (ushort) (base.Length + 6 + Tones.Length * 24);
 
-        public MediaToneMessage(ushort handle, MediaDirection direction, ushort offset, Tone[] tones):base(handle, MsgType.MEDIA_TONE2)
+        public MediaToneMessage(ushort handle, MediaDirection direction, uint offset, Tone[] tones):base(handle, MsgType.MEDIA_TONE2)
         {
-            if (tones.Length > 0xffff)
-                throw new ArgumentOutOfRangeException(nameof(tones), "max 65535 tones allowed");
+            if (tones.Length > 0xff)
+                throw new ArgumentOutOfRangeException(nameof(tones), "max 255 tones allowed");
             Direction = direction;
             Offset = offset;
             Tones = tones;
@@ -141,8 +141,8 @@ namespace RfpProxy.AaMiDe.Media
         {
             var span = base.Raw.Span;
             Direction = (MediaDirection)span[0];
-            var count = BinaryPrimitives.ReadUInt16LittleEndian(span.Slice(1));
-            Offset = BinaryPrimitives.ReadUInt16LittleEndian(span.Slice(4));
+            var count = span[1];
+            Offset = BinaryPrimitives.ReadUInt32LittleEndian(span.Slice(2));
             span = span.Slice(6);
             Tones = new Tone[count];
             for (int i = 0; i < Tones.Length; i++)
@@ -171,8 +171,8 @@ namespace RfpProxy.AaMiDe.Media
         {
             data = base.Serialize(data);
             data[0] = (byte) Direction;
-            BinaryPrimitives.WriteUInt16LittleEndian(data.Slice(1), (ushort) Tones.Length);
-            BinaryPrimitives.WriteUInt16LittleEndian(data.Slice(4), Offset);
+            data[1] = (byte) Tones.Length;
+            BinaryPrimitives.WriteUInt32LittleEndian(data.Slice(2), Offset);
             data = data.Slice(6);
             foreach (var tone in Tones)
             {

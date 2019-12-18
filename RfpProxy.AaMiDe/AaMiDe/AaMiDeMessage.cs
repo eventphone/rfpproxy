@@ -133,7 +133,7 @@ namespace RfpProxy.AaMiDe
         public virtual Span<byte> Serialize(Span<byte> data)
         {
             BinaryPrimitives.WriteUInt16BigEndian(data, (ushort) Type);
-            BinaryPrimitives.WriteUInt16BigEndian(data.Slice(2), Length);
+            BinaryPrimitives.WriteUInt16BigEndian(data.Slice(2), (ushort) (Length - 4));
             return data.Slice(4);
         }
     }

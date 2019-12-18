@@ -13,6 +13,15 @@ namespace RfpProxyLib
             return Encoding.UTF8.GetString(data.Slice(0, eos));
         }
 
+        public static bool IsEmpty(this Span<byte> data)
+        {
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (data[i] != 0) return false;
+            }
+            return true;
+        }
+
         public static bool IsEmpty(this ReadOnlySpan<byte> data)
         {
             for (int i = 0; i < data.Length; i++)

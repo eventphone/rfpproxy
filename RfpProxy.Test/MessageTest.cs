@@ -1030,6 +1030,16 @@ namespace RfpProxy.Test
                 "00000100 00000000 00000000 00000000 00000000 f4010000 00000000");
 
             Assert.Equal(0xC078, media.Handle);
+            Assert.Equal(0u, media.Offset);
+
+            Log(media);
+            Assert.False(media.HasUnknown);
+
+            media = Decode<MediaToneMessage>(
+                "020b0038f3bc010201000000a9010000000000000000000000000000f40100000000010000000000000000000000000000000000f401000000000000");
+
+            Assert.Equal(0xBCF3, media.Handle);
+            Assert.Equal(1u, media.Offset);
 
             Log(media);
             Assert.False(media.HasUnknown);

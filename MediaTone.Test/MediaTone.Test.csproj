@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MediaTone\MediaTone.csproj" />
+    <ProjectReference Include="..\RfpProxyLib\RfpProxyLib.csproj" />
   </ItemGroup>
 
 </Project>
