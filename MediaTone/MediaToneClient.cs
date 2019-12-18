@@ -82,6 +82,7 @@ namespace RfpProxy.MediaTone
             data = new byte[message.Length];
             message.Serialize(data);
             cancellationToken.ThrowIfCancellationRequested();
+            await Task.Delay(1000, cancellationToken);
             await WriteAsync(MessageDirection.ToRfp, 0, rfp, data, cancellationToken);
         }
 
@@ -100,6 +101,8 @@ namespace RfpProxy.MediaTone
             ReadMidiFile("elise", "35473");
             cancellationToken.ThrowIfCancellationRequested();
             ReadMidiFile("portal", "767825");
+            cancellationToken.ThrowIfCancellationRequested();
+            ReadMidiFile("tetris", "838747");
             cancellationToken.ThrowIfCancellationRequested();
             ReadMidiFile("smb", "762");
             _audio.Add(("**##",

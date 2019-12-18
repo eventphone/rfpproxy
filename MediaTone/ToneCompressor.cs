@@ -75,6 +75,10 @@ namespace RfpProxy.MediaTone
                 do
                 {
                     maximum = relative;
+                    if (length > tones.Length)
+                    {
+                        break;
+                    }
                     relative = Relative(tones.Slice(0, length));
                     relative = Merge(relative);
                     maxMatchSize = Int32.MaxValue;

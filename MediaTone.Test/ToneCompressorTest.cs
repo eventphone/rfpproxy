@@ -22,6 +22,7 @@ namespace MediaTone.Test
         [InlineData("portal")]
         [InlineData("smb")]
         [InlineData("elise")]
+        [InlineData("tetris")]
         public void CanCompress(string name)
         {
             var c = new MidiReader(name);
@@ -34,6 +35,7 @@ namespace MediaTone.Test
         [InlineData("portal")]
         [InlineData("smb")]
         [InlineData("elise")]
+        [InlineData("tetris")]
         public void CanCompressWithLimit(string name)
         {
             var c = new MidiReader(name);
