@@ -122,13 +122,21 @@ namespace RfpProxy.CompressIPUI
                             }
                             else
                             {
-                                if ((ipui.Number >> 28) == 0x3014)
+                                var emc = (ipui.Number >> 28);
+                                if (emc == 0x3014 || emc == 0x1603)
                                 {
                                     Console.WriteLine(data.ToHex());
                                     //00000080 b0100301 400fdf
                                     var span = iedata.Span;
                                     span[2] = 0x10;
-                                    span[3] = 0x03;
+                                    if (emc == 0x3014)
+                                    {
+                                        span[3] = 0x03;
+                                    }
+                                    else if (emc == 0x1603)
+                                    {
+                                        span[3] = 0x01;
+                                    }
                                     BinaryPrimitives.WriteUInt32BigEndian(span.Slice(4), (uint) (ipui.Number >> 8));
                                     Console.WriteLine($"unshifted {data.ToHex()}");
                                 }
