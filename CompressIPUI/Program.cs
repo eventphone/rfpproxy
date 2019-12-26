@@ -69,8 +69,9 @@ namespace RfpProxy.CompressIPUI
     {
         private static readonly HashSet<ushort> EMCs = new HashSet<ushort>
         {
-            0x3014,
-            0x1603,
+            0x3014, // Motorla / SGW Global
+            0x1603, //T-Sinus 302
+            0x246d, //Belgacom
         };
 
         public ReplaceIpuiClient(string socket):base(socket)
