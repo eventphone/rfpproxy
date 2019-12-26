@@ -74,8 +74,8 @@ namespace RfpProxy.CompressIPUI
         {
             //                       v Lc                    v IE Portable Identity
             //               v DNM     v LcDataInd|LcDataReq   v IE Length
-            var filter = "0301 0000 7907 00000000 0000 0000 0500";
-            var mask = "  ffff 0000 fffc 00000000 0000 0000 ff00";
+            var filter = "0301 0000 7907 00000000 0000 0000 0508";
+            var mask = "  ffff 0000 fffc 00000000 0000 0000 ff0f";
             await AddHandlerAsync(0, "000000000000", "000000000000", filter, mask, cancellationToken);
         }
 
