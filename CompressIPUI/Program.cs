@@ -100,10 +100,20 @@ namespace RfpProxy.CompressIPUI
                                 {
                                     Console.WriteLine(data.ToHex());
                                     var span = iedata.Span;
-                                    ////00000080 b0100301 400fdf
-                                    span[2] = 0x13;
-                                    span[3] = 0x01;
-                                    span[4] = 0x40;
+                                    if (emc == 0x3014)
+                                    {
+                                        ////00000080 b0100301 400fdf
+                                        span[2] = 0x13;
+                                        span[3] = 0x01;
+                                        span[4] = 0x40;
+                                    }
+                                    else if (emc == 0x1603)
+                                    {
+                                        ////80b01001 603150cf
+                                        span[2] = 0x11;
+                                        span[3] = 0x60;
+                                        span[4] = 0x30;
+                                    }
                                     span[4] |= (byte) (ipui.Number >> 16 & 0xf);
                                     BinaryPrimitives.WriteUInt16BigEndian(span.Slice(5), (ushort) ipui.Number);
                                     span[7] = 0x00;
