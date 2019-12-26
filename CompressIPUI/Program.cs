@@ -95,7 +95,8 @@ namespace RfpProxy.CompressIPUI
                         {
                             if (direction == MessageDirection.FromOmm)
                             {
-                                if ((ipui.Number >> 20) == 0x3014)
+                                var emc = ipui.Number >> 20;
+                                if (emc == 0x3014 || emc == 0x0160)
                                 {
                                     Console.WriteLine(data.ToHex());
                                     var span = iedata.Span;
