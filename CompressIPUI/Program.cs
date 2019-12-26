@@ -147,9 +147,8 @@ namespace RfpProxy.CompressIPUI
             }
             catch (Exception ex)
             {
-#if DEBUG
                 Console.WriteLine(ex);
-#endif
+                Console.WriteLine(data.ToHex());
             }
             return WriteAsync(direction, messageId, rfp, data, cancellationToken);
         }
