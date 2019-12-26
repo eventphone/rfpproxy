@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,6 +67,12 @@ namespace RfpProxy.CompressIPUI
 
     class ReplaceIpuiClient : ProxyClient
     {
+        private static readonly HashSet<ushort> EMCs = new HashSet<ushort>
+        {
+            0x3014,
+            0x1603,
+        };
+
         public ReplaceIpuiClient(string socket):base(socket)
         {
         }
@@ -95,25 +102,14 @@ namespace RfpProxy.CompressIPUI
                         {
                             if (direction == MessageDirection.FromOmm)
                             {
-                                var emc = ipui.Number >> 20;
-                                if (emc == 0x3014 || emc == 0x1603)
+                                var emc = (ushort)(ipui.Number >> 20);
+                                if (EMCs.Contains(emc))
                                 {
                                     Console.WriteLine(data.ToHex());
                                     var span = iedata.Span;
-                                    if (emc == 0x3014)
-                                    {
-                                        ////00000080 b0100301 400fdf
-                                        span[2] = 0x13;
-                                        span[3] = 0x01;
-                                        span[4] = 0x40;
-                                    }
-                                    else if (emc == 0x1603)
-                                    {
-                                        ////80b01001 603150cf
-                                        span[2] = 0x11;
-                                        span[3] = 0x60;
-                                        span[4] = 0x30;
-                                    }
+                                    span[2] = (byte)(0x10 | (emc >> 12));
+                                    span[3] = (byte)(0xff & (emc >> 4));
+                                    span[4] = (byte)((0xf & emc) << 4);
                                     span[4] |= (byte) (ipui.Number >> 16 & 0xf);
                                     BinaryPrimitives.WriteUInt16BigEndian(span.Slice(5), (ushort) ipui.Number);
                                     span[7] = 0x00;
@@ -122,21 +118,14 @@ namespace RfpProxy.CompressIPUI
                             }
                             else
                             {
-                                var emc = (ipui.Number >> 28);
-                                if (emc == 0x3014 || emc == 0x1603)
+                                var emc = (ushort)(ipui.Number >> 28);
+                                if (EMCs.Contains(emc))
                                 {
                                     Console.WriteLine(data.ToHex());
                                     //00000080 b0100301 400fdf
                                     var span = iedata.Span;
                                     span[2] = 0x10;
-                                    if (emc == 0x3014)
-                                    {
-                                        span[3] = 0x03;
-                                    }
-                                    else if (emc == 0x1603)
-                                    {
-                                        span[3] = 0x01;
-                                    }
+                                    span[3] = (byte)(emc >> 12);
                                     BinaryPrimitives.WriteUInt32BigEndian(span.Slice(4), (uint) (ipui.Number >> 8));
                                     Console.WriteLine($"unshifted {data.ToHex()}");
                                 }
