@@ -84,7 +84,7 @@ namespace RfpProxy.CompressIPUI
             try
             {
                 var length = data.Span[15];
-                if (length > 0)
+                if (length == 8)
                 {
                     var iedata = data.Slice(16);
                     var ie = new NwkIePortableIdentity(iedata);
