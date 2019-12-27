@@ -71,6 +71,7 @@ namespace RfpProxy.CompressIPUI
         {
             0x3014, // Motorla / SGW Global
             0x1603, //T-Sinus 302
+            0x1627, //T-Sinus 302
             0x1671, //T-Sinus 302
             0x177a, //T-Sinus 302
             0x246d, //Belgacom
