@@ -75,6 +75,7 @@ namespace RfpProxy.CompressIPUI
             0x1671, //T-Sinus 302
             0x177a, //T-Sinus 302
             0x246d, //Belgacom
+            0x1714, //Swissvoice
         };
 
         public ReplaceIpuiClient(string socket):base(socket)
