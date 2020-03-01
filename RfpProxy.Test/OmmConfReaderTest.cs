@@ -1,4 +1,6 @@
 using System;
+using System.Buffers.Binary;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using RfpProxyLib;
@@ -60,6 +62,44 @@ namespace RfpProxy.Test
             {
                 var rfp = await reader.GetValueAsync("RFP", "mac", "abcdef012345", CancellationToken.None);
                 Assert.Null(rfp);
+            }
+        }
+
+        [Fact]
+        public async Task CanDecryptAxiPassword()
+        {
+            using (var reader = new OmmConfReader("omm_conf.txt"))
+            {
+                var user = await reader.GetValueAsync("XAC", "name", "axi", CancellationToken.None);
+                var passwd = user["passwd"];
+                var bf_key = new byte[] {0x09, 0x6B, 0xA9, 0x87, 0x98, 0x90, 0xB6, 0x7A, 0x18, 0x93, 0xE3, 0x97, 0xB9, 0x77, 0xF3,};
+                var bf = new BlowFish(bf_key);
+                var crypted = HexEncoding.HexToByte(passwd);
+                
+                SwapEndianess(crypted);
+
+                var plain = bf.Decrypt_ECB(crypted);
+
+                SwapEndianess(plain.Span);
+
+                
+                var eos = plain.Span.IndexOf((byte) 0);
+                if (eos >= 0) 
+                    passwd = Encoding.UTF8.GetString(plain.Slice(0, eos).Span);
+
+                _output.WriteLine(plain.ToHex());
+                Assert.Equal("axi", passwd);
+            }
+        }
+
+        private void SwapEndianess(Span<byte> data)
+        {
+            var t = data;
+            while (!t.IsEmpty)
+            {
+                var value = BinaryPrimitives.ReadUInt32BigEndian(t);
+                BinaryPrimitives.WriteUInt32LittleEndian(t, value);
+                t = t.Slice(4);
             }
         }
     }
