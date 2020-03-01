@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -73,6 +74,22 @@ namespace RfpProxyLib
 
     public class OmmConfReader:IDisposable
     {
+        private static readonly byte[] HiddenMd5Data = {
+            0x16, 0xFF, 0x50, 1, 0x13, 0xC0, 0x73, 0x34, 0x93,
+            0x37, 0x70, 0x14, 0xFF, 0x4C, 0x20, 0x2E, 0xB, 0x28,
+            0x21, 0xC, 0xBC, 0xC2, 0x60, 0xC0, 0x7F, 0x21, 0x3B,
+            0xD6, 0x15, 0x38, 0x83, 5, 0xA0, 0, 0xFF, 0x11, 0x97,
+            0x57, 0x18, 0xC9, 0x27, 0x8F, 0xF8, 0xFF, 0xA5, 0x72,
+            0x89, 0x29, 0x12, 0x16, 0xE9, 0x34, 0xFF, 0xCD, 0x8B,
+            0xFF, 0xF4, 0xB6, 0x10, 0x9B, 0, 0x8C, 3, 0x96, 0x32,
+            0xD, 0x7F, 0x60, 0xFE, 0xFF, 0xDE, 0x72, 0x2E, 0x16,
+            0xA6, 0xBF, 0xA0, 0x10, 0x83, 0xF0, 0xAC, 0x6A, 0x4B,
+            0xC, 0xFF, 0xFF, 0x5F, 0xFE, 0xCB, 7, 0xB9, 0x5F, 0x53,
+            0x1D, 0x48, 0x3C
+        };
+        private static readonly byte[] ByteOrderMark = {0xef, 0xbb, 0xbf};
+        private static readonly byte[] LineBreak = {13, 10};
+
         private readonly Stream _config;
         private readonly Dictionary<string, List<OmmConfEntry>> _sections;
 
@@ -100,7 +117,9 @@ namespace RfpProxyLib
         {
             _disposed = true;
             using (var sr = new StreamReader(_config, Encoding.UTF8))
+            using (var md5 = MD5.Create())
             {
+                md5.TransformBlock(ByteOrderMark, 0, ByteOrderMark.Length, null, 0);
                 string previous = null;
                 OmmConfHeader header = null;
                 while (!sr.EndOfStream)
@@ -113,6 +132,8 @@ namespace RfpProxyLib
                     }
                     else if (current.AsSpan().TrimStart('-').IsEmpty)
                     {
+                        if (previous is null)
+                            throw new InvalidDataException("omm_conf cannot start with separator line ---");
                         header = new OmmConfHeader(previous.Split('|'));
                     }
                     else if (!(header is null))
@@ -122,8 +143,18 @@ namespace RfpProxyLib
                         var section = AddSection(data.Type);
                         section.Add(data);
                     }
+                    if (previous != null )
+                    {
+                        var bytes = Encoding.UTF8.GetBytes(previous);
+                        md5.TransformBlock(bytes, 0, bytes.Length, null, 0);
+                        md5.TransformBlock(LineBreak, 0, LineBreak.Length, null, 0);
+                    }
                     previous = current;
                 }
+                md5.TransformFinalBlock(HiddenMd5Data, 0, HiddenMd5Data.Length);
+                var checksum = HexEncoding.ByteToHex(md5.Hash);
+                if (previous != checksum)
+                    throw new InvalidDataException("invalid checksum");
             }
         }
 
