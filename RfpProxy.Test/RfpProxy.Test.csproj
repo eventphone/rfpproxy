@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="omm_conf.txt" />
     <None Remove="rekey.bin" />
   </ItemGroup>
 
@@ -28,6 +29,12 @@
   <ItemGroup>
     <ProjectReference Include="..\RfpProxy.AaMiDe\RfpProxy.AaMiDe.csproj" />
     <ProjectReference Include="..\RfpProxy\RfpProxy.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="omm_conf.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
