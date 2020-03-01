@@ -96,13 +96,13 @@ namespace RfpProxy.AaMiDe
                     return new SysHttpSetMessage(data);
                 case MsgType.SYS_SYSLOG:
                     return new SysSyslogMessage(data);
-                case MsgType.SYS_COREFILE_URL:
+                case MsgType.SYS_CORE_DUMP:
                     return new SysCorefileUrlMessage(data);
                 case MsgType.SYS_PASSWD:
                     return new SysPasswdMessage(data);
                 case MsgType.SYS_RPING:
                     return new SysRPingMessage(data);
-                case MsgType.SYS_ROUNDTRIP_DELAY:
+                case MsgType.SYS_VSNTP_TIME:
                     return new SysRoundtripDelayMessage(data);
                 case MsgType.SYS_RESET:
                     return new SysResetMessage(data);
