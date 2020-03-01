@@ -2,6 +2,8 @@ using System;
 using System.Buffers.Binary;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
+using RfpProxy.AaMiDe.Sys;
 using RfpProxyLib;
 using Xunit;
 using Xunit.Abstractions;
@@ -362,6 +364,108 @@ namespace RfpProxy.Test
                 aes_key[i] = v22;
             }
             _output.WriteLine(aes_key.AsSpan().ToHex());
+        }
+
+        [Fact]
+        public void CanInitIV()
+        {
+            var omm_iv = HexEncoding.HexToByte("7165E6DF425AC4FA");
+            BinaryPrimitives.WriteUInt32LittleEndian(omm_iv, BinaryPrimitives.ReadUInt32BigEndian(omm_iv));
+            BinaryPrimitives.WriteUInt32LittleEndian(omm_iv.AsSpan(4), BinaryPrimitives.ReadUInt32BigEndian(omm_iv.AsSpan(4)));
+            ulong byte_88030F0 = 0x6e_15_de_7f_12_a7_09_1f;
+            ulong byte_88030DF = 0xb1_f3_bb_0e_e8_63_53_5d;
+            var omm_init_iv = byte_88030DF ^ byte_88030F0;
+            _output.WriteLine("{0:x16}", byte_88030F0);
+            _output.WriteLine("{0:x16}", byte_88030DF);
+            _output.WriteLine("{0:x16}", omm_init_iv);
+            Assert.Equal(omm_iv.AsSpan().ToHex(), omm_init_iv.ToString("x16"));
+
+            var rfp_iv = HexEncoding.HexToByte("4B36E868C134C2E9");
+            BinaryPrimitives.WriteUInt32LittleEndian(rfp_iv, BinaryPrimitives.ReadUInt32BigEndian(rfp_iv));
+            BinaryPrimitives.WriteUInt32LittleEndian(rfp_iv.AsSpan(4), BinaryPrimitives.ReadUInt32BigEndian(rfp_iv.AsSpan(4)));
+            ulong byte_88030E7 = 0xb1_f7_31_44_c7_13_95_d0;
+            ulong byte_88030F7 = 0xd9_1f_07_0f_2e_d1_a1_11;
+            var rfp_init_iv = byte_88030E7 ^ byte_88030F7;
+            _output.WriteLine("{0:x16}", byte_88030E7);
+            _output.WriteLine("{0:x16}", byte_88030F7);
+            _output.WriteLine("{0:x16}", rfp_init_iv);
+            Assert.Equal(rfp_iv.AsSpan().ToHex(), rfp_init_iv.ToString("x16"));
+        }
+
+        [Fact]
+        public void CanDecryptRFPA()
+        {
+            var rfpa_crypted = "45C2DD259C4B368DC86F972E62180635A3241099DB76FE8C0B10922D0838EE254C88543C4981B58236122E9AC35297038CBD8EDE4926F2D6519167EA2A64FD0E";
+            var rfpa_plain = "6e9dda8b0e300ce29d41990c1c4e43b9e13ef2374e491511699684fbbbb283c325a72b5e6e558365063e37f694213b80309f3b1053bb398bc4ea78a1baa8705d";
+            var mac = "0030421B1737\0";
+
+            mac = mac.ToLowerInvariant();
+
+            var crypted = HexEncoding.HexToByte(rfpa_crypted);
+            var t = crypted.AsSpan();
+            while (!t.IsEmpty)
+            {
+                //endian swap
+                var value = BinaryPrimitives.ReadUInt32BigEndian(t);
+                BinaryPrimitives.WriteUInt32LittleEndian(t, value);
+                t = t.Slice(4);
+            }
+
+            var bf = new BlowFish(Encoding.ASCII.GetBytes(mac));
+            var plain = bf.Decrypt_ECB(crypted);
+
+            t = plain.Span;
+            while (!t.IsEmpty)
+            {
+                //endian swap
+                var value = BinaryPrimitives.ReadUInt32BigEndian(t);
+                BinaryPrimitives.WriteUInt32LittleEndian(t, value);
+                t = t.Slice(4);
+            }
+
+            _output.WriteLine(rfpa_crypted);
+            _output.WriteLine(crypted.AsSpan().ToHex());
+            _output.WriteLine(plain.ToHex());
+
+            Assert.Equal(rfpa_plain, plain.ToHex());
+        }
+
+        [Fact]
+        public void CanDecryptWithIndividualKey()
+        {
+            var key = "6e9dda8b0e300ce29d41990c1c4e43b9e13ef2374e491511699684fbbbb283c325a72b5e6e558365063e37f694213b80309f3b1053bb398bc4ea78a1baa8705d";
+            var omm_key = key.Substring(0, 56*2);
+            var key2 = key.Substring(8*2);
+            var omm_bf = new BlowFish(HexEncoding.HexToByte(omm_key));
+            var rfp_bf = new BlowFish(HexEncoding.HexToByte(key2));
+            var auth = new SysAuthenticateMessage(HexEncoding.HexToByte("012d00205356c49560e597d6445f49dce9a8219eb3f10cf055e24b291c867ce128421361"));
+            var ommdata = "81add1586bdc7bd9e9c4f3836eaa70877a51a8e4288ca34df49c602496d64924" +
+                         "5213eb56376060949eda9f373dc3ab7a806bf97a9f072579a5ed79c2a67a8a78" +
+                         "c9bd1f291247db8879add3ce9849ecdf3fcec198ddc4b8105b99bba78ad41df2" +
+                         "52b5485036532e8a66c9ad2be5b9d3194bbd8b7c5dc351ceb82f30668f5ef60d" +
+                         "2039db815242095f5c7bb23f257e47e8013aa8df7aea53a25b77cfe437b92a91" +
+                         "053e31dbc8e99adc88311c6b8800275d56ee4d8be1988688391d113c753654e2" +
+                         "4ada0060822754fb801ae266ab7081db0dc91f933bbb592977d69fd5f794dde0" +
+                         "32d0384597e0e3f3b97ea0accd41d9d3baf76b4477706a12cb827242c2183c5d" +
+                         "bb677584d824c52fe389d2ac54f27fc97675ab201e44475c97b62ceec665ab01" +
+                         "c10faae08a2aa955b59e11f8c844171d73c078e89045c4c5a4dc06090ed1fc62" +
+                         "fb75ccbc302d064ae2d7ceedf577af8afcd38b612f05f671eebac58a7dc594b1" +
+                         "d947e47f59838a7a430cd6984d226c0af06867849abcd81e1154c2c5461a520f" +
+                         "5acd5b2193687305a8d3cd49d684ad86300aaa44326e059b98e66fbdc4d4316c" +
+                         "e8c99216356424bc977294f7ffe9ebb782f91b5cc5ca253153716b199944555c" +
+                         "8f842dc37d8ac1e1";
+
+            var rfpdata = "9f723e0ee29e7a5848556fcc94f8c446d2acdad3bd472ceb37440c8c94554e31";
+
+            var iv = HexEncoding.HexToByte("dfe66571fac45a42");
+            BlowFish.XorBlock(iv, auth.OmmIv.Span);
+            var plain = omm_bf.Decrypt_CBC(iv, HexEncoding.HexToByte(ommdata));
+            _output.WriteLine(plain.ToHex());
+
+            iv = HexEncoding.HexToByte("68e8364be9c234c1");
+            BlowFish.XorBlock(iv, auth.RfpIv.Span);
+            plain = rfp_bf.Decrypt_CBC(iv, HexEncoding.HexToByte(rfpdata));
+            _output.WriteLine(plain.ToHex());
         }
     }
 }
