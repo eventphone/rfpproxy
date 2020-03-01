@@ -16,14 +16,14 @@ namespace RfpProxy.AaMiDe.Sys
 
         public override bool HasUnknown => true;
 
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(32);
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(31);
 
         public SysAuthenticateMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_AUTHENTICATE, data)
         {
-            Reserved1 = base.Raw.Slice(0, 8);
-            RfpIv = base.Raw.Slice(8, 8);
-            Reserved2 = base.Raw.Slice(16, 8);
-            OmmIv = base.Raw.Slice(24, 8);
+            Reserved1 = base.Raw.Slice(0, 7);
+            RfpIv = base.Raw.Slice(7, 8);
+            Reserved2 = base.Raw.Slice(15, 8);
+            OmmIv = base.Raw.Slice(23, 8);
         }
 
         public override void Log(TextWriter writer)
