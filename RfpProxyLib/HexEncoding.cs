@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -67,6 +68,16 @@ namespace RfpProxyLib
                 return (byte)(x - 'A' + 10);
             }
             return 0;
+        }
+
+        public static void SwapEndianess(Span<byte> data)
+        {
+            while (!data.IsEmpty)
+            {
+                var value = BinaryPrimitives.ReadUInt32BigEndian(data);
+                BinaryPrimitives.WriteUInt32LittleEndian(data, value);
+                data = data.Slice(4);
+            }
         }
     }
 }

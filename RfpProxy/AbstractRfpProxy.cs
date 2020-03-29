@@ -2,8 +2,11 @@
 using System.Buffers.Binary;
 using System.IO.Pipelines;
 using System.Net.Sockets;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using RfpProxyLib;
 
 namespace RfpProxy
 {
@@ -21,6 +24,11 @@ namespace RfpProxy
 
             var iv = connection.RfpToOmmIv;
             connection.RfpToOmmIv = ReadOnlyMemory<byte>.Empty;
+
+            connection.Identifier = new RfpIdentifier(sysInit.Slice(12,6).ToArray());
+            var key = await GetRfpKeyAsync(connection, cancellationToken).ConfigureAwait(false);
+            SetKeys(key, connection);
+
             await OnClientMessageAsync(connection, sysInit, cancellationToken).ConfigureAwait(false);
             connection.RfpToOmmIv = iv;
             await ReadAsync(connection, client, OnClientMessageAsync, connection.RfpToOmmIv, connection.DecryptRfpToOmm, connection.RekeyRfpToOmmDecrypt, cancellationToken).ConfigureAwait(false);
@@ -34,7 +42,56 @@ namespace RfpProxy
 
             await OnServerMessageAsync(connection, sysAuthenticate, cancellationToken).ConfigureAwait(false);
 
-            var ack = await ReadPacketAsync(0x01, 0x08, server, cancellationToken).ConfigureAwait(false);
+            var packet = await ReadPacketAsync(0, 0, server, cancellationToken).ConfigureAwait(false);
+            var type = packet.Slice(0, 2);
+            if (type.Span[0] == 0x01)
+            {
+                ReadOnlyMemory<byte> key;
+                if (type.Span[1] == 0x24)
+                {
+                    //SYS_RFP_AUTH_KEY
+                    key = packet.Slice(4);
+                }
+                else if (type.Span[1] == 0x25)
+                {
+                    //SYS_RFP_RE_ENROLEMENT
+                    var checksum = packet.Slice(0x44);
+                    var crypted = packet.Slice(4, 0x40);
+                    var pw = await GetRootPasswordHashAsync(cancellationToken).ConfigureAwait(false);
+                    var pwBytes = Encoding.ASCII.GetBytes(pw);
+
+                    using (var sha = SHA256.Create())
+                    {
+                        var data = new byte[0x20 + 0x1a + 0x40].AsMemory();
+                        sysAuthenticate.Slice(4).CopyTo(data);
+                        pwBytes.CopyTo(data.Slice(0x20));
+                        crypted.CopyTo(data.Slice(0x20 + 0x1a));
+                        var hash = new byte[0x20];
+                        if (!sha.TryComputeHash(data.Span, hash, out _))
+                            throw new InvalidOperationException();
+                        if (!checksum.Span.SequenceEqual(hash))
+                            throw new InvalidOperationException();
+                    }
+                    var aesKey = new byte[0x20];
+                    sysAuthenticate.Slice(4).CopyTo(aesKey);
+                    pwBytes.CopyTo(aesKey.AsSpan());
+                    using (var aes = new AesManaged{Key = aesKey, Mode = CipherMode.ECB, Padding = PaddingMode.None})
+                    using (var decryptor = aes.CreateDecryptor())
+                    {
+                        var buffer = crypted.ToArray();
+                        key = decryptor.TransformFinalBlock(buffer, 0, buffer.Length);
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException();
+                }
+                SetKeys(key, connection);
+                connection.RekeyOmmToRfpDecrypt(packet);
+                await OnServerMessageAsync(connection, packet, cancellationToken).ConfigureAwait(false);
+                packet = await ReadPacketAsync(0x01, 0x08, server, cancellationToken).ConfigureAwait(false);
+            }
+            var ack = packet;
             connection.RekeyOmmToRfpDecrypt(ack);
             await OnServerMessageAsync(connection, ack, cancellationToken).ConfigureAwait(false);
 
@@ -104,7 +161,7 @@ namespace RfpProxy
                 var buffer = result.Buffer;
                 if (buffer.Length >= 4)
                 {
-                    if (buffer.Slice(0, 2).ToMemory().Span.SequenceEqual(typeArray))
+                    if (type == 0 || buffer.Slice(0, 2).ToMemory().Span.SequenceEqual(typeArray))
                     {
                         //found message type
                         var packetLength = BinaryPrimitives.ReadUInt16BigEndian(buffer.Slice(2, 2).ToMemory().Span);
@@ -115,8 +172,8 @@ namespace RfpProxy
                             reader.AdvanceTo(buffer.End, buffer.End);
                             return buffer.ToMemory();
                         }
-                        throw new Exception("unexpected packet");
                     }
+                    throw new Exception("unexpected packet");
                 }
                 if (result.IsCompleted)
                 {
@@ -131,6 +188,17 @@ namespace RfpProxy
         protected abstract Task OnClientMessageAsync(RfpConnection connection, ReadOnlyMemory<byte> data, CancellationToken cancellationToken);
 
         protected abstract Task OnServerMessageAsync(RfpConnection connection, ReadOnlyMemory<byte> data, CancellationToken cancellationToken);
+
+        protected virtual void SetKeys(ReadOnlyMemory<byte> key, CryptedRfpConnection connection)
+        {
+            if (key.IsEmpty) return;
+            connection.SetOmmKey(key.Span.Slice(0, 56));
+            connection.SetRfpKey(key.Span.Slice(8));
+        }
+
+        protected abstract Task<ReadOnlyMemory<byte>> GetRfpKeyAsync(CryptedRfpConnection connection, CancellationToken cancellationToken);
+
+        protected abstract Task<string> GetRootPasswordHashAsync(CancellationToken cancellationToken);
 
         protected override CryptedRfpConnection OnClientConnected(TcpClient client, TcpClient server)
         {

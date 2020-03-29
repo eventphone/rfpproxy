@@ -165,7 +165,6 @@ namespace RfpProxy
         {
             if (data.Length >= 18 && data.Span.StartsWith(SysInit.Span))
             {
-                connection.Identifier = new RfpIdentifier(data.Slice(12,6).ToArray());
                 _connections.AddOrUpdate(connection.Identifier, connection, (m, c) => connection);
             }
 
@@ -204,6 +203,16 @@ namespace RfpProxy
             }
             if (!data.IsEmpty)
                 await connection.SendToClientAsync(data, cancellationToken).ConfigureAwait(false);
+        }
+
+        protected override Task<ReadOnlyMemory<byte>> GetRfpKeyAsync(CryptedRfpConnection connection, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override Task<string> GetRootPasswordHashAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -14,8 +14,6 @@ namespace RfpProxy.Test
     {
         private readonly ITestOutputHelper _output;
 
-        private byte[] _ivTx;
-        private byte[] _ivRx;
         private CryptedRfpConnection _connection;
 
         public CryptoTest(ITestOutputHelper output)
