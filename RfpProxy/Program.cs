@@ -15,6 +15,7 @@ namespace RfpProxy
             int port = 16321;
             int listen = 16000;
             string socket = "client.sock";
+            string configfile = "/opt/SIP-DECT/tmp/omm_conf.txt";
             bool showHelp = false;
             bool useTProxy = false;
             var options = new OptionSet
@@ -24,6 +25,7 @@ namespace RfpProxy
                 {"l|listen=", "TCP listen port of proxy", (ushort x) => listen = x},
                 {"s|socket=", "socket path", (string x) => socket = x},
                 {"t|transparent", "use TPROXY", x => useTProxy = x != null},
+                {"c|config", "omm_conf.txt", x=> configfile = x },
                 {"h|help", "show help", x => showHelp = x != null},
             };
 
@@ -49,7 +51,7 @@ namespace RfpProxy
             }
 
             using (var cts = new CancellationTokenSource())
-            using (var proxy = new RfpProxy(listen, host, port, socket) {UseTProxy = useTProxy})
+            using (var proxy = new RfpProxy(listen, host, port, socket, configfile) {UseTProxy = useTProxy})
             {
                 Console.CancelKeyPress += (s, e) =>
                 {

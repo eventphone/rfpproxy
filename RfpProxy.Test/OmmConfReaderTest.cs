@@ -76,11 +76,11 @@ namespace RfpProxy.Test
                 var bf = new BlowFish(bf_key);
                 var crypted = HexEncoding.HexToByte(passwd);
                 
-                SwapEndianess(crypted);
+                HexEncoding.SwapEndianess(crypted);
 
                 var plain = bf.Decrypt_ECB(crypted);
 
-                SwapEndianess(plain.Span);
+                HexEncoding.SwapEndianess(plain.Span);
 
                 
                 var eos = plain.Span.IndexOf((byte) 0);
@@ -92,14 +92,13 @@ namespace RfpProxy.Test
             }
         }
 
-        private void SwapEndianess(Span<byte> data)
+        [Fact]
+        public async Task CanReadRootPassword()
         {
-            var t = data;
-            while (!t.IsEmpty)
+            using (var reader = new OmmConfReader("omm_conf.txt"))
             {
-                var value = BinaryPrimitives.ReadUInt32BigEndian(t);
-                BinaryPrimitives.WriteUInt32LittleEndian(t, value);
-                t = t.Slice(4);
+                var user = await reader.GetValueAsync("UA", "user", "root", CancellationToken.None); 
+                Assert.Equal("$1$$juPq1oleiGg7WHdZ5itlC/", user["password"]);
             }
         }
     }

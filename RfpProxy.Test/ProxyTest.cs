@@ -196,7 +196,7 @@ namespace RfpProxy.Test
             {
             }
 
-            public TestProxy(string rfpa, string ommPw) : base(51337, "localhost", 61337, "asdf")
+            public TestProxy(string rfpa, string ommPw) : base(51337, "localhost", 61337, "asdf", null)
             {
                 _rfpa = rfpa;
                 _ommPw = ommPw;

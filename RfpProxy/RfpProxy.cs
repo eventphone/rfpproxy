@@ -17,13 +17,15 @@ namespace RfpProxy
     public class RfpProxy : TransparentRfpProxy
     {
         private readonly string _socket;
+        private readonly string _ommConf;
         private readonly ConcurrentDictionary<Subscription, Subscription> _subscriptions = new ConcurrentDictionary<Subscription, Subscription>();
         private readonly ConcurrentDictionary<RfpIdentifier, RfpConnection> _connections = new ConcurrentDictionary<RfpIdentifier, RfpConnection>();
 
-        public RfpProxy(int listenPort, string ommHost, int ommPort, string socket) 
+        public RfpProxy(int listenPort, string ommHost, int ommPort, string socket, string ommConf) 
             : base(listenPort, ommHost, ommPort)
         {
             _socket = socket;
+            _ommConf = ommConf;
         }
 
         public override Task RunAsync(CancellationToken cancellationToken)
@@ -205,14 +207,27 @@ namespace RfpProxy
                 await connection.SendToClientAsync(data, cancellationToken).ConfigureAwait(false);
         }
 
-        protected override Task<ReadOnlyMemory<byte>> GetRfpKeyAsync(CryptedRfpConnection connection, CancellationToken cancellationToken)
+        protected override async Task<ReadOnlyMemory<byte>> GetRfpKeyAsync(CryptedRfpConnection connection, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            using (var reader = new OmmConfReader(_ommConf))
+            {
+                var rfp = await reader.GetValueAsync("RFP", "mac", connection.Identifier.ToString(), CancellationToken.None).ConfigureAwait(false);
+                if (rfp is null) return ReadOnlyMemory<byte>.Empty;
+                var id = rfp["id"];
+                var rfpa = await reader.GetValueAsync("RFPA", "id", id, CancellationToken.None).ConfigureAwait(false);
+                if (rfpa is null) return ReadOnlyMemory<byte>.Empty;
+                var key = rfpa[1];
+                return HexEncoding.HexToByte(key);
+            }
         }
 
-        protected override Task<string> GetRootPasswordHashAsync(CancellationToken cancellationToken)
+        protected override async Task<string> GetRootPasswordHashAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            using (var reader = new OmmConfReader(_ommConf))
+            {
+                var user = await reader.GetValueAsync("UA", "user", "root", cancellationToken);
+                return user?["password"];
+            }
         }
     }
 }
