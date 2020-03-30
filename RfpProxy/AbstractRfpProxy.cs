@@ -196,7 +196,19 @@ namespace RfpProxy
             connection.SetRfpKey(key.Span.Slice(8));
         }
 
-        protected abstract Task<ReadOnlyMemory<byte>> GetRfpKeyAsync(CryptedRfpConnection connection, CancellationToken cancellationToken);
+        private async Task<ReadOnlyMemory<byte>> GetRfpKeyAsync(CryptedRfpConnection connection, CancellationToken cancellationToken)
+        {
+            var rfpa = await GetRfpaAsync(connection, cancellationToken);
+            if (rfpa.IsEmpty) return rfpa;
+            HexEncoding.SwapEndianess(rfpa.Span);
+            var key = connection.Identifier.ToString() + '\0';
+            var bf = new BlowFish(Encoding.ASCII.GetBytes(key));
+            var plain = bf.Decrypt_ECB(rfpa.Span);
+            HexEncoding.SwapEndianess(plain.Span);
+            return plain;
+        }
+
+        protected abstract Task<Memory<byte>> GetRfpaAsync(CryptedRfpConnection connection, CancellationToken cancellationToken);
 
         protected abstract Task<string> GetRootPasswordHashAsync(CancellationToken cancellationToken);
 

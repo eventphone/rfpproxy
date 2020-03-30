@@ -207,15 +207,15 @@ namespace RfpProxy
                 await connection.SendToClientAsync(data, cancellationToken).ConfigureAwait(false);
         }
 
-        protected override async Task<ReadOnlyMemory<byte>> GetRfpKeyAsync(CryptedRfpConnection connection, CancellationToken cancellationToken)
+        protected override async Task<Memory<byte>> GetRfpaAsync(CryptedRfpConnection connection, CancellationToken cancellationToken)
         {
             using (var reader = new OmmConfReader(_ommConf))
             {
-                var rfp = await reader.GetValueAsync("RFP", "mac", connection.Identifier.ToString(), CancellationToken.None).ConfigureAwait(false);
-                if (rfp is null) return ReadOnlyMemory<byte>.Empty;
+                var rfp = await reader.GetValueAsync("RFP", "mac", connection.Identifier.ToString().ToUpper(), CancellationToken.None).ConfigureAwait(false);
+                if (rfp is null) return Memory<byte>.Empty;
                 var id = rfp["id"];
                 var rfpa = await reader.GetValueAsync("RFPA", "id", id, CancellationToken.None).ConfigureAwait(false);
-                if (rfpa is null) return ReadOnlyMemory<byte>.Empty;
+                if (rfpa is null) return Memory<byte>.Empty;
                 var key = rfpa[1];
                 return HexEncoding.HexToByte(key);
             }

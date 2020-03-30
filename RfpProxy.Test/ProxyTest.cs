@@ -51,6 +51,25 @@ namespace RfpProxy.Test
             proxy.SendFromOmm("b30ece1f8c9731c2");
             ValidateTypeAndLength(proxy.LastOmmMessage);
             Assert.Equal("0102000400090000", proxy.LastOmmMessageHex);
+
+            proxy.SendFromOmm("9d8fb229f310b7e994ba405be02d01f5ad4827d383925564" + 
+                              "925f9fadc6e023f5db5f3f74cd91d17d8814a9946e7abdbe729b59d32d0b4725" +
+                              "2b99c39b70fd362802862e0541b876dd4fe8e9291add80e03cf40c5355bfc168" +
+                              "e041229eef995b6a74ba52de3ca84dce31510178296fc2fe86325b4663142052" +
+                              "fe9c27b34f887a3ab2a9f3222cc8aefb8134c77edfa2b142c39da25a7ea2d8cc" +
+                              "1fe10d67c2546499bb41e3645f7b6616a80b51d700b4ed17315298e13b0abf56" +
+                              "b02ef601622f4837adde01b885dd370db331318dc1821a660b33e48ec3849542" +
+                              "4675da6b111765dca00a7a1a3d1ae0b7a9e65088549347a81e77f512c6b4715b" +
+                              "8ee78ca5cba5a5666a37472de28add2e96747ab669febdf4ab3c5b3ef24a7bb7" +
+                              "1b3b0e7cb8e29f4926a9aba0a7467e9cb9ac61573b8deb6d6d6518d466256132" +
+                              "ba122d69e163adb2997fda7c7b3cd8e2519f62624f38e5bc0604f197b5630337" +
+                              "10657db308b8753744e2740a1125f79ea8c934bb34b7a3685a17c75f4221982e" +
+                              "e6bc96ec466649fb4669c9afda51af4752a84287ff83c08e");
+            ValidateTypeAndLength(proxy.LastOmmMessage);
+            proxy.SendFromRfp("4e2da25833e64f92");
+            ValidateTypeAndLength(proxy.LastRfpMessage);
+            proxy.SendFromRfp("3c54c821a4e5961f32933ca3731667960dfb967332f26106");
+            ValidateTypeAndLength(proxy.LastRfpMessage);
         }
 
         [Fact]
@@ -278,19 +297,13 @@ namespace RfpProxy.Test
                 base.Dispose(disposing);
             }
 
-            protected override Task<ReadOnlyMemory<byte>> GetRfpKeyAsync(CryptedRfpConnection connection, CancellationToken cancellationToken)
+            protected override Task<Memory<byte>> GetRfpaAsync(CryptedRfpConnection connection, CancellationToken cancellationToken)
             {
                 if (!(_rfpa is null))
                 {
-                    var rfpa = HexEncoding.HexToByte(_rfpa);
-                    HexEncoding.SwapEndianess(rfpa);
-                    var key = connection.Identifier.ToString() + '\0';
-                    var bf = new BlowFish(Encoding.ASCII.GetBytes(key));
-                    var plain = bf.Decrypt_ECB(rfpa);
-                    HexEncoding.SwapEndianess(plain.Span);
-                    return Task.FromResult<ReadOnlyMemory<byte>>(plain);
+                    return Task.FromResult<Memory<byte>>(HexEncoding.HexToByte(_rfpa));
                 }
-                return Task.FromResult(ReadOnlyMemory<byte>.Empty);
+                return Task.FromResult(Memory<byte>.Empty);
             }
 
             protected override Task<string> GetRootPasswordHashAsync(CancellationToken cancellationToken)
