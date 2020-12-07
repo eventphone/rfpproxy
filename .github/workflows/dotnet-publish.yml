@@ -1,4 +1,4 @@
-name: dotnet publish workshop
+name: dotnet publish workflow
 on: workflow_dispatch
 jobs:
   publish:
@@ -20,6 +20,8 @@ jobs:
     - run: 'dotnet publish -o publish/busyled -c Release BusyLed/BusyLed.csproj'
     - run: 'dotnet publish -o publish/midi -c Release MediaTone/MediaTone.csproj'
     - run: 'dotnet publish -o publish/morseled -c Release MorseLed/MorseLed.csproj'
-  artifacts:
-    paths:
-    - publish
+    - name: Upload result
+      uses: actions/upload-artifact@v2
+      with:
+        name: rfpproxy_publish
+        path: publish
