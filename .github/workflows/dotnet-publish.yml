@@ -1,5 +1,5 @@
 name: dotnet publish workflow
-on: workflow_dispatch
+on: [workflow_dispatch, push]
 jobs:
   publish:
     runs-on: ubuntu-latest
