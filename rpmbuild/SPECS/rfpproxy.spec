@@ -46,10 +46,21 @@ rm -rf $RPM_BUILD_ROOT/
 getent passwd rfpproxy >/dev/null 2>&1 || useradd -r -M -d /opt/rfpproxy rfpproxy
 
 %post
-%systemd_post rfpproxy.service
+if [ $1 -eq 1 ] ; then
+  # Initial installation
+  systemctl preset rfpproxy.service >/dev/null 2>&1 || :
+fi
 
 %preun
-%systemd_preun rfpproxy.service
+if [ $1 -eq 0 ] ; then
+  # Package removal, not upgrade
+  systemctl --no-reload disable rfpproxy.service > /dev/null 2>&1 || :
+  systemctl stop rfpproxy.service > /dev/null 2>&1 || :
+fi
 
 %postun
-%systemd_postun_with_restart rfpproxy.service
+systemctl daemon-reload >/dev/null 2>&1 || :
+if [ $1 -ge 1 ] ; then
+  # Package upgrade, not uninstall
+  systemctl try-restart rfpproxy.service >/dev/null 2>&1 || :
+fi
