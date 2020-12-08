@@ -21,7 +21,7 @@ jobs:
     - run: 'dotnet publish -o publish/midi -c Release MediaTone/MediaTone.csproj'
     - run: 'dotnet publish -o publish/morseled -c Release MorseLed/MorseLed.csproj'
     - run: 'sudo apt install rpm'
-    - run: 'rpmbuild --target noarch -bb --build-in-place rpmbuild/SPECS/rfpproxy.spec'
+    - run: 'rpmbuild --target noarch --define "_binaries_in_noarch_packages_terminate_build 0" -bb --build-in-place rpmbuild/SPECS/rfpproxy.spec'
     - name: Upload result
       uses: actions/upload-artifact@v2
       with:
