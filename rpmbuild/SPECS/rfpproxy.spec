@@ -6,8 +6,8 @@ License: MIT
 URL: https://github.com/eventphone/rfpproxy
 Requires: dotnet-runtime-3.0
 
-%global __requires_exclude_from ^$RPM_BUILD_ROOT/.*$
-%global __provides_exclude_from ^$RPM_BUILD_ROOT/.*$
+%global __requires_exclude_from ^.*$
+%global __provides_exclude_from ^.*$
 
 %description
 rfpproxy
