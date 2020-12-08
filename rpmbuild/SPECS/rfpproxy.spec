@@ -12,8 +12,8 @@ rfpproxy
 %prep
 mkdir -p $RPM_BUILD_ROOT/opt/rfpproxy $RPM_BUILD_ROOT/lib/systemd/system
 
-cp -r ../publish/* $RPM_BUILD_ROOT/opt/rfpproxy
-cp ../rfpproxy.service $RPM_BUILD_ROOT/lib/systemd/system/.
+cp -r publish/* $RPM_BUILD_ROOT/opt/rfpproxy
+cp rfpproxy.service $RPM_BUILD_ROOT/lib/systemd/system/.
 exit
 
 %files
@@ -21,7 +21,7 @@ exit
 /lib/systemd/system/rfpproxy.service
 
 %clean
-mv %{_rpmdir}/noarch/* ../publish/
+mv %{_rpmdir}/noarch/* publish/
 rm -rf $RPM_BUILD_ROOT/
 
 %post
