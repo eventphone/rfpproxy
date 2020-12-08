@@ -4,7 +4,7 @@ Version: 0.0.1
 Release: 1
 License: MIT
 URL: https://github.com/eventphone/rfpproxy
-Requires: dotnet-runtime-3.1
+Requires: dotnet-runtime-3.0
 
 %description
 rfpproxy
@@ -12,12 +12,26 @@ rfpproxy
 %prep
 mkdir -p $RPM_BUILD_ROOT/opt/rfpproxy $RPM_BUILD_ROOT/lib/systemd/system
 
-cp -r publish/* $RPM_BUILD_ROOT/opt/rfpproxy
+cp -ru publish/*/* $RPM_BUILD_ROOT/opt/rfpproxy
+rm $RPM_BUILD_ROOT/opt/rfpproxy/*.pdb
 cp rfpproxy.service $RPM_BUILD_ROOT/lib/systemd/system/.
 exit
 
 %files
-/opt/rfpproxy/*/*
+%caps(cap_net_admin=+eip) /opt/rfpproxy/rfpproxy
+/opt/rfpproxy/avm
+/opt/rfpproxy/busyled
+/opt/rfpproxy/compressipui
+/opt/rfpproxy/mediatone
+/opt/rfpproxy/morseled
+/opt/rfpproxy/rfpproxyinject
+/opt/rfpproxy/RfpProxy.ChangeLed
+/opt/rfpproxy/rfpproxylog
+/opt/rfpproxy/rfpproxydump
+/opt/rfpproxy/rfpproxytraffic
+%attr(644, root, root) /opt/rfpproxy/*.dll
+/opt/rfpproxy/*.deps.json
+/opt/rfpproxy/*.runtimeconfig.json
 /lib/systemd/system/rfpproxy.service
 
 %clean
