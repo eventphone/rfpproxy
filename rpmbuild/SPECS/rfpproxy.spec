@@ -35,7 +35,8 @@ exit
 /lib/systemd/system/rfpproxy.service
 
 %clean
-mv %{_rpmdir}/noarch/* publish/
+mkdir rpm
+mv %{_rpmdir}/noarch/* rpm/
 rm -rf $RPM_BUILD_ROOT/
 
 %pre
