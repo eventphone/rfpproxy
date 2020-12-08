@@ -38,6 +38,9 @@ exit
 mv %{_rpmdir}/noarch/* publish/
 rm -rf $RPM_BUILD_ROOT/
 
+%pre
+getent passwd rfpproxy >/dev/null 2>&1 || useradd -r -M -d /opt/rfpproxy rfpproxy
+
 %post
 %systemd_post rfpproxy.service
 
