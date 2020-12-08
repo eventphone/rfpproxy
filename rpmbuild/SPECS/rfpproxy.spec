@@ -21,24 +21,24 @@ cp rfpproxy.service $RPM_BUILD_ROOT/lib/systemd/system/.
 exit
 
 %files
-%caps(cap_net_admin=+eip) /opt/rfpproxy/rfpproxy
-/opt/rfpproxy/avm
-/opt/rfpproxy/busyled
-/opt/rfpproxy/compressipui
-/opt/rfpproxy/mediatone
-/opt/rfpproxy/morseled
-/opt/rfpproxy/rfpproxyinject
-/opt/rfpproxy/RfpProxy.ChangeLed
-/opt/rfpproxy/rfpproxylog
-/opt/rfpproxy/rfpproxydump
-/opt/rfpproxy/rfpproxytraffic
+%attr(755, root, root) %caps(cap_net_admin=+eip) /opt/rfpproxy/rfpproxy
+%attr(755, root, root) /opt/rfpproxy/avm
+%attr(755, root, root) /opt/rfpproxy/busyled
+%attr(755, root, root) /opt/rfpproxy/compressipui
+%attr(755, root, root) /opt/rfpproxy/mediatone
+%attr(755, root, root) /opt/rfpproxy/morseled
+%attr(755, root, root) /opt/rfpproxy/rfpproxyinject
+%attr(755, root, root) /opt/rfpproxy/RfpProxy.ChangeLed
+%attr(755, root, root) /opt/rfpproxy/rfpproxylog
+%attr(755, root, root) /opt/rfpproxy/rfpproxydump
+%attr(755, root, root) /opt/rfpproxy/rfpproxytraffic
 %attr(644, root, root) /opt/rfpproxy/*.dll
 /opt/rfpproxy/*.deps.json
 /opt/rfpproxy/*.runtimeconfig.json
 /lib/systemd/system/rfpproxy.service
 
 %clean
-mkdir rpm
+mkdir -p rpm
 mv %{_rpmdir}/noarch/* rpm/
 rm -rf $RPM_BUILD_ROOT/
 
