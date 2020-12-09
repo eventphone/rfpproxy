@@ -1,3 +1,28 @@
+# What?
+
+As presented at [36c3](https://www.youtube.com/watch?v=9nXKbwEJPxU) this is the code, we used to intercept all traffic between the Mitel OMM and our RFPs. This code was running in production and helped us to enable weird dect phones to talk to our setup.
+
+# How?
+
+By using some iptables rules (or something similar) all traffic is redirected to this proxy, decrypted, modified if necessary, reencrypted and sent to the OMM/RFP. In Between there is a socket, which allows any programm to filter, modify or inject arbitrary packets.
+
+You should be familiar with the DECT Standard:
+
+- [ETSI EN 300 175-2](RfpProxy.AaMiDe/AaMiDe/en_30017502v020400o.pdf)
+- [ETSI EN 300 175-3](RfpProxy.AaMiDe/AaMiDe/en_30017503v020701p.pdf)
+- [ETSI EN 300 175-4](RfpProxy.AaMiDe/AaMiDe/en_30017504v020400o.pdf)
+- [ETSI EN 300 175-5](RfpProxy.AaMiDe/AaMiDe/en_30017505v020701p.pdf)
+- [ETSI EN 300 175-6](RfpProxy.AaMiDe/AaMiDe/en_30017506v020701p.pdf)
+- [ETSI EN 300 175-7](RfpProxy.AaMiDe/AaMiDe/en_30017507v020400o.pdf)
+
+# Status
+
+This is the latest version, we are using during our events. Not all proprietary Information Elements are implemented and the whole parsing is mostly readonly. If you want to help us to get a better understanding, don't waste your time constributing to this codebase, but help us to implement the basics for a proper Wireshark Dissector ([15741](https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=15741) and [15742](https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=15742)). 
+
+# Technical Details
+
+This may be outdated...
+
 ## Protocol
 There are two phases - first a handshake, in plaintext JSON, where the client sends all parameters for the messages it wants to receive or handle. after this handshake is completed, there is a protocol switch to a binary protocol.
 
