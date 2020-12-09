@@ -3,7 +3,8 @@ Description=OMM RFP intercepting proxy
 
 [Service]
 WorkingDirectory=/opt/rfpproxy
-ExecStart=/opt/rfpproxy/rfpproxy
+RuntimeDirectory=rfpproxy
+ExecStart=/opt/rfpproxy/rfpproxy -s /run/rfpproxy/client.sock
 Restart=always
 # Restart service after 10 seconds if dotnet service crashes
 RestartSec=10
