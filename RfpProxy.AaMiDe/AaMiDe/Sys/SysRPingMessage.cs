@@ -18,6 +18,7 @@ namespace RfpProxy.AaMiDe.Sys
         /// </summary>
         protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(8);
 
+        //this packet changed in 8.1, so this is wrong
         public SysRPingMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_RPING, data)
         {
             var span = base.Raw.Span;
