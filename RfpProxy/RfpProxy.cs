@@ -180,7 +180,11 @@ namespace RfpProxy
                 {
                     Console.WriteLine(ex.Message);
                     _subscriptions.TryRemove(subscription, out _);
-                    subscription.Cancel();
+                    try
+                    {
+                        subscription.Cancel();
+                    }
+                    catch(ObjectDisposedException){}
                 }
             }
             if (!data.IsEmpty)
@@ -200,7 +204,11 @@ namespace RfpProxy
                 {
                     Console.WriteLine(ex.Message);
                     _subscriptions.TryRemove(subscription, out _);
-                    subscription.Cancel();
+                    try
+                    {
+                        subscription.Cancel();
+                    }
+                    catch(ObjectDisposedException){}
                 }
             }
             if (!data.IsEmpty)
