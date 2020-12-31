@@ -198,11 +198,8 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecodeSysSyslogMessage()
         {
-            var syslog = Decode<SysSyslogMessage>("01070008" +
-                                             "ac141701" +
-                                             "0202" +
-                                             "676a");
-            Assert.Equal("172.20.23.1", syslog.Ip.ToString());
+            var syslog = Decode<SysSyslogMessage>("01070014 00000000 00000000 0000ffff ac106314 02020000");
+            Assert.Equal("::ffff:172.16.99.20", syslog.Ip.ToString());
             Assert.Equal(514, syslog.Port);
 
             Log(syslog);
