@@ -98,7 +98,9 @@ namespace RfpProxy.AaMiDe.Sys
 
         public override bool HasUnknown => true;
 
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(0x104);
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(0x110);
+
+        public SysInitMessage():base(MsgType.SYS_INIT){}
 
         public SysInitMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_INIT, data)
         {
@@ -122,8 +124,8 @@ namespace RfpProxy.AaMiDe.Sys
             Reserved3 = Plain.AsMemory().Slice(16, 44);
             Crc32 = BinaryPrimitives.ReadUInt32BigEndian(Plain.AsSpan().Slice(60));
 
-            SwVersion = base.Raw.Slice(0x64, 0x90).Span.CString();
-            Signature = base.Raw.Slice(0xf4, 0x10);
+            SwVersion = base.Raw.Slice(0x70, 0x90).Span.CString();
+            Signature = base.Raw.Slice(0x100, 0x10);
         }
 
         private void AesDecrypt()
