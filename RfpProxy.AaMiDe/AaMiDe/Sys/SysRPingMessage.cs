@@ -16,14 +16,13 @@ namespace RfpProxy.AaMiDe.Sys
         /// <summary>
         /// padding
         /// </summary>
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(8);
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(20);
 
-        //this packet changed in 8.1, so this is wrong
         public SysRPingMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_RPING, data)
         {
             var span = base.Raw.Span;
-            Ip = new IPAddress(span.Slice(0, 4));
-            Rtt = TimeSpan.FromMilliseconds(BinaryPrimitives.ReadUInt32BigEndian(span.Slice(4)));
+            Ip = new IPAddress(span.Slice(0, 16));
+            Rtt = TimeSpan.FromMilliseconds(BinaryPrimitives.ReadUInt32BigEndian(span.Slice(16)));
         }
 
         public override void Log(TextWriter writer)

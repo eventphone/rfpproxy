@@ -246,9 +246,9 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecodeSysRPingMessage()
         {
-            var rping = Decode<SysRPingMessage>("010e000c ac141701 00000023 00000000");
-            Assert.Equal("172.20.23.1", rping.Ip.ToString());
-            Assert.Equal(TimeSpan.FromMilliseconds(0x23), rping.Rtt);
+            var rping = Decode<SysRPingMessage>("010e0018 00000000 00000000 0000ffff 08080808 00000015 00eeeeee");
+            Assert.Equal("::ffff:8.8.8.8", rping.Ip.ToString());
+            Assert.Equal(TimeSpan.FromMilliseconds(0x15), rping.Rtt);
 
             Log(rping);
             Assert.False(rping.HasUnknown);
