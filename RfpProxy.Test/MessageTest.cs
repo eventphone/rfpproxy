@@ -187,11 +187,8 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecodeSysHttpSetMessage()
         {
-            var http = Decode<SysHttpSetMessage>("01090008" +
-                                             "ac140103" +
-                                             "01bb" +
-                                             "022f");
-            Assert.Equal("172.20.1.3", http.Ip.ToString());
+            var http = Decode<SysHttpSetMessage>("01090014 00000000 00000000 0000ffff ac106314 01bb0200");
+            Assert.Equal("::ffff:172.16.99.20", http.Ip.ToString());
             Assert.Equal(443, http.Port);
 
             Log(http);
