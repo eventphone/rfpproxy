@@ -66,6 +66,45 @@ namespace RfpProxy.AaMiDe.Sys
             RFPSL37 = 0x200E,
         }
 
+        [Flags]
+        public enum RfpCapabilities : uint
+        {
+            None = 0b_00000000_00000000_00000000_00000000,
+            Reserved1 = 0b_00000000_00000000_00000000_00000001,
+            Reserved2 = 0b_00000000_00000000_00000000_00000010,
+            Reserved3 = 0b_00000000_00000000_00000000_00000100,
+            NormalTx = 0b_00000000_00000000_00000000_00001000,
+            Indoor = 0b_00000000_00000000_00000000_00010000,
+            Wlan = 0b_00000000_00000000_00000000_00100000,
+            Reserved7 = 0b_00000000_00000000_00000000_01000000,
+            Reserved8 = 0b_00000000_00000000_00000000_10000000,
+            Encryption = 0b_00000000_00000000_00000001_00000000,
+            FrequencyShift = 0b_00000000_00000000_00000010_00000000,
+            LowTx = 0b_00000000_00000000_00000100_00000000,
+            Reserved12 = 0b_00000000_00000000_00001000_00000000,
+            Reserved13 = 0b_00000000_00000000_00010000_00000000,
+            Reserved14 = 0b_00000000_00000000_00100000_00000000,
+            Reserved15 = 0b_00000000_00000000_01000000_00000000,
+            AdvancedFeature = 0b_00000000_00000000_10000000_00000000,
+            Reserved17 = 0b_00000000_00000001_00000000_00000000,
+            Reserved18 = 0b_00000000_00000010_00000000_00000000,
+            Reserved19 = 0b_00000000_00000100_00000000_00000000,
+            Reserved20 = 0b_00000000_00001000_00000000_00000000,
+            Reserved21 = 0b_00000000_00010000_00000000_00000000,
+            Reserved22 = 0b_00000000_00100000_00000000_00000000,
+            Reserved23 = 0b_00000000_01000000_00000000_00000000,
+            Reserved24 = 0b_00000000_10000000_00000000_00000000,
+            Reserved25 = 0b_00000001_00000000_00000000_00000000,
+            Reserved26 = 0b_00000010_00000000_00000000_00000000,
+            Reserved27 = 0b_00000100_00000000_00000000_00000000,
+            Reserved28 = 0b_00001000_00000000_00000000_00000000,
+            Reserved29 = 0b_00010000_00000000_00000000_00000000,
+            Reserved30 = 0b_00100000_00000000_00000000_00000000,
+            Reserved31 = 0b_01000000_00000000_00000000_00000000,
+            Reserved32 = 0b_10000000_00000000_00000000_00000000,
+            ConfigurableTX = NormalTx | LowTx,
+        }
+
         public RfpType Hardware { get; }
 
         public ReadOnlyMemory<byte> Reserved1 { get; }
@@ -74,7 +113,7 @@ namespace RfpProxy.AaMiDe.Sys
 
         public ReadOnlyMemory<byte> Reserved2 { get; }
 
-        public ushort Capabilities { get; }
+        public RfpCapabilities Capabilities { get; }
 
         public ReadOnlyMemory<byte> Crypted { get; }
         
@@ -89,7 +128,9 @@ namespace RfpProxy.AaMiDe.Sys
         public PhysicalAddress Mac2 { get; }
 
         public ReadOnlyMemory<byte> Reserved3 { get; }
-        
+
+        public uint Protocol { get; }
+
         public ReadOnlyMemory<byte> Reserved4 { get; }
 
         public string SwVersion { get; }
@@ -107,10 +148,11 @@ namespace RfpProxy.AaMiDe.Sys
             Hardware = (RfpType) BinaryPrimitives.ReadInt32BigEndian(base.Raw.Span);
             Reserved1 = base.Raw.Slice(0x04, 0x04);
             Mac = new PhysicalAddress(base.Raw.Slice(0x08, 0x06).ToArray());
-            Reserved2 = base.Raw.Slice(0x0e, 0x08);
-            Capabilities = BinaryPrimitives.ReadUInt16BigEndian(base.Raw.Slice(0x16).Span);
+            Reserved2 = base.Raw.Slice(0x0e, 0x06);
+            Capabilities = (RfpCapabilities) BinaryPrimitives.ReadUInt32BigEndian(base.Raw.Slice(0x14).Span);
             Crypted = base.Raw.Slice(0x18, 0x40);
-            Reserved4 = base.Raw.Slice(0x58, 0x0c);
+            Protocol = BinaryPrimitives.ReadUInt32BigEndian(base.Raw.Slice(0x58, 0x04).Span);
+            Reserved4 = base.Raw.Slice(0x5c, 0x08);
 
             Plain = new byte[Crypted.Length];
             AesDecrypt();
@@ -150,9 +192,9 @@ namespace RfpProxy.AaMiDe.Sys
         {
             base.Log(writer);
             writer.Write($"Hardware({Hardware:G}) Reserved1({Reserved1.ToHex()}) MAC({Mac}) ");
-            writer.Write($"Reserved2({Reserved2.ToHex()}) Capabilities({Capabilities:x2}) ");
+            writer.Write($"Reserved2({Reserved2.ToHex()}) Capabilities({Capabilities}) ");
             writer.Write($"Magic({Magic:x16}) Mac2({Mac2}) Branding({Branding}) ");
-            writer.Write($"Reserved3({Reserved3.ToHex()}) Crc({Crc32:x8}) Reserved4({Reserved4.ToHex()}) ");
+            writer.Write($"Reserved3({Reserved3.ToHex()}) Crc({Crc32:x8}) Protocol({Protocol:x8}) Reserved4({Reserved4.ToHex()}) ");
             writer.Write($"SW Version({SwVersion}) Signature({Signature.ToHex()}) ");
         }
     }

@@ -127,7 +127,7 @@ namespace RfpProxy.Test
                                               "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
                                               "00000000 00000000 00000000 00000000 00000000 ed342c73 e4379702 f1483b85 7b44da67");
             Assert.Equal("0030421B1737", init.Mac.ToString());
-            Assert.Equal(0xef3c, init.Capabilities);
+            Assert.Equal(0x1ef3cu, (uint)init.Capabilities);
             Assert.Equal("SIP-DECT 8.1SP1-FA27", init.SwVersion);
 
             Log(init);
