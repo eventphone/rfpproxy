@@ -54,13 +54,10 @@ Use the same mode of operation for decryption.
 
 using System;
 using System.Buffers.Binary;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
-using System.Text;
-using RfpProxyLib;
 
-namespace RfpProxy
+namespace RfpProxyLib
 {
     public class BlowFish
     {

@@ -51,23 +51,24 @@ namespace RfpProxy.Test
         [Fact]
         public void CanCalculateInitSignature()
         {
-            var sysInit = "01200104 00000004 00070100 00304212 eb330000 00000000 000003dc 809d5e35" +
-                       "4b6d6b6b 5360bc0a b470a9f4 0c510b8d d58eb3f7 ebf8894e c768f5b6 9d08e45b" +
-                       "13fbb03f b22b75a2 eca3156b a1330ff4 2f1fc8a6 8bfc5302 91fb189b 00070100" +
-                       "00000000 00000000 5349502d 44454354 20372e31 2d434b31 34000000 00000000" +
-                       "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
-                       "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
-                       "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
-                       "00000000 00000000 00000000 00000000 00000000 00000000";
+            var sysInit = "01200110 0000000d 00080100 0030421b 17370000 00000000 0001ef3c 2a0d8ce8 " +
+                          "725371d0 d799a029 8dc02c73 4ac5b803 abc38663 b494de7b 2ffbe03d 70b616eb " +
+                          "facf2e7d 85f61b29 5cba5c76 ea515501 b3c02b75 5862261b fc08ffde 00080201 " +
+                          "00000000 00000000 00000000 00000000 00000000 5349502d 44454354 20382e31 " +
+                          "5350312d 46413237 00000000 00000000 00000000 00000000 00000000 00000000 " +
+                          "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 " +
+                          "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 " +
+                          "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 " +
+                          "00000000";
             sysInit = sysInit.Replace(" ", String.Empty);
-            var signature_key = "096ba9879890b67a1893e397b977f3af3757b9edba6786e4ae267a80c8409707672522c07bc3ea2cfd4a58e6f88a80c7ca8d2b2eb2c20fad";
-            var sysAuthenticate = "1c42339d625cf222ecce069e6098d252b2f2148381fc466f2d67a1a587aaf570";
+            var signature_key = "e7adda3adb0521f3d3fbdf3a18ee8648b47398b1570c2b45ef8d2a9180a1a32c69284a9c97d444abf87f5c578f9428214dd0183cba969dc5";
+            var sysAuthenticate = "a367fa2bd9d02c246d639afccfb1569a3240dd4027434430b71b4a7fe8ba62b7";
             using (var md5 = MD5.Create())
             {
                 var data = HexEncoding.HexToByte(sysAuthenticate + sysInit + signature_key);
                 var hash = md5.ComputeHash(data);
-                Assert.Equal("fbd0c9b2a76cade42bb263adcfe5317b", hash.AsSpan().ToHex());
                 _output.WriteLine(hash.AsSpan().ToHex());
+                Assert.Equal("43b305cc65719045766e14b7ba0ba319", hash.AsSpan().ToHex());
             }
         }
 
@@ -197,23 +198,23 @@ namespace RfpProxy.Test
         {
             var table = new byte[]
             {
-                0x4F, 0x4F, 0xA6, 0xD0, 0x72, 0x2E, 0x65,
-                0x7B, 0x1C, 0x50, 0x27, 0xB3, 0x85, 0x06,
-                0x9E, 0xF4, 0xFB, 0x1A, 0xA9, 0x1F, 0x2F,
-                0x92, 0x07, 0x64, 0x4D, 0xF8, 0xBB, 0x84,
-                0xF0, 0xAF, 0x18, 0x97, 0xAF, 0xA1, 0x54,
-                0xD1, 0xC1, 0x8F, 0x07, 0x30, 0x76, 0xCC,
-                0x1D, 0xD9, 0x58, 0xA9, 0x64, 0x92, 0x62,
-                0x9F, 0xE4, 0x19, 0x48, 0x99, 0x34, 0x66,
+                0x4A, 0x10, 0x42, 0x63, 0x37, 0x0C, 0xE7,
+                0x4A, 0x5A, 0x98, 0x4E, 0xA7, 0x03, 0x36,
+                0xCE, 0x45, 0xBE, 0x0F, 0x0E, 0x61, 0xC0,
+                0xAF, 0x6E, 0xAB, 0x26, 0xD2, 0xD2, 0x5D,
+                0x4B, 0x8D, 0x0B, 0x0C, 0xE6, 0x2F, 0x05,
+                0x31, 0x9A, 0xA5, 0x70, 0x40, 0xFB, 0xD4,
+                0xA8, 0x4D, 0x53, 0xB2, 0x41, 0xDF, 0x3B,
+                0xB5, 0x51, 0x9F, 0xC1, 0x1F, 0xC0, 0x99,
 
-                0x46, 0x24, 0x0F, 0x57, 0xEA, 0xBE, 0xD3,
-                0x01, 0x04, 0xC3, 0xC4, 0x24, 0x3C, 0x71,
-                0x6D, 0x5B, 0xCC, 0x4D, 0x10, 0xF2, 0x95,
-                0xF5, 0x81, 0x80, 0xE3, 0xDE, 0xC1, 0x04,
-                0x38, 0xEF, 0x8F, 0x90, 0xC8, 0x84, 0x76,
-                0x11, 0xBA, 0x4C, 0xED, 0x1C, 0x8B, 0x86,
-                0x45, 0x3F, 0xA0, 0x23, 0xE4, 0x55, 0xA8,
-                0x12, 0xCF, 0x37, 0xFA, 0x5B, 0x3B, 0xCB
+                0xAD, 0xBD, 0x98, 0x59, 0xEC, 0x09, 0xC6, 
+                0xB9, 0x89, 0x63, 0x91, 0x9D, 0x1B, 0xD8,
+                0x48, 0x0D, 0x0A, 0x7C, 0x96, 0xD0, 0x97,
+                0xA3, 0x45, 0xEE, 0xC9, 0x5F, 0xF8, 0xCC, 
+                0xCB, 0x2C, 0xA8, 0x20, 0x8F, 0x07, 0x4F,
+                0xAD, 0x0D, 0x71, 0x34, 0xEB, 0x03, 0xAB,
+                0xF4, 0x1A, 0xDC, 0x26, 0x69, 0xFE, 0x76, 
+                0x65, 0x49, 0xA3, 0x7B, 0x89, 0x5D, 0x5C
             };
             var signature_key = new byte[56];
             for (int i = 0; i < 56; i++)
