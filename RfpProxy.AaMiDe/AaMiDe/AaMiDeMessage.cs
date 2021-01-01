@@ -116,6 +116,8 @@ namespace RfpProxy.AaMiDe
                     return new SysOmmControlMessage(data);
                 case MsgType.SYS_MAX_CHANNELS:
                     return new SysMaxChannelsMessage(data);
+                case MsgType.SYS_ENCRYPTION_CONF:
+                    return new SysEncryptionConf(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }
