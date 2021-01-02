@@ -1,9 +1,8 @@
 variables:
   GIT_SUBMODULE_STRATEGY: normal
+image : mcr.microsoft.com/dotnet/core/sdk:latest
 stages:
   - build
-  - deploy
-  - deploy-proxy
 build:
  stage: build
  tags: 
@@ -22,33 +21,11 @@ build:
   - 'dotnet publish -o publish/busyled -c Release BusyLed/BusyLed.csproj'
   - 'dotnet publish -o publish/midi -c Release MediaTone/MediaTone.csproj'
   - 'dotnet publish -o publish/morseled -c Release MorseLed/MorseLed.csproj'
- only:
-  - master
+  - 'dotnet publish -o publish/virtualrfp -c Release SoftRfp/SoftRfp.csproj'
+  - 'apt update -y'
+  - 'apt install -y rpm'
+  - 'rpmbuild --target noarch --define "_binaries_in_noarch_packages_terminate_build 0" -bb --build-in-place rpmbuild/SPECS/rfpproxy.spec'
  artifacts:
   paths:
   - publish
-deploy:
- stage: deploy
- tags: 
-  - deploy
-  - omm
- dependencies:
-  - build
- script:
-  - 'rsync -av --delete --exclude rfpproxy publish/ /opt/rfpproxy/'
- only:
-  - master
-deploy-proxy:
- stage: deploy-proxy
- when: manual
- tags: 
-  - deploy
-  - omm
- dependencies:
-  - build
- script:
-  - 'rsync -av --delete publish/rfpproxy/ /opt/rfpproxy/rfpproxy/'
-  - 'sudo /sbin/setcap CAP_NET_ADMIN=+eip /opt/rfpproxy/rfpproxy/rfpproxy'
-  - 'sudo /usr/bin/systemctl restart rfpproxy'
- only:
-  - master
+  - rpm
