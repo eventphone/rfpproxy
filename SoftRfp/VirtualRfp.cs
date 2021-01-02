@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Buffers.Binary;
-using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.IO.Pipelines;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using RfpProxy.AaMiDe;
@@ -27,12 +28,18 @@ namespace RfpProxy.Virtual
         private Socket _socket;
         private readonly RfpConnectionTracker _connectionTracker;
 
-        public VirtualRfp(string mac, string omm, string rfpa)
+        public string RFPA
         {
-            _mac = mac;
+            get => HexEncoding.ByteToHex(_rfpa.Span);
+            set => _rfpa = value is null ? ReadOnlyMemory<byte>.Empty : HexEncoding.HexToByte(value);
+        }
+
+        public string OmmConfPath { get; set; }
+
+        public VirtualRfp(string mac, string omm)
+        {
+            _mac = mac.ToUpperInvariant();
             _omm = omm;
-            if (!String.IsNullOrEmpty(rfpa))
-                _rfpa = HexEncoding.HexToByte(rfpa);
             _pipe = new Pipe();
             _connectionTracker = new RfpConnectionTracker(new RfpIdentifier(HexEncoding.HexToByte(mac)));
             _heartbeatTimer = new Timer(SendHeartbeat, null, -1, Timeout.Infinite);
@@ -46,7 +53,7 @@ namespace RfpProxy.Virtual
             _socket = connection.Client;
             _auth = await ReadPacketAsync(cancellationToken);
             if (!await InitAsync(cancellationToken)) return;
-            StartEncryption();
+            await StartEncryptionAsync(cancellationToken);
             await Task.WhenAny(FillPipeAsync(cancellationToken), ReadMessagesAsync(cancellationToken));
         }
 
@@ -70,7 +77,7 @@ namespace RfpProxy.Virtual
                        | RfpCapabilities.FrequencyShift
                        | RfpCapabilities.NormalTx
                        | RfpCapabilities.LowTx;
-            var init = new SysInitMessage(PhysicalAddress.Parse(_mac.ToUpperInvariant()), caps);
+            var init = new SysInitMessage(PhysicalAddress.Parse(_mac), caps);
             init.Sign(_auth.Span);
             await SendPacketAsync(init, cancellationToken);
             var ack = await ReadPacketAsync(cancellationToken);
@@ -100,8 +107,21 @@ namespace RfpProxy.Virtual
             return true;
         }
 
-        private void StartEncryption()
+        private async Task StartEncryptionAsync(CancellationToken cancellationToken)
         {
+            if (_rfpa.IsEmpty)
+            {
+                if (!String.IsNullOrEmpty(OmmConfPath) && File.Exists(OmmConfPath))
+                {
+                    var crypted = await LoadRfpaAsync(cancellationToken);
+                    if (!String.IsNullOrEmpty(crypted))
+                    {
+                        _rfpa = DecryptRfpa(crypted);
+                    }
+                }
+                if (_rfpa.IsEmpty)
+                    throw new Exception("Key missing. Can't start encryption");
+            }
             _decipher = new BlowFish(_rfpa.Span.Slice(0, 56));
             _encipher = new BlowFish(_rfpa.Span.Slice(8));
             var txIv = HexEncoding.HexToByte("68e8364be9c234c1");
@@ -111,6 +131,35 @@ namespace RfpProxy.Virtual
             BlowFish.XorBlock(rxIv, _auth.Span.Slice(27, 8));
             _rxIv = rxIv;
             SendMessage(new SysEncryptionConf());
+        }
+
+        private async Task<string> LoadRfpaAsync(CancellationToken cancellationToken)
+        {
+            using (var reader = new OmmConfReader(OmmConfPath))
+            {
+                var rfp = await reader.GetValueAsync("RFP", "mac", _mac, cancellationToken);
+                if (rfp != null)
+                {
+                    var id = rfp["id"];
+                    var rfpa = await reader.GetValueAsync("RFPA", "id", id, cancellationToken);
+                    if (rfpa != null)
+                    {
+                        return rfpa[1];
+                    }
+                }
+                return null;
+            }
+        }
+
+        private ReadOnlyMemory<byte> DecryptRfpa(string rfpa)
+        {
+            var bytes = HexEncoding.HexToByte(rfpa);
+            HexEncoding.SwapEndianess(bytes);
+            var key = (_mac + '\0').ToLowerInvariant();
+            var bf = new BlowFish(Encoding.ASCII.GetBytes(key));
+            var plain = bf.Decrypt_ECB(bytes);
+            HexEncoding.SwapEndianess(plain.Span);
+            return plain;
         }
 
         private async Task<ReadOnlyMemory<byte>> ReadPacketAsync(CancellationToken cancellationToken)

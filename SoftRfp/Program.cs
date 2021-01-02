@@ -14,11 +14,13 @@ namespace RfpProxy.Virtual
             string mac = null;
             string omm = null;
             string rfpa = null;
+            string configfile = "/opt/SIP-DECT/tmp/omm_conf.txt";
             var options = new OptionSet
             {
                 {"m|mac=", "rfp MAC address", x => mac = x},
                 {"o|omm=", "OMM ip address", x => omm = x},
                 {"k|key=", "RFPA (blowfish key)", x => rfpa = x},
+                {"c|config=", "omm_conf.txt", x=> configfile = x },
                 {"h|help", "show help", x => showHelp = x != null},
             };
             try
@@ -53,7 +55,11 @@ namespace RfpProxy.Virtual
                         e.Cancel = true;
                         cts.Cancel();
                     };
-                    var client = new VirtualRfp(mac, omm, rfpa);
+                    var client = new VirtualRfp(mac, omm)
+                    {
+                        RFPA = rfpa,
+                        OmmConfPath = configfile
+                    };  
                     client.OnMessage += (s, e) =>
                     {
                         e.Message.Log(Console.Out);

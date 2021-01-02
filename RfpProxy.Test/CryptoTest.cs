@@ -320,26 +320,12 @@ namespace RfpProxy.Test
             mac = mac.ToLowerInvariant();
 
             var crypted = HexEncoding.HexToByte(rfpa_crypted);
-            var t = crypted.AsSpan();
-            while (!t.IsEmpty)
-            {
-                //endian swap
-                var value = BinaryPrimitives.ReadUInt32BigEndian(t);
-                BinaryPrimitives.WriteUInt32LittleEndian(t, value);
-                t = t.Slice(4);
-            }
+            HexEncoding.SwapEndianess(crypted);
 
             var bf = new BlowFish(Encoding.ASCII.GetBytes(mac));
             var plain = bf.Decrypt_ECB(crypted);
 
-            t = plain.Span;
-            while (!t.IsEmpty)
-            {
-                //endian swap
-                var value = BinaryPrimitives.ReadUInt32BigEndian(t);
-                BinaryPrimitives.WriteUInt32LittleEndian(t, value);
-                t = t.Slice(4);
-            }
+            HexEncoding.SwapEndianess(plain.Span);
 
             _output.WriteLine(rfpa_crypted);
             _output.WriteLine(crypted.AsSpan().ToHex());
