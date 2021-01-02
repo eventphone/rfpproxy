@@ -1,7 +1,7 @@
 Summary: rfpproxy
 Name: rfpproxy
 Version: 0.0.1
-Release: 1
+Release: 2
 License: MIT
 URL: https://github.com/eventphone/rfpproxy
 Requires: dotnet-runtime-3.1
@@ -32,6 +32,7 @@ exit
 %attr(755, root, root) /opt/rfpproxy/rfpproxylog
 %attr(755, root, root) /opt/rfpproxy/rfpproxydump
 %attr(755, root, root) /opt/rfpproxy/rfpproxytraffic
+%attr(755, root, root) /opt/rfpproxy/virtualrfp
 %attr(644, root, root) /opt/rfpproxy/*.dll
 /opt/rfpproxy/*.deps.json
 /opt/rfpproxy/*.runtimeconfig.json

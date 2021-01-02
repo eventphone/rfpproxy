@@ -10,7 +10,7 @@ namespace RfpProxy.Virtual
         private readonly Timer _heartbeatTimer;
         private readonly DateTime _bootTimestamp = DateTime.Now;
 
-        private void SendHeartbeat(object? state)
+        private void SendHeartbeat(object state)
         {
             var heartbeat = new HeartbeatMessage(DateTime.Now - _bootTimestamp);
             SendMessage(heartbeat);
