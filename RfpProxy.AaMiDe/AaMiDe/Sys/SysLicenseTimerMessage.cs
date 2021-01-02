@@ -16,11 +16,27 @@ namespace RfpProxy.AaMiDe.Sys
 
         protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(20);
 
+        public override ushort Length => (ushort) (base.Length + 20);
+
         public SysLicenseTimerMessage(ReadOnlyMemory<byte> data) : base(MsgType.SYS_LICENSE_TIMER, data)
         {
             var grace = BinaryPrimitives.ReadUInt32BigEndian(base.Raw.Span);
             GracePeriod = TimeSpan.FromMinutes(grace);
             Md5 = base.Raw.Slice(4,16);
+        }
+
+        public SysLicenseTimerMessage(TimeSpan gracePeriod, ReadOnlyMemory<byte> md5):base(MsgType.SYS_LICENSE_TIMER)
+        {
+            GracePeriod = gracePeriod;
+            Md5 = md5;
+        }
+
+        public override Span<byte> Serialize(Span<byte> data)
+        {
+            data = base.Serialize(data);
+            BinaryPrimitives.WriteUInt32BigEndian(data, (uint)GracePeriod.TotalMinutes);
+            Md5.Span.CopyTo(data.Slice(4));
+            return data.Slice(20);
         }
 
         public override void Log(TextWriter writer)

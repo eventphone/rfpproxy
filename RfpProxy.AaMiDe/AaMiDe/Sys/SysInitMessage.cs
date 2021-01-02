@@ -3,6 +3,7 @@ using System.Buffers.Binary;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
+using System.Text;
 using RfpProxyLib;
 
 namespace RfpProxy.AaMiDe.Sys
@@ -16,6 +17,12 @@ namespace RfpProxy.AaMiDe.Sys
             0x97, 0xe6, 0x90, 0xad, 0xa4, 0x6f, 0xad, 0x25,
             0xbb, 0xc6, 0x26, 0xf6, 0xf5, 0xa5, 0xa6, 0xce
         };
+
+        private readonly byte[] _signatureKey = HexEncoding.HexToByte(
+            "e7adda3adb0521f3d3fbdf3a18ee8648" +
+            "b47398b1570c2b45ef8d2a9180a1a32c" +
+            "69284a9c97d444abf87f5c578f942821" +
+            "4dd0183cba969dc5");
 
         public enum RfpBranding:ushort
         {
@@ -135,13 +142,22 @@ namespace RfpProxy.AaMiDe.Sys
 
         public string SwVersion { get; }
 
-        public ReadOnlyMemory<byte> Signature { get; }
+        public ReadOnlyMemory<byte> Signature { get; private set; }
 
         public override bool HasUnknown => true;
 
         protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(0x110);
 
-        public SysInitMessage():base(MsgType.SYS_INIT){}
+        public override ushort Length => (ushort) (base.Length + 0x110u);
+
+        public SysInitMessage(PhysicalAddress mac, RfpCapabilities capabilities) : base(MsgType.SYS_INIT)
+        {
+            Mac = mac;
+            Hardware = RfpType.RFP31;
+            Protocol = 0x080201u;
+            Capabilities = capabilities;
+            SwVersion = "SIP-DECT 9.0-eventphone";
+        }
 
         public SysInitMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_INIT, data)
         {
@@ -168,6 +184,32 @@ namespace RfpProxy.AaMiDe.Sys
 
             SwVersion = base.Raw.Slice(0x70, 0x90).Span.CString();
             Signature = base.Raw.Slice(0x100, 0x10);
+        }
+
+        public override Span<byte> Serialize(Span<byte> data)
+        {
+            data =  base.Serialize(data);
+            BinaryPrimitives.WriteInt32BigEndian(data, (int) Hardware);
+            Mac.GetAddressBytes().CopyTo(data.Slice(0x08));
+            BinaryPrimitives.WriteUInt32BigEndian(data.Slice(0x14), (uint) Capabilities);
+            BinaryPrimitives.WriteUInt32BigEndian(data.Slice(0x58), Protocol);
+            Encoding.ASCII.GetBytes(SwVersion).CopyTo(data.Slice(0x70));
+            Signature.Span.CopyTo(data.Slice(0x100));
+            return data.Slice(0x110);
+        }
+
+        public void Sign(ReadOnlySpan<byte> sysAuth)
+        {
+            sysAuth = sysAuth.Slice(4);
+            using (var md5 = MD5.Create())
+            {
+                var data = new byte[sysAuth.Length + Length - 0x10 + _signatureKey.Length];
+                sysAuth.CopyTo(data);
+                Serialize(data.AsSpan(sysAuth.Length));
+                _signatureKey.CopyTo(data.AsMemory(sysAuth.Length + Length - 0x10));
+                var hash = md5.ComputeHash(data);
+                Signature = hash;
+            }
         }
 
         private void AesDecrypt()

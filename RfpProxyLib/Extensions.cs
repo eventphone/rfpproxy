@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Text;
 
 namespace RfpProxyLib
@@ -29,6 +30,15 @@ namespace RfpProxyLib
                 if (data[i] != 0) return false;
             }
             return true;
+        }
+
+        public static ReadOnlyMemory<byte> ToMemory(this ReadOnlySequence<byte> source)
+        {
+            if (source.IsSingleSegment)
+            {
+                return source.First;
+            }
+            return source.ToArray();
         }
     }
 }
