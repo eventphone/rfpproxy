@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DoS": {
+      "commandName": "Project",
+      "commandLineArgs": "-o localhost"
+    }
+  }
+}

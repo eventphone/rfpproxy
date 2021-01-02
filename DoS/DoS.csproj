@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>dos</AssemblyName>
+    <RootNamespace>RfpProxy.Dos</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mono.Options" Version="6.6.0.161" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RfpProxyLib\RfpProxyLib.csproj" />
+  </ItemGroup>
+</Project>
