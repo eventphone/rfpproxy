@@ -7,7 +7,7 @@ build:
  stage: build
  tags: 
   - build
-  - dotnet
+  - docker
  script:
   - 'dotnet restore'
   - 'dotnet publish -o publish/rfpproxy -c Release RfpProxy/RfpProxy.csproj'
