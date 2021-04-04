@@ -14,7 +14,7 @@ namespace RfpProxy.AaMiDe.Sys
 
         protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(16);
 
-        public SysRoundtripDelayMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_ROUNDTRIP_DELAY, data)
+        public SysRoundtripDelayMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_VSNTP_TIME, data)
         {
             var span = base.Raw.Span;
             

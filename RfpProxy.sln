@@ -38,7 +38,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfpProxy.AaMiDe", "RfpProxy
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AVM.Test", "AVM.Test\AVM.Test.csproj", "{F1EBE9EC-C1F5-4365-8FED-E8B11622622D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MorseLed", "MorseLed\MorseLed.csproj", "{06D59132-93F3-430C-96E4-85BDD8AF8F36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MorseLed", "MorseLed\MorseLed.csproj", "{06D59132-93F3-430C-96E4-85BDD8AF8F36}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoftRfp", "SoftRfp\SoftRfp.csproj", "{66885528-DD0A-4FF0-AC98-E6246170A7D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoS", "DoS\DoS.csproj", "{7ADFC8E3-A6D5-4424-B331-C714C8CCF0A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -110,6 +114,14 @@ Global
 		{06D59132-93F3-430C-96E4-85BDD8AF8F36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06D59132-93F3-430C-96E4-85BDD8AF8F36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06D59132-93F3-430C-96E4-85BDD8AF8F36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66885528-DD0A-4FF0-AC98-E6246170A7D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66885528-DD0A-4FF0-AC98-E6246170A7D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66885528-DD0A-4FF0-AC98-E6246170A7D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66885528-DD0A-4FF0-AC98-E6246170A7D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7ADFC8E3-A6D5-4424-B331-C714C8CCF0A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ADFC8E3-A6D5-4424-B331-C714C8CCF0A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ADFC8E3-A6D5-4424-B331-C714C8CCF0A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ADFC8E3-A6D5-4424-B331-C714C8CCF0A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

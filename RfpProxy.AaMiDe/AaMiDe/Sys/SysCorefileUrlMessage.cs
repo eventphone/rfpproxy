@@ -12,7 +12,7 @@ namespace RfpProxy.AaMiDe.Sys
 
         protected override ReadOnlyMemory<byte> Raw => ReadOnlyMemory<byte>.Empty;
 
-        public SysCorefileUrlMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_COREFILE_URL, data)
+        public SysCorefileUrlMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_CORE_DUMP, data)
         {
             Url = base.Raw.Span.CString();
         }

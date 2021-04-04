@@ -54,13 +54,10 @@ Use the same mode of operation for decryption.
 
 using System;
 using System.Buffers.Binary;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
-using System.Text;
-using RfpProxyLib;
 
-namespace RfpProxy
+namespace RfpProxyLib
 {
     public class BlowFish
     {
@@ -190,10 +187,56 @@ namespace RfpProxy
             return Crypt_CBC(iv, data, false);
         }
 
+        /// <summary>
+        /// Encrypts a byte array in ECB mode
+        /// </summary>
+        /// <param name="data">Plaintext data</param>
+        /// <returns>Ciphertext bytes</returns>
+        public Memory<byte> Encrypt_ECB(ReadOnlySpan<byte> data)
+        {
+            return Crypt_ECB(data, false);
+        }
+
+        /// <summary>
+        /// Decrypts a byte array (ECB)
+        /// </summary>
+        /// <param name="data">Ciphertext byte array</param>
+        /// <returns>Plaintext</returns>
+        public Memory<byte> Decrypt_ECB(ReadOnlySpan<byte> data)
+        {
+            return Crypt_ECB(data, true);
+        }
+
         #endregion
 
         #region Cryptography
 
+        /// <summary>
+        /// Encrypts or decrypts data in ECB mode
+        /// </summary>
+        /// <param name="text">plain/ciphertext</param>
+        /// <param name="decrypt">true to decrypt, false to encrypt</param>
+        /// <returns>(En/De)crypted data</returns>
+        private byte[] Crypt_ECB(ReadOnlySpan<byte> data, bool decrypt)
+        {
+            byte[] result = new byte[(data.Length + 7) & ~7];
+            var block = new byte[8];
+            data.CopyTo(result);
+            for (int i = 0; i < result.Length; i += 8)
+            {
+                Buffer.BlockCopy(result, i, block, 0, 8);
+                if (decrypt)
+                {
+                    BlockDecrypt(block);
+                }
+                else
+                {
+                    BlockEncrypt(block);
+                }
+                Buffer.BlockCopy(block, 0, result, i, 8);
+            }
+            return result;
+        }
 
         /// <summary>
         /// Encrypts or decrypts data in CBC mode

@@ -69,7 +69,7 @@ namespace RfpProxy.Traffic
                     }
                     else
                     {
-                        await client.AddHandlerAsync(0, mac, "ffffffffffff", "010e000cac14170100", "ffffffffffffffff0f", cts.Token);
+                        await client.AddHandlerAsync(0, mac, "ffffffffffff", "010e0018ac1417010f", "ffffffffffffffff0f", cts.Token);
                     }
                     await client.FinishHandshakeAsync(cts.Token);
                     if (omm)

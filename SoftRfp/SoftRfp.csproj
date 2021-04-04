@@ -3,16 +3,17 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AssemblyName>rfpproxydump</AssemblyName>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
+    <AssemblyName>virtualrfp</AssemblyName>
+    <RootNamespace>RfpProxy.Virtual</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Mono.Options" Version="6.6.0.161" />
+    <PackageReference Include="System.IO.Pipelines" Version="4.7.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RfpProxy.AaMiDe\RfpProxy.AaMiDe.csproj" />
     <ProjectReference Include="..\RfpProxyLib\RfpProxyLib.csproj" />
   </ItemGroup>
 

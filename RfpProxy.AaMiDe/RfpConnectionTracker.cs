@@ -11,6 +11,11 @@ namespace RfpProxy.AaMiDe
         
         public RfpIdentifier Rfp { get; }
 
+        public RfpConnectionTracker(RfpIdentifier rfp)
+            : this(rfp, new MacConnectionTracker())
+        {
+        }
+
         public RfpConnectionTracker(RfpIdentifier rfp, MacConnectionTracker tracker)
         {
             _tracker = tracker;

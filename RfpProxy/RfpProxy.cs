@@ -17,13 +17,15 @@ namespace RfpProxy
     public class RfpProxy : TransparentRfpProxy
     {
         private readonly string _socket;
+        private readonly string _ommConf;
         private readonly ConcurrentDictionary<Subscription, Subscription> _subscriptions = new ConcurrentDictionary<Subscription, Subscription>();
         private readonly ConcurrentDictionary<RfpIdentifier, RfpConnection> _connections = new ConcurrentDictionary<RfpIdentifier, RfpConnection>();
 
-        public RfpProxy(int listenPort, string ommHost, int ommPort, string socket) 
+        public RfpProxy(int listenPort, string ommHost, int ommPort, string socket, string ommConf) 
             : base(listenPort, ommHost, ommPort)
         {
             _socket = socket;
+            _ommConf = ommConf;
         }
 
         public override Task RunAsync(CancellationToken cancellationToken)
@@ -165,7 +167,6 @@ namespace RfpProxy
         {
             if (data.Length >= 18 && data.Span.StartsWith(SysInit.Span))
             {
-                connection.Identifier = new RfpIdentifier(data.Slice(12,6).ToArray());
                 _connections.AddOrUpdate(connection.Identifier, connection, (m, c) => connection);
             }
 
@@ -179,7 +180,11 @@ namespace RfpProxy
                 {
                     Console.WriteLine(ex.Message);
                     _subscriptions.TryRemove(subscription, out _);
-                    subscription.Cancel();
+                    try
+                    {
+                        subscription.Cancel();
+                    }
+                    catch(ObjectDisposedException){}
                 }
             }
             if (!data.IsEmpty)
@@ -199,11 +204,38 @@ namespace RfpProxy
                 {
                     Console.WriteLine(ex.Message);
                     _subscriptions.TryRemove(subscription, out _);
-                    subscription.Cancel();
+                    try
+                    {
+                        subscription.Cancel();
+                    }
+                    catch(ObjectDisposedException){}
                 }
             }
             if (!data.IsEmpty)
                 await connection.SendToClientAsync(data, cancellationToken).ConfigureAwait(false);
+        }
+
+        protected override async Task<Memory<byte>> GetRfpaAsync(CryptedRfpConnection connection, CancellationToken cancellationToken)
+        {
+            using (var reader = new OmmConfReader(_ommConf))
+            {
+                var rfp = await reader.GetValueAsync("RFP", "mac", connection.Identifier.ToString().ToUpper(), cancellationToken).ConfigureAwait(false);
+                if (rfp is null) return Memory<byte>.Empty;
+                var id = rfp["id"];
+                var rfpa = await reader.GetValueAsync("RFPA", "id", id, cancellationToken).ConfigureAwait(false);
+                if (rfpa is null) return Memory<byte>.Empty;
+                var key = rfpa[1];
+                return HexEncoding.HexToByte(key);
+            }
+        }
+
+        protected override async Task<string> GetRootPasswordHashAsync(CancellationToken cancellationToken)
+        {
+            using (var reader = new OmmConfReader(_ommConf))
+            {
+                var user = await reader.GetValueAsync("UA", "user", "root", cancellationToken);
+                return user?["password"];
+            }
         }
     }
 }

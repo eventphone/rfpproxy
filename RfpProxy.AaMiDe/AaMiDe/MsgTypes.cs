@@ -15,7 +15,7 @@ namespace RfpProxy.AaMiDe
         SYS_MAX_CHANNELS = 0x0108,
         SYS_HTTP_SET = 0x0109,
         SYS_PASSWD = 0x010a,
-        SYS_CRYPTED_PACKET = 0x010b,
+        SYS_CRYPTED_PACKET = 0x010b,//blowfish ECB
         SYS_OMM_CONTROL = 0x010c,
         SYS_STATE_DUMP = 0x010d,
         SYS_RPING = 0x010e,
@@ -24,11 +24,17 @@ namespace RfpProxy.AaMiDe
         SYS_NEW_SW = 0x0111,
         SYS_AUDIO_LOG = 0x0112,
         SYS_USB_OVERLOAD = 0x0113,
-
-        SYS_COREFILE_URL = 0x0116,
-        SYS_ROUNDTRIP_DELAY = 0x0117,
+        SYS_SW_CONTAINER = 0x0115,
+        SYS_CORE_DUMP = 0x0116,
+        SYS_VSNTP_TIME = 0x0117,
+        SYS_UPDATE_802_1X_SUPPLICANT = 0x0119,
         SYS_INIT = 0x0120,
         SYS_RESET = 0x0121,
+        SYS_SUPPLICANT_MD5 = 0x0122,
+        SYS_STREAM_INFO = 0x0123,
+        SYS_RFP_AUTH_KEY = 0x0124,
+        SYS_RFP_RE_ENROLEMENT = 0x0125,
+        SYS_ENCRYPTION_CONF = 0x0126,
         SYS_AUTHENTICATE = 0x012d,
         SYS_LICENSE_TIMER = 0x0134,
 
@@ -54,6 +60,7 @@ namespace RfpProxy.AaMiDe
         MEDIA_EOS_DETECT = 0x0210,
         MEDIA_AUDIO_STATISTICS = 0x0211,
         MEDIA_VIDEO_STATE = 0x0212,
+        MEDIA_CHANNEL_MOD_INFO = 0x0213,
 
         DNM = 0x0301,
         SYNC = 0x0302,

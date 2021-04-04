@@ -119,18 +119,16 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecodeSysInitMessage()
         {
-            var init = Decode<SysInitMessage>("01200104" +
-                                             "0000000800070100" +
-                                             "0030420f8227" +
-                                             "0000000000000000" +
-                                             "03fc" +
-                                             "a9b9df00301bd287ea0373c9f7869951d6fa651ccbdf21e665488dd8d84e52e805da3272c066522501360cffe09efbad5393d713ad9a19874c2496ae5c629b69000701000000000000000000" +
-                                             "5349502d4445435420372e312d434b313400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" +
-                                             "3720690a8f6d49be" +
-                                             "756b4815d44020ee");
-            Assert.Equal("0030420F8227", init.Mac.ToString());
-            Assert.Equal(0x3fcu, init.Capabilities);
-            Assert.Equal("SIP-DECT 7.1-CK14", init.SwVersion);
+            var init = Decode<SysInitMessage>("01200110 0000000d 00080100 0030421b 17370000 00000000 0001ef3c 2a0d8ce8 725371d0 d799a029" +
+                                              "8dc02c73 4ac5b803 abc38663 b494de7b 2ffbe03d 70b616eb facf2e7d 85f61b29 5cba5c76 ea515501" +
+                                              "b3c02b75 5862261b fc08ffde 00080201 00000000 00000000 00000000 00000000 00000000 5349502d" +
+                                              "44454354 20382e31 5350312d 46413237 00000000 00000000 00000000 00000000 00000000 00000000" +
+                                              "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
+                                              "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
+                                              "00000000 00000000 00000000 00000000 00000000 ed342c73 e4379702 f1483b85 7b44da67");
+            Assert.Equal("0030421B1737", init.Mac.ToString());
+            Assert.Equal(0x1ef3cu, (uint)init.Capabilities);
+            Assert.Equal("SIP-DECT 8.1SP1-FA27", init.SwVersion);
 
             Log(init);
             //TODO Assert.False(init.HasUnknown);
@@ -187,11 +185,8 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecodeSysHttpSetMessage()
         {
-            var http = Decode<SysHttpSetMessage>("01090008" +
-                                             "ac140103" +
-                                             "01bb" +
-                                             "022f");
-            Assert.Equal("172.20.1.3", http.Ip.ToString());
+            var http = Decode<SysHttpSetMessage>("01090014 00000000 00000000 0000ffff ac106314 01bb0200");
+            Assert.Equal("::ffff:172.16.99.20", http.Ip.ToString());
             Assert.Equal(443, http.Port);
 
             Log(http);
@@ -201,11 +196,8 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecodeSysSyslogMessage()
         {
-            var syslog = Decode<SysSyslogMessage>("01070008" +
-                                             "ac141701" +
-                                             "0202" +
-                                             "676a");
-            Assert.Equal("172.20.23.1", syslog.Ip.ToString());
+            var syslog = Decode<SysSyslogMessage>("01070014 00000000 00000000 0000ffff ac106314 02020000");
+            Assert.Equal("::ffff:172.16.99.20", syslog.Ip.ToString());
             Assert.Equal(514, syslog.Port);
 
             Log(syslog);
@@ -246,9 +238,9 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecodeSysRPingMessage()
         {
-            var rping = Decode<SysRPingMessage>("010e000c ac141701 00000023 00000000");
-            Assert.Equal("172.20.23.1", rping.Ip.ToString());
-            Assert.Equal(TimeSpan.FromMilliseconds(0x23), rping.Rtt);
+            var rping = Decode<SysRPingMessage>("010e0018 00000000 00000000 0000ffff 08080808 00000015 00eeeeee");
+            Assert.Equal("::ffff:8.8.8.8", rping.Ip.ToString());
+            Assert.Equal(TimeSpan.FromMilliseconds(0x15), rping.Rtt);
 
             Log(rping);
             Assert.False(rping.HasUnknown);

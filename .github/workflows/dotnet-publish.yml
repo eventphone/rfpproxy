@@ -7,7 +7,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '3.0'
+        dotnet-version: '3.1'
     - run: 'dotnet restore'
     - run: 'dotnet publish -o publish/rfpproxy -c Release RfpProxy/RfpProxy.csproj'
     - run: 'dotnet publish -o publish/rfpproxy.log -c Release RfpProxy.Log/RfpProxy.Log.csproj'
@@ -20,6 +20,7 @@ jobs:
     - run: 'dotnet publish -o publish/busyled -c Release BusyLed/BusyLed.csproj'
     - run: 'dotnet publish -o publish/midi -c Release MediaTone/MediaTone.csproj'
     - run: 'dotnet publish -o publish/morseled -c Release MorseLed/MorseLed.csproj'
+    - run: 'dotnet publish -o publish/virtualrfp -c Release SoftRfp/SoftRfp.csproj'
     - name: Upload result
       uses: actions/upload-artifact@v2
       with:
