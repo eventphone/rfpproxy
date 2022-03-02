@@ -17,7 +17,7 @@ You should be familiar with the DECT Standard:
 
 # Status
 
-This is the latest version, we are using during our events. Not all proprietary Information Elements are implemented and the whole parsing is mostly readonly. If you want to help us to get a better understanding, don't waste your time constributing to this codebase, but help us to implement the basics for a proper Wireshark Dissector ([15741](https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=15741) and [15742](https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=15742)). 
+This is the latest version, we are using during our events. Not all proprietary Information Elements are implemented and the whole parsing is mostly readonly. If you want to help us to get a better understanding, don't waste your time constributing to this codebase, but help us to implement the basics for a proper Wireshark Dissector ([15741](https://gitlab.com/wireshark/wireshark/-/issues/15741) and [15742](https://gitlab.com/wireshark/wireshark/-/issues/15742)).
 
 # Technical Details
 
