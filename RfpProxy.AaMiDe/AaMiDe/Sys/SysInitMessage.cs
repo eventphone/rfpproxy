@@ -146,7 +146,7 @@ namespace RfpProxy.AaMiDe.Sys
 
         public override bool HasUnknown => true;
 
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(0x110);
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(Protocol > 0x040000?0x110:0xF4);
 
         public override ushort Length => (ushort) (base.Length + 0x110u);
 
@@ -162,7 +162,7 @@ namespace RfpProxy.AaMiDe.Sys
         public SysInitMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_INIT, data)
         {
             Hardware = (RfpType) BinaryPrimitives.ReadInt32BigEndian(base.Raw.Span);
-            Reserved1 = base.Raw.Slice(0x04, 0x04);
+            Reserved1 = base.Raw.Slice(0x04, 0x04);//protocol?
             Mac = new PhysicalAddress(base.Raw.Slice(0x08, 0x06).ToArray());
             Reserved2 = base.Raw.Slice(0x0e, 0x06);
             Capabilities = (RfpCapabilities) BinaryPrimitives.ReadUInt32BigEndian(base.Raw.Slice(0x14).Span);
@@ -182,8 +182,16 @@ namespace RfpProxy.AaMiDe.Sys
             Reserved3 = Plain.AsMemory().Slice(16, 44);
             Crc32 = BinaryPrimitives.ReadUInt32BigEndian(Plain.AsSpan().Slice(60));
 
-            SwVersion = base.Raw.Slice(0x70, 0x90).Span.CString();
-            Signature = base.Raw.Slice(0x100, 0x10);
+            int offset = 0x64;
+            int length = 0x80;
+            if (Protocol > 0x040000u)
+            {
+                offset = 0x70;
+                length = 0x90;
+            }
+
+            SwVersion = base.Raw.Slice(offset, length).Span.CString();
+            Signature = base.Raw.Slice(offset + length, 0x10);
         }
 
         public override Span<byte> Serialize(Span<byte> data)
