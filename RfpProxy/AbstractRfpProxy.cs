@@ -73,11 +73,16 @@ namespace RfpProxy
                     var aesKey = new byte[0x20];
                     sysAuthenticate.Slice(4).CopyTo(aesKey);
                     pwBytes.CopyTo(aesKey.AsSpan());
-                    using (var aes = new AesManaged{Key = aesKey, Mode = CipherMode.ECB, Padding = PaddingMode.None})
-                    using (var decryptor = aes.CreateDecryptor())
+                    using (var aes = Aes.Create())
                     {
-                        var buffer = crypted.ToArray();
-                        key = decryptor.TransformFinalBlock(buffer, 0, buffer.Length);
+                        aes.Key = aesKey; 
+                        aes.Mode = CipherMode.ECB;
+                        aes.Padding = PaddingMode.None;
+                        using (var decryptor = aes.CreateDecryptor())
+                        {
+                            var buffer = crypted.ToArray();
+                            key = decryptor.TransformFinalBlock(buffer, 0, buffer.Length);
+                        } 
                     }
                 }
                 else
