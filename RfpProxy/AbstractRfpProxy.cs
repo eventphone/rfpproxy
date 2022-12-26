@@ -198,7 +198,7 @@ namespace RfpProxy
 
         private async Task<ReadOnlyMemory<byte>> GetRfpKeyAsync(CryptedRfpConnection connection, CancellationToken cancellationToken)
         {
-            var rfpa = await GetRfpaAsync(connection, cancellationToken);
+            var rfpa = await GetRfpaAsync(connection, cancellationToken).ConfigureAwait(false);
             if (rfpa.IsEmpty) return rfpa;
             HexEncoding.SwapEndianess(rfpa.Span);
             var key = connection.Identifier.ToString() + '\0';

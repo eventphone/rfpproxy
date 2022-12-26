@@ -5,10 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using RfpProxyLib;
 using RfpProxyLib.Messages;
 
@@ -50,7 +48,7 @@ namespace RfpProxy
 
         private async Task RunInternalAsync(CancellationToken cancellationToken)
         {
-            var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP)
+            using var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP)
             {
                 ReceiveTimeout = 10,
                 SendTimeout = 10,
@@ -67,11 +65,10 @@ namespace RfpProxy
             socket.Listen(5);
             try
             {
-                var accept = socket.AcceptAsync();
+                var accept = socket.AcceptAsync(cancellationToken).AsTask();
                 var tasks = new HashSet<Task>
                 {
                     accept,
-                    Task.Delay(Timeout.Infinite, cancellationToken),
                     base.RunAsync(cancellationToken)
                 };
                 Console.WriteLine("interception socket up & running");
@@ -84,7 +81,7 @@ namespace RfpProxy
                         var client = await accept.ConfigureAwait(false);
                         tasks.Add(HandleClientAsync(client, cancellationToken));
                         tasks.Remove(accept);
-                        accept = socket.AcceptAsync();
+                        accept = socket.AcceptAsync(cancellationToken).AsTask();
                         tasks.Add(accept);
                     }
                     else
@@ -233,7 +230,7 @@ namespace RfpProxy
         {
             using (var reader = new OmmConfReader(_ommConf))
             {
-                var user = await reader.GetValueAsync("UA", "user", "root", cancellationToken);
+                var user = await reader.GetValueAsync("UA", "user", "root", cancellationToken).ConfigureAwait(false);
                 return user?["password"];
             }
         }
