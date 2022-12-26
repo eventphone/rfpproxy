@@ -122,6 +122,7 @@ namespace RfpProxy
         }
 
         protected abstract Task ReadFromClientAsync(T clientData, PipeReader client, CancellationToken cancellationToken);
+
         protected abstract Task ReadFromServerAsync(T clientData, PipeReader server, CancellationToken cancellationToken);
 
         protected abstract T OnClientConnected(TcpClient client, TcpClient server);
@@ -132,7 +133,7 @@ namespace RfpProxy
         {
             if (disposing)
             {
-                _listener.Stop();
+                _listener?.Stop();
             }
         }
 

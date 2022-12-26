@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Buffers.Binary;
 using System.IO.Pipelines;
 using System.Net.Sockets;
@@ -169,8 +170,9 @@ namespace RfpProxy
                         {
                             //length is correct
                             buffer = buffer.Slice(0, packetLength + 4);
+                            var copy = buffer.ToArray();
                             reader.AdvanceTo(buffer.End, buffer.End);
-                            return buffer.ToMemory();
+                            return copy;
                         }
                     }
                     throw new Exception("unexpected packet");
