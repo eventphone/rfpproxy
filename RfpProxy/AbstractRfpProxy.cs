@@ -133,7 +133,7 @@ namespace RfpProxy
                             plain = decrypt(block, iv);
                         }
 
-                        iv = block.Slice(block.Length - 8);
+                        iv = block.Slice(block.Length - 8).ToArray();
                         await messageCallback(connection, plain.Slice(0, length + 4), cancellationToken).ConfigureAwait(false);
                         buffer = buffer.Slice(block.Length);
                         success = true;
