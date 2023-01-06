@@ -25,7 +25,7 @@ namespace RfpProxy
                 {"l|listen=", "TCP listen port of proxy", (ushort x) => listen = x},
                 {"s|socket=", "socket path", (string x) => socket = x},
                 {"t|transparent", "use TPROXY", x => useTProxy = x != null},
-                {"c|config", "omm_conf.txt", x=> configfile = x },
+                {"c|config=", "omm_conf.txt", x=> configfile = x },
                 {"h|help", "show help", x => showHelp = x != null},
             };
 
