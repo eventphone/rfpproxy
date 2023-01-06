@@ -8,6 +8,7 @@ namespace RfpProxy.AaMiDe
 
         SYS_IP_OPTIONS = 0x0101,
         SYS_LED = 0x0102,
+        SYS_INFO = 0x0103,
         SYS_SPY = 0x0104,
         SYS_HEARTBEAT_INTERVAL = 0x0105,
         SYS_RSX = 0x0106,
@@ -27,6 +28,7 @@ namespace RfpProxy.AaMiDe
         SYS_SW_CONTAINER = 0x0115,
         SYS_CORE_DUMP = 0x0116,
         SYS_VSNTP_TIME = 0x0117,
+        SYS_RANDOM_VALUE = 0x0118,
         SYS_UPDATE_802_1X_SUPPLICANT = 0x0119,
         SYS_INIT = 0x0120,
         SYS_RESET = 0x0121,
@@ -35,6 +37,9 @@ namespace RfpProxy.AaMiDe
         SYS_RFP_AUTH_KEY = 0x0124,
         SYS_RFP_RE_ENROLEMENT = 0x0125,
         SYS_ENCRYPTION_CONF = 0x0126,
+        SYS_FIRMWARE_UPDATE = 0x0127,
+        SYS_COUNTRY_TAG = 0x0128,
+        SYS_PING = 0x0129,
         SYS_AUTHENTICATE = 0x012d,
         SYS_LICENSE_TIMER = 0x0134,
 
