@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Mono.Options;
+using RfpProxyLib;
 
 namespace RfpProxy.Virtual
 {
@@ -11,6 +12,7 @@ namespace RfpProxy.Virtual
         static async Task Main(string[] args)
         {
             bool showHelp = false;
+            bool debug = false;
             string mac = null;
             string omm = null;
             string rfpa = null;
@@ -21,6 +23,7 @@ namespace RfpProxy.Virtual
                 {"o|omm=", "OMM ip address", x => omm = x},
                 {"k|key=", "RFPA (blowfish key)", x => rfpa = x},
                 {"c|config=", "omm_conf.txt", x=> configfile = x },
+                {"d|debug", "dump raw packets", x => debug = x != null },
                 {"h|help", "show help", x => showHelp = x != null},
             };
             try
@@ -57,11 +60,16 @@ namespace RfpProxy.Virtual
                     };
                     var client = new VirtualRfp(mac, omm)
                     {
-                        RFPA = rfpa,
-                        OmmConfPath = configfile
-                    };  
+                        OmmConfPath = configfile,
+                        Debug = debug
+                    };
+                    if (!String.IsNullOrEmpty(rfpa))
+                    {
+                        client.RFPA = HexEncoding.ByteToHex(VirtualRfp.DecryptRfpa(rfpa, mac).Span);
+                    }
                     client.OnMessage += (s, e) =>
                     {
+                        Console.Write($"{DateTime.Now:O} ");
                         e.Message.Log(Console.Out);
                         Console.WriteLine();
                     };
