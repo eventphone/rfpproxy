@@ -104,6 +104,8 @@ namespace RfpProxy.AaMiDe
                     return new SysRPingMessage(data);
                 case MsgType.SYS_VSNTP_TIME:
                     return new SysRoundtripDelayMessage(data);
+                case MsgType.SYS_RANDOM_VALUE:
+                    return new SysRandomValueMessage(data);
                 case MsgType.SYS_RESET:
                     return new SysResetMessage(data);
                 case MsgType.HEARTBEAT:
