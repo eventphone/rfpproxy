@@ -1085,6 +1085,21 @@ namespace RfpProxy.Test
             Log(b);
         }
 
+        [Fact]
+        public void CanDecodeSysFirmwareUpdateMessage()
+        {
+            var firmwareUpdate = Decode<SysFirmwareUpdateMessage>("0127008f" +
+                                                                  "01008700 00000000 032c5349 502d4445 43542038 2e335350" +
+                                                                  "342d484b 3039205b 4e6f7620 20392031 313a3335 3a333720" +
+                                                                  "32303232 5d000506 382e332e 3300042c 5349502d 44454354" +
+                                                                  "20382e31 5350332d 464b3234 205b4e6f 76203234 2031383a" +
+                                                                  "32343a30 30203230 32305d00 0606382e 322e3100 07137466" +
+                                                                  "74703a2f 2f31302e 3136322e 302e322f 00080101 090100");
+
+            Log(firmwareUpdate);
+            Assert.False(firmwareUpdate.HasUnknown);
+        }
+
         private T Decode<T>(string hex) where T:AaMiDeMessage
         {
             var data = HexEncoding.HexToByte(hex.Replace(" ", String.Empty));
