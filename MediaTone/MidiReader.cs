@@ -27,7 +27,14 @@ namespace RfpProxy.MediaTone
         {
             var result = new List<Note>();
             var position = 0L;
-            foreach (var entry in _midi.GetNotesAndRests(RestSeparationPolicy.NoSeparation))
+            var settings = new ObjectDetectionSettings
+            {
+                RestDetectionSettings = new RestDetectionSettings
+                {
+                    RestSeparationPolicy = RestSeparationPolicy.NoSeparation
+                }
+            };
+            foreach (var entry in _midi.GetObjects(ObjectType.Note | ObjectType.Rest, settings))
             {
                 if (entry is Rest rest)
                 {
@@ -88,8 +95,8 @@ namespace RfpProxy.MediaTone
                     if (note.Length != length)
                     {
                         var split = note.Split(note.Time + length);
-                        grouped[i] = split.LeftPart;
-                        notes.Add(split.RightPart);
+                        grouped[i] = (Note)split.LeftPart;
+                        notes.Add((Note)split.RightPart);
                     }
                     notes.Remove(note);
                 }

@@ -75,7 +75,7 @@ namespace RfpProxy.Test
         [Fact]
         public void CanDecryptSysInit()
         {
-            using (var aes = new AesManaged())
+            using (var aes = Aes.Create())
             {
                 var key = "e705bc1a92412f3262c547f87946936997e690ada46fad25bbc626f6f5a5a6ce";
                 var ciphered = "705bb6102d8f709f94ad5ba7382bdf0ce136e535c109c1e9b2ffed6c5ced5fe4" +

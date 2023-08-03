@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Buffers.Binary;
 using System.IO.Pipelines;
 using System.Net.Sockets;
@@ -73,11 +74,16 @@ namespace RfpProxy
                     var aesKey = new byte[0x20];
                     sysAuthenticate.Slice(4).CopyTo(aesKey);
                     pwBytes.CopyTo(aesKey.AsSpan());
-                    using (var aes = new AesManaged{Key = aesKey, Mode = CipherMode.ECB, Padding = PaddingMode.None})
-                    using (var decryptor = aes.CreateDecryptor())
+                    using (var aes = Aes.Create())
                     {
-                        var buffer = crypted.ToArray();
-                        key = decryptor.TransformFinalBlock(buffer, 0, buffer.Length);
+                        aes.Key = aesKey; 
+                        aes.Mode = CipherMode.ECB;
+                        aes.Padding = PaddingMode.None;
+                        using (var decryptor = aes.CreateDecryptor())
+                        {
+                            var buffer = crypted.ToArray();
+                            key = decryptor.TransformFinalBlock(buffer, 0, buffer.Length);
+                        } 
                     }
                 }
                 else
@@ -127,7 +133,7 @@ namespace RfpProxy
                             plain = decrypt(block, iv);
                         }
 
-                        iv = block.Slice(block.Length - 8);
+                        iv = block.Slice(block.Length - 8).ToArray();
                         await messageCallback(connection, plain.Slice(0, length + 4), cancellationToken).ConfigureAwait(false);
                         buffer = buffer.Slice(block.Length);
                         success = true;
@@ -164,8 +170,9 @@ namespace RfpProxy
                         {
                             //length is correct
                             buffer = buffer.Slice(0, packetLength + 4);
+                            var copy = buffer.ToArray();
                             reader.AdvanceTo(buffer.End, buffer.End);
-                            return buffer.ToMemory();
+                            return copy;
                         }
                     }
                     throw new Exception("unexpected packet");
@@ -193,7 +200,7 @@ namespace RfpProxy
 
         private async Task<ReadOnlyMemory<byte>> GetRfpKeyAsync(CryptedRfpConnection connection, CancellationToken cancellationToken)
         {
-            var rfpa = await GetRfpaAsync(connection, cancellationToken);
+            var rfpa = await GetRfpaAsync(connection, cancellationToken).ConfigureAwait(false);
             if (rfpa.IsEmpty) return rfpa;
             HexEncoding.SwapEndianess(rfpa.Span);
             var key = connection.Identifier.ToString() + '\0';

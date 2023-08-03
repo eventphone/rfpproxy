@@ -14,7 +14,6 @@ namespace RfpProxy
         private readonly string _server;
         private readonly int _port;
         private TcpListener _listener;
-        private readonly CancellationTokenSource _cts;
 
 
         protected TcpProxy(int listenPort, string server, int serverPort)
@@ -22,7 +21,6 @@ namespace RfpProxy
             _listenPort = listenPort;
             _server = server;
             _port = serverPort;
-            _cts = new CancellationTokenSource();
         }
 
         public virtual async Task RunAsync(CancellationToken cancellationToken)
@@ -31,11 +29,10 @@ namespace RfpProxy
             try
             {
                 _listener.Start();
-                var accept = _listener.AcceptTcpClientAsync();
+                var accept = _listener.AcceptTcpClientAsync(cancellationToken).AsTask();
                 var tasks = new HashSet<Task>
                 {
-                    accept,
-                    Task.Delay(Timeout.Infinite, cancellationToken)
+                    accept
                 };
                 while (!cancellationToken.IsCancellationRequested)
                 {
@@ -48,7 +45,7 @@ namespace RfpProxy
                         tasks.Add(HandleClientAsync(client, cancellationToken));
 
                         tasks.Remove(accept);
-                        accept = _listener.AcceptTcpClientAsync();
+                        accept = _listener.AcceptTcpClientAsync(cancellationToken).AsTask();
                         tasks.Add(accept);
                     }
                     else
@@ -102,11 +99,11 @@ namespace RfpProxy
                     {
                         var clientPipe = new Pipe();
                         var fillClientPipe = PipeHelper.FillPipeAsync(client.Client, clientPipe.Writer, cts.Token);
-                        var readClientPipe = ReadFromClientAsync(clientData, clientPipe.Reader, cancellationToken);
+                        var readClientPipe = ReadFromClientAsync(clientData, clientPipe.Reader, cts.Token);
 
                         var serverPipe = new Pipe();
                         var fillServerPipe = PipeHelper.FillPipeAsync(server.Client, serverPipe.Writer, cts.Token);
-                        var readServerPipe = ReadFromServerAsync(clientData, serverPipe.Reader, cancellationToken);
+                        var readServerPipe = ReadFromServerAsync(clientData, serverPipe.Reader, cts.Token);
 
                         var t = await Task.WhenAny(fillClientPipe, readClientPipe, fillServerPipe, readServerPipe).ConfigureAwait(false);
                         await t;
@@ -125,21 +122,18 @@ namespace RfpProxy
         }
 
         protected abstract Task ReadFromClientAsync(T clientData, PipeReader client, CancellationToken cancellationToken);
+
         protected abstract Task ReadFromServerAsync(T clientData, PipeReader server, CancellationToken cancellationToken);
 
         protected abstract T OnClientConnected(TcpClient client, TcpClient server);
 
         protected abstract void OnClientDisconnected(T client);
 
-        public void Stop()
-        {
-            _cts.Cancel();
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
+                _listener?.Stop();
             }
         }
 

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>mediatone</AssemblyName>
     <RootNamespace>RfpProxy.MediaTone</RootNamespace>
   </PropertyGroup>
@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Melanchall.DryWetMidi" Version="5.1.0" />
-    <PackageReference Include="Mono.Options" Version="6.6.0.161" />
+    <PackageReference Include="Melanchall.DryWetMidi.Nativeless" Version="6.1.3" />
+    <PackageReference Include="Mono.Options" Version="6.12.0.148" />
   </ItemGroup>
 
   <ItemGroup>
