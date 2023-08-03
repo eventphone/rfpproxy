@@ -15,7 +15,7 @@ namespace RfpProxy
             int port = 16321;
             int listen = 16000;
             string socket = "client.sock";
-            string configfile = "/opt/SIP-DECT/tmp/omm_conf_8.3SP4.txt";
+            string configfile = "/opt/SIP-DECT/tmp/omm_conf_8.3SP5.txt";
             bool showHelp = false;
             bool useTProxy = false;
             var options = new OptionSet
