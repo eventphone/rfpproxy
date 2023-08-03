@@ -16,7 +16,7 @@ namespace RfpProxy.Virtual
             string mac = null;
             string omm = null;
             string rfpa = null;
-            string configfile = "/opt/SIP-DECT/tmp/omm_conf.txt";
+            string configfile = "/opt/SIP-DECT/tmp/omm_conf_8.3SP5.txt";
             var options = new OptionSet
             {
                 {"m|mac=", "rfp MAC address", x => mac = x},
