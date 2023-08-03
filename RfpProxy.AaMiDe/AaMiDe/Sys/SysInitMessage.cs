@@ -254,7 +254,7 @@ namespace RfpProxy.AaMiDe.Sys
 
             int offset = 0x64;
             int length = 0x80;
-            if (Protocol > 0x040000u)
+            if (Protocol > 0x080000u)
             {
                 offset = 0x70;
                 length = 0x90;
