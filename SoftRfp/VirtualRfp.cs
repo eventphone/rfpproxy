@@ -49,9 +49,9 @@ namespace RfpProxy.Virtual
 
         public async Task RunAsync(CancellationToken cancellationToken)
         {
-            using var connection = new TcpClient(AddressFamily.InterNetworkV6);
+            using var connection = new TcpClient(AddressFamily.InterNetwork);
             using var registration = cancellationToken.Register(() => connection.Close());
-            await connection.ConnectAsync(_omm, 16321);
+            await connection.ConnectAsync(_omm, 16321, cancellationToken);
             _socket = connection.Client;
             _auth = await ReadPacketAsync(cancellationToken);
             if (!await InitAsync(cancellationToken)) return;
@@ -76,7 +76,7 @@ namespace RfpProxy.Virtual
 
         private async Task<bool> InitAsync(CancellationToken cancellationToken)
         {
-            var caps = RfpCapabilities.Indoor;
+            var caps = RfpCapabilities.Indoor | RfpCapabilities.Encryption | RfpCapabilities.AdvancedFeature;
             var init = new SysInitMessage(PhysicalAddress.Parse(_mac), caps);
             init.Sign(_auth.Span);
             await SendPacketAsync(init, cancellationToken);

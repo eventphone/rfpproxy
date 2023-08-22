@@ -214,7 +214,7 @@ namespace RfpProxy.AaMiDe.Sys
 
         public override bool HasUnknown => true;
 
-        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(Protocol > 0x040000?0x110:0xF4);
+        protected override ReadOnlyMemory<byte> Raw => base.Raw.Slice(Protocol > 0x080000?0x110:0xF4);
 
         public override ushort Length => (ushort) (base.Length + 0x110u);
 

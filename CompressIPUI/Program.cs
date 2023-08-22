@@ -54,6 +54,7 @@ namespace RfpProxy.CompressIPUI
                     };
                     await client.SubscribeAsync(cts.Token);
                     await client.RunAsync(cts.Token);
+                    cts.Cancel();
                 }
             }
             catch (OperationCanceledException)

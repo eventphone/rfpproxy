@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
+using System.Security.Cryptography;
 using RfpProxy.AaMiDe;
 using RfpProxy.AaMiDe.Dnm;
 using RfpProxy.AaMiDe.Mac;
@@ -105,15 +107,61 @@ namespace RfpProxy.Test
         public void CanDecodeSysAuthenticateMessage()
         {
             var auth = Decode<SysAuthenticateMessage>("012d0020" +
-                                             "57b858bb227549d7" +
-                                             "2215096317457eee" +
-                                             "f01aa118ab156ad5" +
-                                             "e8b35e55ab2b30a0");
-            Assert.Equal("2215096317457eee", auth.RfpIv.ToHex());
-            Assert.Equal("e8b35e55ab2b30a0", auth.OmmIv.ToHex());
-
+                                             "57b858bb227549" +
+                                             "d72215096317457e" +
+                                             "eef01aa118ab156a" +
+                                             "d5e8b35e55ab2b30" +
+                                             "a0");
             Log(auth);
+            Assert.Equal("d72215096317457e", auth.RfpIv.ToHex());
+            Assert.Equal("d5e8b35e55ab2b30", auth.OmmIv.ToHex());
+
             //TODO Assert.False(auth.HasUnknown);
+        }
+
+        [Fact]
+        public void CanSign()
+        {
+            var auth = HexEncoding.HexToByte(
+                "012d0020 a1ec05aa 36940a9c 027cc8ab e7045501 1c33e8aa c57860f6 ac9c2d00 432182b8"
+                    .Replace(" ", String.Empty));
+            var orig = HexEncoding.HexToByte(
+                ("012001100000000d 00080100 0030421b 17370000 00000000 0001ef3c 2a0d8ce8 725371d0 d799a029" +
+                "8dc02c73 4ac5b803 abc38663 b494de7b 2ffbe03d 70b616eb facf2e7d 85f61b29 5cba5c76 ea515501" +
+                "b3c02b75 5862261b fc08ffde 00080201 00000000 00000000 00000000 00000000 00000000 5349502d" +
+                "44454354 20382e31 5350332d 464b3234 00000000 00000000 00000000 00000000 00000000 00000000" +
+                "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
+                "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
+                "00000000 00000000 00000000 00000000 00000000 cb8321c7 401dd174 d3b350fa faa7b770")
+                    .Replace(" ", String.Empty));
+            var signatureKey = HexEncoding.HexToByte(
+                "e7adda3adb0521f3d3fbdf3a18ee8648" +
+                "b47398b1570c2b45ef8d2a9180a1a32c" +
+                "69284a9c97d444abf87f5c578f942821" +
+                "4dd0183cba969dc5");
+
+            _output.WriteLine(orig.AsSpan().ToHex());
+            var init = new SysInitMessage(orig);
+            init.Sign(auth);
+            var created = new byte[0x114];
+            init.Serialize(created);
+            _output.WriteLine(created.AsSpan().ToHex());
+            var caps = SysInitMessage.RfpCapabilities.Reserved3 | 
+                       SysInitMessage.RfpCapabilities.Indoor |
+                       SysInitMessage.RfpCapabilities.Wlan |
+                       SysInitMessage.RfpCapabilities.Encryption |
+                       SysInitMessage.RfpCapabilities.FrequencyShift |
+                       SysInitMessage.RfpCapabilities.ConfigurableTX |
+                       SysInitMessage.RfpCapabilities.Reserved12 |
+                       SysInitMessage.RfpCapabilities.Reserved14 |
+                       SysInitMessage.RfpCapabilities.Reserved15 |
+                       SysInitMessage.RfpCapabilities.AdvancedFeature |
+                       SysInitMessage.RfpCapabilities.WlanDfsSupported;
+            init = new SysInitMessage(PhysicalAddress.Parse("0030421b1737"), caps);
+            init.Sign(auth);
+            created = new byte[0x114];
+            init.Serialize(created);
+            _output.WriteLine(created.AsSpan().ToHex());
         }
 
         [Fact]
@@ -140,6 +188,28 @@ namespace RfpProxy.Test
                                          "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
                                          "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 cc59b116 bd3f31ef" +
                                          "34dd9fde 29b71133");
+            Log(init);
+
+            init = Decode<SysInitMessage>("01200110 0000000d 00080100 0030421b 17370000 00000000 0001ef3c 2a0d8ce8 725371d0 d799a029" +
+                                          "8dc02c73 4ac5b803 abc38663 b494de7b 2ffbe03d 70b616eb facf2e7d 85f61b29 5cba5c76 ea515501" +
+                                          "b3c02b75 5862261b fc08ffde 00080201 00000000 00000000 00000000 00000000 00000000 5349502d" +
+                                          "44454354 20382e31 5350332d 464b3234 00000000 00000000 00000000 00000000 00000000 00000000" +
+                                          "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
+                                          "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
+                                          "00000000 00000000 00000000 00000000 00000000 cb8321c7 401dd174 d3b350fa faa7b770");
+            var serialized = new byte[500];
+            init.Serialize(serialized);
+            var auth = HexEncoding.HexToByte("012d0020 a1ec05aa 36940a9c 027cc8ab e7045501 1c33e8aa c57860f6 ac9c2d00 432182b8".Replace(" ", String.Empty));
+            init.Sign(auth);
+            Log(init);
+
+            init = Decode<SysInitMessage>("01200104 00000011 00080000 08000fe0 151e0000 00000000 0001ef1c aece27b5 c1f0f091 a31e0cbc" +
+                                          "1c38a6b9 bcea10e1 6adf5595 6c15f6e3 d633903b 06c975cd f19050b5 681f3e2e 1c48f7e5 258526bb" +
+                                          "dd61d152 d065a6d0 121cf542 00080000 00000000 00000000 5349502d 44454354 20382e30 2d484630" +
+                                          "31444931 36000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
+                                          "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
+                                          "00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000" +
+                                          "00000000 00000000 1779261c 5c73b323 20724091 67111e70");
             Log(init);
         }
 
