@@ -13,6 +13,8 @@ namespace RfpProxy.AaMiDe
     {
         private readonly ushort _length;
 
+        public int MessageLength => _length + 4;
+
         public virtual ushort Length => 4;
 
         public virtual bool HasUnknown => !Raw.IsEmpty;

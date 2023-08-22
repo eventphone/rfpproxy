@@ -3,6 +3,7 @@
     public enum DeTeWeType:byte
     {
         Language = 0x16,
+        Unknown1C = 0x1C,
         Display = 0x20,
         SendText = 0x21,
         DateTime = 0x23,

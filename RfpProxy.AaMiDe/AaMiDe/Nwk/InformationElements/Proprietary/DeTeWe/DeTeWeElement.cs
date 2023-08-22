@@ -60,6 +60,8 @@ namespace RfpProxy.AaMiDe.Nwk.InformationElements.Proprietary.DeTeWe
                         return new SendTextDeTeWeElement(data);
                     case DeTeWeType.Reserved1:
                         return new Reserved1DeTeWeElement(data);
+                    case DeTeWeType.Unknown1C:
+                        return new Unknown1CDeTeWeElement(data);
                     default:
                         return new UnknownDeTeWeElement(type, data);
                 }
