@@ -37,9 +37,9 @@ namespace RfpProxy.Pcap
             }
             catch (OptionException ex)
             {
-                Console.Error.Write("rfpproxy.pcap: ");
+                Console.Error.Write("rfpproxydump: ");
                 Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine("Try 'dotnet rfpproxy.pcap.dll --help' for more information");
+                Console.Error.WriteLine("Try 'rfpproxydump --help' for more information");
                 return;
             }
             if (String.IsNullOrEmpty(filename))
