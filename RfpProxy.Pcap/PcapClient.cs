@@ -15,7 +15,10 @@ namespace RfpProxy.Pcap
         public PcapClient(string socket, Stream file) : base(socket)
         {
             _file = file;
-            _file.SetLength(0);
+            if (_file.CanSeek)
+            {
+                _file.SetLength(0);
+            }
             WritePcapHeader();
         }
 
