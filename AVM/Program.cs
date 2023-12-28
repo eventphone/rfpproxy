@@ -75,6 +75,7 @@ namespace RfpProxy.AVM
             11640,
             11942, //TODO from our blog post, but also flagged as gigaset in GURU3
             12574,
+            13085,
         };
 
         private static readonly byte SignalType = 0b11100100;
