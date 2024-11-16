@@ -4,7 +4,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.0'
@@ -22,14 +22,14 @@ jobs:
     - run: 'dotnet publish -o publish/morseled -c Release MorseLed/MorseLed.csproj'
     - run: 'dotnet publish -o publish/virtualrfp -c Release SoftRfp/SoftRfp.csproj'
     - name: Upload result
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: rfpproxy_publish
         path: publish
     - run: 'sudo apt install rpm'
     - run: 'rpmbuild --target noarch --define "_binaries_in_noarch_packages_terminate_build 0" -bb --build-in-place rpmbuild/SPECS/rfpproxy.spec'
     - name: Upload rpm
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: rpm
         path: rpm/*.rpm
