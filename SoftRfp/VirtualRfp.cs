@@ -27,7 +27,7 @@ namespace RfpProxy.Virtual
         private Pipe _pipe;
         private Socket _socket;
         private readonly RfpConnectionTracker _connectionTracker;
-
+        
         public string RFPA
         {
             get => HexEncoding.ByteToHex(_rfpa.Span);
@@ -35,6 +35,8 @@ namespace RfpProxy.Virtual
         }
 
         public string OmmConfPath { get; set; }
+
+        public bool Debug { get; set; }
 
         public VirtualRfp(string mac, string omm)
         {
@@ -47,9 +49,9 @@ namespace RfpProxy.Virtual
 
         public async Task RunAsync(CancellationToken cancellationToken)
         {
-            using var connection = new TcpClient(AddressFamily.InterNetworkV6);
+            using var connection = new TcpClient(AddressFamily.InterNetwork);
             using var registration = cancellationToken.Register(() => connection.Close());
-            await connection.ConnectAsync(_omm, 16321);
+            await connection.ConnectAsync(_omm, 16321, cancellationToken);
             _socket = connection.Client;
             _auth = await ReadPacketAsync(cancellationToken);
             if (!await InitAsync(cancellationToken)) return;
@@ -63,6 +65,10 @@ namespace RfpProxy.Virtual
         {
             var data = new byte[message.Length];
             message.Serialize(data);
+            if (Debug)
+            {
+                Console.WriteLine($"> {HexEncoding.ByteToHex(data)}");
+            }
             var crypted = _encipher.Encrypt_CBC(_txIv.Span, data);
             _txIv = crypted.Slice(crypted.Length - 8);
             _socket.Send(crypted.Span);
@@ -70,13 +76,7 @@ namespace RfpProxy.Virtual
 
         private async Task<bool> InitAsync(CancellationToken cancellationToken)
         {
-            var caps = RfpCapabilities.Wlan
-                       | RfpCapabilities.Encryption
-                       | RfpCapabilities.AdvancedFeature
-                       | RfpCapabilities.Indoor
-                       | RfpCapabilities.FrequencyShift
-                       | RfpCapabilities.NormalTx
-                       | RfpCapabilities.LowTx;
+            var caps = RfpCapabilities.Indoor | RfpCapabilities.Encryption | RfpCapabilities.AdvancedFeature;
             var init = new SysInitMessage(PhysicalAddress.Parse(_mac), caps);
             init.Sign(_auth.Span);
             await SendPacketAsync(init, cancellationToken);
@@ -153,9 +153,14 @@ namespace RfpProxy.Virtual
 
         private ReadOnlyMemory<byte> DecryptRfpa(string rfpa)
         {
+            return DecryptRfpa(rfpa, _mac);
+        }
+
+        public static ReadOnlyMemory<byte> DecryptRfpa(string rfpa, string mac)
+        {
             var bytes = HexEncoding.HexToByte(rfpa);
             HexEncoding.SwapEndianess(bytes);
-            var key = (_mac + '\0').ToLowerInvariant();
+            var key = (mac + '\0').ToLowerInvariant();
             var bf = new BlowFish(Encoding.ASCII.GetBytes(key));
             var plain = bf.Decrypt_ECB(bytes);
             HexEncoding.SwapEndianess(plain.Span);
@@ -270,6 +275,10 @@ namespace RfpProxy.Virtual
 
         protected virtual void OnOnMessage(ReadOnlyMemory<byte> data)
         {
+            if (Debug)
+            {
+                Console.WriteLine($"< {HexEncoding.ByteToHex(data.Span)}");
+            }
             var message = new AaMiDeMessageEventArgs(data, _connectionTracker);
             switch (message.Message.Type)
             {

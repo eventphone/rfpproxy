@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Concurrent;
+using System.IO;
 using RfpProxyLib;
 using RfpProxyLib.Messages;
 
@@ -11,7 +12,7 @@ namespace RfpProxy.Pcap
         private readonly ConcurrentDictionary<RfpIdentifier, int> _rfpSequenceNumbers = new ConcurrentDictionary<RfpIdentifier, int>();
         private readonly ConcurrentDictionary<RfpIdentifier, int> _ommSequenceNumbers = new ConcurrentDictionary<RfpIdentifier, int>();
 
-        public AaMiDePcapClient(string socket, string filename) : base(socket, filename)
+        public AaMiDePcapClient(string socket, Stream file) : base(socket, file)
         {
         }
 

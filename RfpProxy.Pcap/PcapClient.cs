@@ -10,12 +10,15 @@ namespace RfpProxy.Pcap
 {
     abstract class PcapClient : ProxyClient
     {
-        private readonly FileStream _file;
+        private readonly Stream _file;
 
-        public PcapClient(string socket, string filename) : base(socket)
+        public PcapClient(string socket, Stream file) : base(socket)
         {
-            _file = File.OpenWrite(filename);
-            _file.SetLength(0);
+            _file = file;
+            if (_file.CanSeek)
+            {
+                _file.SetLength(0);
+            }
             WritePcapHeader();
         }
 

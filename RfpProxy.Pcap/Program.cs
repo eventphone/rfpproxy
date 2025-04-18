@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace RfpProxy.Pcap
                 {"s|socket=", "socket path", x => socketname = x},
                 {"r|rfp=", "rfp MAC address", x => mac = x},
                 {"rm|rfpmask=", "rfp mask", x => rfpMmask = x},
-                {"f|filename=", "pcap file path", x => filename = x},
+                {"f|filename=", "pcap file path - use '-' for STDOUT", x => filename = x},
                 {"dnm", "use internal rfp ether protocol", x => dnm = x != null},
                 {"h|help", "show help", x => showHelp = x != null},
             };
@@ -36,9 +37,9 @@ namespace RfpProxy.Pcap
             }
             catch (OptionException ex)
             {
-                Console.Error.Write("rfpproxy.pcap: ");
+                Console.Error.Write("rfpproxydump: ");
                 Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine("Try 'dotnet rfpproxy.pcap.dll --help' for more information");
+                Console.Error.WriteLine("Try 'rfpproxydump --help' for more information");
                 return;
             }
             if (String.IsNullOrEmpty(filename))
@@ -50,15 +51,16 @@ namespace RfpProxy.Pcap
             }
             try
             {
+                var target = filename == "-" ? Console.OpenStandardOutput() : File.OpenWrite(filename!);
                 PcapClient client;
                 if (dnm)
                 {
-                    client = new DnmPcapClient(socketname, filename);
+                    client = new DnmPcapClient(socketname, target);
                 }
                 else
                 {
                     filterMask = "0000";
-                    client = new AaMiDePcapClient(socketname, filename);
+                    client = new AaMiDePcapClient(socketname, target);
                 }
                 using (var cts = new CancellationTokenSource())
                 using (client)

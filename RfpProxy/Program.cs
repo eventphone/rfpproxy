@@ -15,7 +15,7 @@ namespace RfpProxy
             int port = 16321;
             int listen = 16000;
             string socket = "client.sock";
-            string configfile = "/opt/SIP-DECT/tmp/omm_conf.txt";
+            string configfile = "/opt/SIP-DECT/tmp/omm_conf_8.3SP5.txt";
             bool showHelp = false;
             bool useTProxy = false;
             var options = new OptionSet
@@ -25,7 +25,7 @@ namespace RfpProxy
                 {"l|listen=", "TCP listen port of proxy", (ushort x) => listen = x},
                 {"s|socket=", "socket path", (string x) => socket = x},
                 {"t|transparent", "use TPROXY", x => useTProxy = x != null},
-                {"c|config", "omm_conf.txt", x=> configfile = x },
+                {"c|config=", "omm_conf.txt", x=> configfile = x },
                 {"h|help", "show help", x => showHelp = x != null},
             };
 

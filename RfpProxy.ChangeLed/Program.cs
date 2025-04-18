@@ -51,7 +51,7 @@ namespace RfpProxy.ChangeLed
                         cts.Cancel();
                         socket.Close();
                     };
-                    await socket.ConnectAsync(new UnixDomainSocketEndPoint(socketname));
+                    await socket.ConnectAsync(new UnixDomainSocketEndPoint(socketname), cts.Token);
                     cts.Token.ThrowIfCancellationRequested();
                     await SubscribeAsync(socket, cts.Token).ConfigureAwait(false);
                     await RunAsync(socket, cts.Token).ConfigureAwait(false);

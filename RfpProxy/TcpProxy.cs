@@ -93,7 +93,7 @@ namespace RfpProxy
                 using (client)
                 using (var server = ConnectToServer(client))
                 {
-                    await server.ConnectAsync(_server, _port).ConfigureAwait(false);
+                    await server.ConnectAsync(_server, _port, cts.Token).ConfigureAwait(false);
                     var clientData = OnClientConnected(client, server);
                     try
                     {

@@ -13,6 +13,8 @@ namespace RfpProxy.AaMiDe
     {
         private readonly ushort _length;
 
+        public int MessageLength => _length + 4;
+
         public virtual ushort Length => 4;
 
         public virtual bool HasUnknown => !Raw.IsEmpty;
@@ -104,6 +106,8 @@ namespace RfpProxy.AaMiDe
                     return new SysRPingMessage(data);
                 case MsgType.SYS_VSNTP_TIME:
                     return new SysRoundtripDelayMessage(data);
+                case MsgType.SYS_RANDOM_VALUE:
+                    return new SysRandomValueMessage(data);
                 case MsgType.SYS_RESET:
                     return new SysResetMessage(data);
                 case MsgType.HEARTBEAT:
@@ -118,6 +122,8 @@ namespace RfpProxy.AaMiDe
                     return new SysMaxChannelsMessage(data);
                 case MsgType.SYS_ENCRYPTION_CONF:
                     return new SysEncryptionConf(data);
+                case MsgType.SYS_FIRMWARE_UPDATE:
+                    return new SysFirmwareUpdateMessage(data);
                 default:
                     return new UnknownAaMiDeMessage(type, data);
             }

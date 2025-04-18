@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers.Binary;
+using System.IO;
 using RfpProxyLib;
 using RfpProxyLib.Messages;
 
@@ -7,7 +8,7 @@ namespace RfpProxy.Pcap
 {
     class DnmPcapClient : PcapClient
     {
-        public DnmPcapClient(string socket, string filename) : base(socket, filename)
+        public DnmPcapClient(string socket, Stream file) : base(socket, file)
         {
         }
 

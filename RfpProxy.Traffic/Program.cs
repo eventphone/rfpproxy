@@ -69,7 +69,7 @@ namespace RfpProxy.Traffic
                     }
                     else
                     {
-                        await client.AddHandlerAsync(0, mac, "ffffffffffff", "010e0018ac1417010f", "ffffffffffffffff0f", cts.Token);
+                        await client.AddHandlerAsync(0, mac, "ffffffffffff", "010e001800000000000000000000ffff0ac000195000000000adbeef", "ffffffffffffffffffffffffffffffffffffffff00000000ffffffff", cts.Token);
                     }
                     await client.FinishHandshakeAsync(cts.Token);
                     if (omm)
@@ -78,7 +78,7 @@ namespace RfpProxy.Traffic
                     }
                     else
                     {
-                        await client.WriteAsync(MessageDirection.ToRfp, 0, rfp, HexEncoding.HexToByte("010e000cac1417010f00000000000000"), cts.Token);
+                        await client.WriteAsync(MessageDirection.ToRfp, 0, rfp, HexEncoding.HexToByte("010e001800000000000000000000ffff0ac0001950000000deadbeef"), cts.Token);
                     }
                     await client.RunAsync(cts.Token);
                 }
@@ -107,9 +107,10 @@ namespace RfpProxy.Traffic
                 }
                 else
                 {
-                    _ping = HexEncoding.HexToByte("010e000c" +
-                                                  "ac141701" +
-                                                  "0f00000000000000");
+                    _ping = HexEncoding.HexToByte("010e0018" +
+                                                  "00000000000000000000ffff0ac000195" +
+                                                  "0000000" +
+                                                  "deadbeef");
                 }
             }
 
