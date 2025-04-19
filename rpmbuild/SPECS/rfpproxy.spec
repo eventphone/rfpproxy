@@ -1,7 +1,7 @@
 Summary: rfpproxy
 Name: rfpproxy
 Version: 0.0.2
-Release: 3
+Release: 4
 License: MIT
 URL: https://github.com/eventphone/rfpproxy
 Requires: dotnet-runtime-8.0
