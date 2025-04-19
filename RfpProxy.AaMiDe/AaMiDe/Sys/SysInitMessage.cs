@@ -224,9 +224,9 @@ namespace RfpProxy.AaMiDe.Sys
             Hardware = RfpType.RFP35;
             Mac2 = mac;
             Magic = 0x00037a20000529d9;
-            Protocol = 0x080303u;
+            Protocol = 0x080500u;
             Capabilities = capabilities;
-            SwVersion = "SIP-DECT 8.3-eventphone";
+            SwVersion = "SIP-DECT 9.2-eventphone";
         }
 
         public SysInitMessage(ReadOnlyMemory<byte> data):base(MsgType.SYS_INIT, data)
