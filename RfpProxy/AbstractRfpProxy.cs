@@ -111,8 +111,12 @@ namespace RfpProxy
             if (next.Buffer.Length > 2 && next.Buffer.FirstSpan[0] == 0x01 && next.Buffer.Slice(1).FirstSpan[0] == 0x0c)
             {
                 Console.WriteLine($"[{connection.TraceId}] found SYS_OMM_CONTROL");
-                packet = await ReadPacketAsync(0x010c, 0x08, server, cancellationToken).ConfigureAwait(false);
+                packet = await ReadPacketAsync(0x010c, 0, server, cancellationToken).ConfigureAwait(false);
                 Console.WriteLine($"[{connection.TraceId}] SYS_OMM_CONTROL");
+                await OnServerMessageAsync(connection, packet, cancellationToken).ConfigureAwait(false);
+                
+                packet = await ReadPacketAsync(0x0121, 0, server, cancellationToken).ConfigureAwait(false);
+                Console.WriteLine($"[{connection.TraceId}] SYS_RESET");
                 await OnServerMessageAsync(connection, packet, cancellationToken).ConfigureAwait(false);
             }           
 
