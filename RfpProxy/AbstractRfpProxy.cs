@@ -106,6 +106,7 @@ namespace RfpProxy
             //check if we have another unencrypted SYS_OMM_CONTROL
             //this may happen if the RFP requires a firmware update
             if (server.TryRead(out var available)){
+                server.CancelPendingRead();
                 var buffer = available.Buffer;
                 if (buffer.Length > 2 && buffer.FirstSpan[0] == 0x01 && buffer.Slice(1).FirstSpan[0] == 0x0c)
                 {
