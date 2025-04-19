@@ -114,8 +114,7 @@ namespace RfpProxy
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[{clientData}] HandleClient failed");
-                        Console.WriteLine(ex);
+                        Console.WriteLine($"[{clientData}] HandleClient failed\n{ex}");
                     }
                     finally
                     {
