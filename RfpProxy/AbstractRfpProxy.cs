@@ -103,19 +103,17 @@ namespace RfpProxy
             }
             var ack = packet;
             await OnServerMessageAsync(connection, ack, cancellationToken).ConfigureAwait(false);
+
             //check if we have another unencrypted SYS_OMM_CONTROL
             //this may happen if the RFP requires a firmware update
-            if (server.TryRead(out var available)){
-                server.CancelPendingRead();
-                var buffer = available.Buffer;
-                if (buffer.Length > 2 && buffer.FirstSpan[0] == 0x01 && buffer.Slice(1).FirstSpan[0] == 0x0c)
-                {
-                    Console.WriteLine($"[{connection.TraceId}] found SYS_OMM_CONTROL");
-                    packet = await ReadPacketAsync(0x010c, 0x08, server, cancellationToken).ConfigureAwait(false);
-                    Console.WriteLine($"[{connection.TraceId}] SYS_OMM_CONTROL");
-                    await OnServerMessageAsync(connection, packet, cancellationToken).ConfigureAwait(false);
-                }
-            }
+            var next = await server.ReadAsync(cancellationToken);
+            if (next.Buffer.Length > 2 && next.Buffer.FirstSpan[0] == 0x01 && next.Buffer.Slice(1).FirstSpan[0] == 0x0c)
+            {
+                Console.WriteLine($"[{connection.TraceId}] found SYS_OMM_CONTROL");
+                packet = await ReadPacketAsync(0x010c, 0x08, server, cancellationToken).ConfigureAwait(false);
+                Console.WriteLine($"[{connection.TraceId}] SYS_OMM_CONTROL");
+                await OnServerMessageAsync(connection, packet, cancellationToken).ConfigureAwait(false);
+            }            
 
             connection.InitOmmToRfpIv(sysAuthenticate.Slice(27, 8).Span);
 
