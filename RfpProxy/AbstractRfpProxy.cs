@@ -21,7 +21,7 @@ namespace RfpProxy
         protected override async Task ReadFromClientAsync(CryptedRfpConnection connection, PipeReader client, CancellationToken cancellationToken)
         {
             var sysInit = await ReadPacketAsync(0x0120, 0, client, cancellationToken).ConfigureAwait(false);
-
+            Console.WriteLine($"[{connection.TraceId}] SYS_INIT");
             var iv = connection.RfpToOmmIv;
             connection.RfpToOmmIv = ReadOnlyMemory<byte>.Empty;
 
@@ -37,6 +37,7 @@ namespace RfpProxy
         protected override async Task ReadFromServerAsync(CryptedRfpConnection connection, PipeReader server, CancellationToken cancellationToken)
         {
             var sysAuthenticate = await ReadPacketAsync(0x012d, 0x20, server, cancellationToken).ConfigureAwait(false);
+            Console.WriteLine($"[{connection.TraceId}] SYS_AUTHENTICATE");
             connection.InitRfpToOmmIv(sysAuthenticate.Slice(11, 8).Span);
 
             await OnServerMessageAsync(connection, sysAuthenticate, cancellationToken).ConfigureAwait(false);
@@ -49,11 +50,13 @@ namespace RfpProxy
                 if (type.Span[1] == 0x24)
                 {
                     //SYS_RFP_AUTH_KEY
+                    Console.WriteLine($"[{connection.TraceId}] SYS_RFP_AUTH_KEY");
                     key = packet.Slice(4);
                 }
                 else if (type.Span[1] == 0x25)
                 {
                     //SYS_RFP_RE_ENROLEMENT
+                    Console.WriteLine($"[{connection.TraceId}] SYS_RFP_RE_ENROLEMENT");
                     var checksum = packet.Slice(0x44);
                     var crypted = packet.Slice(4, 0x40);
                     var pw = await GetRootPasswordHashAsync(cancellationToken).ConfigureAwait(false);
@@ -93,6 +96,10 @@ namespace RfpProxy
                 SetKeys(key, connection);
                 await OnServerMessageAsync(connection, packet, cancellationToken).ConfigureAwait(false);
                 packet = await ReadPacketAsync(0x01, 0x08, server, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                Console.WriteLine($"[{connection.TraceId}] PACKET 0x{type.Span[0]:X2}{type.Span[1]:X2}");
             }
             var ack = packet;
             /*
