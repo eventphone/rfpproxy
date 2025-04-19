@@ -95,7 +95,12 @@ namespace RfpProxy
                 packet = await ReadPacketAsync(0x01, 0x08, server, cancellationToken).ConfigureAwait(false);
             }
             var ack = packet;
-            await OnServerMessageAsync(connection, ack, cancellationToken).ConfigureAwait(false);
+            /*
+             * if the omm closed the connection due to version mismatch, we still need to send the
+             * ack packet. That's why we can't use the cancellationtoken
+             */
+
+            await OnServerMessageAsync(connection, ack, CancellationToken.None).ConfigureAwait(false);
 
             connection.InitOmmToRfpIv(sysAuthenticate.Slice(27, 8).Span);
 
