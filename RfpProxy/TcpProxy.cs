@@ -118,9 +118,20 @@ namespace RfpProxy
                     }
                     finally
                     {
-                        cts.Cancel();
-                        OnClientDisconnected(clientData);
-                        await Task.WhenAll(tasks);
+                        //delay cancellation to allow processing of pending packets
+                        cts.CancelAfter(100);
+                        try
+                        {
+                            await Task.WhenAll(tasks);
+                        }
+                        catch(Exception ex)
+                        {
+                            Console.WriteLine($"[{clientData}] Exception during teardown\n{ex}");
+                        }
+                        finally
+                        {
+                            OnClientDisconnected(clientData);
+                        }                        
                     }
                 }
         }
