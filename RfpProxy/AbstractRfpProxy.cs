@@ -21,7 +21,7 @@ namespace RfpProxy
         protected override async Task ReadFromClientAsync(CryptedRfpConnection connection, PipeReader client, CancellationToken cancellationToken)
         {
             var sysInit = await ReadPacketAsync(0x0120, 0, client, cancellationToken).ConfigureAwait(false);
-
+            Console.WriteLine($"[{connection.TraceId}] SYS_INIT");
             var iv = connection.RfpToOmmIv;
             connection.RfpToOmmIv = ReadOnlyMemory<byte>.Empty;
 
@@ -37,6 +37,7 @@ namespace RfpProxy
         protected override async Task ReadFromServerAsync(CryptedRfpConnection connection, PipeReader server, CancellationToken cancellationToken)
         {
             var sysAuthenticate = await ReadPacketAsync(0x012d, 0x20, server, cancellationToken).ConfigureAwait(false);
+            Console.WriteLine($"[{connection.TraceId}] SYS_AUTHENTICATE");
             connection.InitRfpToOmmIv(sysAuthenticate.Slice(11, 8).Span);
 
             await OnServerMessageAsync(connection, sysAuthenticate, cancellationToken).ConfigureAwait(false);
@@ -49,11 +50,13 @@ namespace RfpProxy
                 if (type.Span[1] == 0x24)
                 {
                     //SYS_RFP_AUTH_KEY
+                    Console.WriteLine($"[{connection.TraceId}] SYS_RFP_AUTH_KEY");
                     key = packet.Slice(4);
                 }
                 else if (type.Span[1] == 0x25)
                 {
                     //SYS_RFP_RE_ENROLEMENT
+                    Console.WriteLine($"[{connection.TraceId}] SYS_RFP_RE_ENROLEMENT");
                     var checksum = packet.Slice(0x44);
                     var crypted = packet.Slice(4, 0x40);
                     var pw = await GetRootPasswordHashAsync(cancellationToken).ConfigureAwait(false);
@@ -94,8 +97,27 @@ namespace RfpProxy
                 await OnServerMessageAsync(connection, packet, cancellationToken).ConfigureAwait(false);
                 packet = await ReadPacketAsync(0x01, 0x08, server, cancellationToken).ConfigureAwait(false);
             }
+            else
+            {
+                Console.WriteLine($"[{connection.TraceId}] PACKET 0x{type.Span[0]:X2}{type.Span[1]:X2}");
+            }
             var ack = packet;
             await OnServerMessageAsync(connection, ack, cancellationToken).ConfigureAwait(false);
+
+            //check if we have another unencrypted SYS_OMM_CONTROL
+            //this may happen if the RFP requires a firmware update
+            var next = await server.ReadAsync(cancellationToken).ConfigureAwait(false);
+            server.AdvanceTo(next.Buffer.Start, next.Buffer.Start); 
+            if (next.Buffer.Length > 2 && next.Buffer.FirstSpan[0] == 0x01 && next.Buffer.Slice(1).FirstSpan[0] == 0x0c)
+            {
+                packet = await ReadPacketAsync(0x010c, 0, server, cancellationToken).ConfigureAwait(false);
+                Console.WriteLine($"[{connection.TraceId}] SYS_OMM_CONTROL");
+                await OnServerMessageAsync(connection, packet, cancellationToken).ConfigureAwait(false);
+
+                packet = await ReadPacketAsync(0x0121, 0, server, cancellationToken).ConfigureAwait(false);
+                Console.WriteLine($"[{connection.TraceId}] SYS_RESET");
+                await OnServerMessageAsync(connection, packet, cancellationToken).ConfigureAwait(false);
+            }           
 
             connection.InitOmmToRfpIv(sysAuthenticate.Slice(27, 8).Span);
 
@@ -146,7 +168,7 @@ namespace RfpProxy
             }
             catch (OperationCanceledException ex)
             {
-                Console.WriteLine("cancelled in AbstractRfpProxy.ReadAsync");
+                Console.WriteLine($"[{connection.TraceId}] cancelled in AbstractRfpProxy.ReadAsync");
                 reader.Complete(ex);
             }
         }

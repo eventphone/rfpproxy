@@ -18,6 +18,7 @@ namespace RfpProxy
         }
 
         public RfpIdentifier Identifier { get; set; }
+        public Guid TraceId { get; } = Guid.NewGuid();
 
         public virtual ValueTask<int> SendToServerAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken)
         {
@@ -29,6 +30,11 @@ namespace RfpProxy
         {
             if (data.IsEmpty) return new ValueTask<int>(0);
             return Client.Client.SendAsync(data, SocketFlags.None, cancellationToken);
+        }
+
+        public override string ToString()
+        {
+            return TraceId.ToString();
         }
     }
 }

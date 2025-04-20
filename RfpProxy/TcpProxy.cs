@@ -95,28 +95,43 @@ namespace RfpProxy
                 {
                     await server.ConnectAsync(_server, _port, cts.Token).ConfigureAwait(false);
                     var clientData = OnClientConnected(client, server);
+                    var tasks = new List<Task>();
                     try
                     {
                         var clientPipe = new Pipe();
                         var fillClientPipe = PipeHelper.FillPipeAsync(client.Client, clientPipe.Writer, cts.Token);
+                        tasks.Add(fillClientPipe);
                         var readClientPipe = ReadFromClientAsync(clientData, clientPipe.Reader, cts.Token);
+                        tasks.Add(readClientPipe);
 
                         var serverPipe = new Pipe();
                         var fillServerPipe = PipeHelper.FillPipeAsync(server.Client, serverPipe.Writer, cts.Token);
+                        tasks.Add(fillServerPipe);
                         var readServerPipe = ReadFromServerAsync(clientData, serverPipe.Reader, cts.Token);
-
-                        var t = await Task.WhenAny(fillClientPipe, readClientPipe, fillServerPipe, readServerPipe).ConfigureAwait(false);
+                        tasks.Add(readServerPipe);
+                        var t = await Task.WhenAny(tasks).ConfigureAwait(false);
                         await t;
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("HandleClient failed");
-                        Console.WriteLine(ex);
+                        Console.WriteLine($"[{clientData}] HandleClient failed\n{ex}");
                     }
                     finally
                     {
-                        cts.Cancel();
-                        OnClientDisconnected(clientData);
+                        //delay cancellation to allow processing of pending packets
+                        cts.CancelAfter(100);
+                        try
+                        {
+                            await Task.WhenAll(tasks);
+                        }
+                        catch(Exception ex)
+                        {
+                            Console.WriteLine($"[{clientData}] Exception during teardown\n{ex}");
+                        }
+                        finally
+                        {
+                            OnClientDisconnected(clientData);
+                        }                        
                     }
                 }
         }
