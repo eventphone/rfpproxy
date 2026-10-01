@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -87,8 +87,6 @@ namespace RfpProxyLib
             0xC, 0xFF, 0xFF, 0x5F, 0xFE, 0xCB, 7, 0xB9, 0x5F, 0x53,
             0x1D, 0x48, 0x3C
         };
-        private static readonly byte[] ByteOrderMark = {0xef, 0xbb, 0xbf};
-        private static readonly byte[] LineBreak = {13, 10};
 
         private readonly Stream _config;
         private readonly Dictionary<string, List<OmmConfEntry>> _sections;
@@ -116,10 +114,43 @@ namespace RfpProxyLib
         public async Task ParseAsync(CancellationToken cancellation)
         {
             _disposed = true;
-            using (var sr = new StreamReader(_config, Encoding.UTF8))
-            using (var md5 = MD5.Create())
+            byte[] raw;
+            using (var ms = new MemoryStream())
+
             {
-                md5.TransformBlock(ByteOrderMark, 0, ByteOrderMark.Length, null, 0);
+                await _config.CopyToAsync(ms, 81920, cancellation)
+                    .ConfigureAwait(false);
+                raw = ms.ToArray();
+            }
+
+            int checksumStart = raw.Length;
+            while (checksumStart > 0 &&
+                   (raw[checksumStart - 1] == (byte)'\r' ||
+                    raw[checksumStart - 1] == (byte)'\n'))
+                checksumStart--;
+            int checksumEnd = checksumStart;
+            while (checksumStart > 0 &&
+                   raw[checksumStart - 1] != (byte)'\r' &&
+                   raw[checksumStart - 1] != (byte)'\n')
+                checksumStart--;
+            if (checksumStart == checksumEnd)
+                throw new InvalidDataException("omm_conf has no checksum");
+
+            string checksum = Encoding.ASCII.GetString(raw, checksumStart, checksumEnd - checksumStart);
+            byte[] calculated;
+            using (var md5 = MD5.Create()) {
+                md5.TransformBlock(raw, 0, checksumStart, null, 0);
+                md5.TransformFinalBlock(HiddenMd5Data, 0, HiddenMd5Data.Length);
+                calculated = md5.Hash;
+            }
+
+            var calculatedChecksum = HexEncoding.ByteToHex(calculated);
+            if (!String.Equals(checksum, calculatedChecksum, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException($"invalid checksum (expected {checksum}, calculated {calculatedChecksum})");
+
+            using (var ms = new MemoryStream(raw, writable: false))
+            using (var sr = new StreamReader(ms, Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
+            {
                 string previous = null;
                 OmmConfHeader header = null;
                 while (!sr.EndOfStream)
@@ -143,18 +174,8 @@ namespace RfpProxyLib
                         var section = AddSection(data.Type);
                         section.Add(data);
                     }
-                    if (previous != null )
-                    {
-                        var bytes = Encoding.UTF8.GetBytes(previous);
-                        md5.TransformBlock(bytes, 0, bytes.Length, null, 0);
-                        md5.TransformBlock(LineBreak, 0, LineBreak.Length, null, 0);
-                    }
                     previous = current;
                 }
-                md5.TransformFinalBlock(HiddenMd5Data, 0, HiddenMd5Data.Length);
-                var checksum = HexEncoding.ByteToHex(md5.Hash);
-                if (previous != checksum)
-                    throw new InvalidDataException("invalid checksum");
             }
         }
 
